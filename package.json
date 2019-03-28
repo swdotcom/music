@@ -1,0 +1,16 @@
+{
+  "name": "@software/tempo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "keywords": [],
+  "author": "software",
+  "license": "ISC"
+  "devDependencies": {
+    "typescript": "3.4.0"
+  }
+}
