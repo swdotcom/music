@@ -1,0 +1,41 @@
+{
+    "name": "@software/tempo",
+    "version": "1.0.0",
+    "description": "music player controller",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "scripts": {
+        "build": "tsc",
+        "test": "npm run build && mocha --reporter spec"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/swdotcom/tempo.git"
+    },
+    "keywords": [
+        "music",
+        "player",
+        "spotify",
+        "itunes",
+        "controller",
+        "top",
+        "songs",
+        "recommendations",
+        "playlist"
+    ],
+    "author": "software",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/swdotcom/tempo/issues"
+    },
+    "homepage": "https://github.com/swdotcom/tempo#readme",
+    "devDependencies": {
+        "@types/node": "^11.12.1",
+        "chai": "^4.2.0",
+        "mocha": "^6.0.2",
+        "typescript": "^3.3.4000"
+    },
+    "dependencies": {
+        "applescript": "1.0.0"
+    }
+}
