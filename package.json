@@ -1,12 +1,12 @@
 {
-    "name": "@software/tempo",
+    "name": "@software/music",
     "version": "1.0.0",
     "description": "music player controller",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "scripts": {
-        "build": "tsc",
-        "test": "npm run build && mocha --reporter spec"
+        "build": "tsc && node packaging",
+        "test": "npm run build && mocha --reporter spec --timeout 5000"
     },
     "repository": {
         "type": "git",

@@ -14,33 +14,7 @@ export function isMac() {
     return process.platform.indexOf("darwin") !== -1;
 }
 
-export async function getCommandResult(cmd: string, maxLines: any = -1) {
-    let result: string = "";
-    let content: string = await execCmd(`${cmd}`, null);
-    if (!content) {
-        return result;
-    }
-    let contentList = content
-        .replace(/\r\n/g, "\r")
-        .replace(/\n/g, "\r")
-        .split(/\r/);
-    if (contentList && contentList.length > 0) {
-        let len =
-            maxLines !== -1
-                ? Math.min(contentList.length, maxLines)
-                : contentList.length;
-        for (let i = 0; i < len; i++) {
-            let line = contentList[i];
-            if (line && line.trim().length > 0) {
-                result = line.trim();
-                break;
-            }
-        }
-    }
-    return result;
-}
-
-async function execCmd(cmd: string, projectDir: any) {
+export async function execCmd(cmd: string, projectDir: any = null) {
     let result: any = null;
     try {
         let opts =
@@ -54,15 +28,23 @@ async function execCmd(cmd: string, projectDir: any) {
     return result;
 }
 
-function execPromise(command: string, opts: {}) {
-    return new Promise(function(resolve, reject) {
+async function execPromise(command: string, opts: {}) {
+    return new Promise((resolve, reject) => {
         exec(command, opts, (error: any, stdout: string, stderr: any) => {
             if (error) {
                 reject(error);
                 return;
             }
-
             resolve(stdout.trim());
         });
     });
+}
+
+// Sleep for the designated milliseconds.
+// It should not be used in lib but only in the test.
+// It has a max of 5 seconds as this is resource intensive
+export function sleep(delayInMillis: number) {
+    delayInMillis = Math.min(delayInMillis, 5000);
+    var start = new Date().getTime();
+    while (new Date().getTime() < start + delayInMillis);
 }

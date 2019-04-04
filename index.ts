@@ -14,9 +14,29 @@ export async function isItunesRunning() {
 }
 
 export async function stopSpotifyIfRunning() {
-    await musicCtr.stopPlayer(SPOTIFY_NAME);
+    return await musicCtr.stopPlayer(SPOTIFY_NAME);
 }
 
 export async function stopItunesIfRunning() {
-    await musicCtr.stopPlayer(ITUNES_NAME);
+    return await musicCtr.stopPlayer(ITUNES_NAME);
+}
+
+export async function startSpotifyIfNotRunning() {
+    await musicCtr.startPlayer(SPOTIFY_NAME);
+}
+
+export async function startItunesIfNotRunning() {
+    return await musicCtr.startPlayer(ITUNES_NAME);
+}
+
+export async function play(player: string) {
+    return await musicCtr.play(player);
+}
+
+export async function playTrackInContext(player: string, params: any[]) {
+    return await musicCtr.playTrackInContext(player, params);
+}
+
+export async function getState(player: string) {
+    return await musicCtr.getState(player);
 }
