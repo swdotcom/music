@@ -5,6 +5,7 @@ const util = require("../dist/lib/util.js");
 describe("get active music player function test", () => {
     beforeEach(async () => {
         await index.startSpotifyIfNotRunning();
+        await index.startItunesIfNotRunning();
         util.sleep(2000);
     });
 
@@ -20,7 +21,16 @@ describe("get active music player function test", () => {
 
         index.playTrackInContext("Spotify", params).then(() => {
             index.getState("Spotify").then(result => {
-                console.log("mocha result: ", result);
+                console.log("spotify playing result: ", result);
+                expect(true).to.equal(true);
+            });
+        });
+    });
+
+    it("expect to get the running and playing state for itunes", () => {
+        index.play("iTunes").then(() => {
+            index.getState("iTunes").then(result => {
+                console.log("itunes playing result: ", result);
                 expect(true).to.equal(true);
             });
         });

@@ -6,18 +6,6 @@ const fs = require("fs");
 export class MusicController {
     private scriptsPath: string = __dirname + "/scripts/";
 
-    private spotify_track_info: string =
-        'tell application "Spotify"\n' +
-        "set track_artist to artist of current track\n" +
-        "set track_album to album of current track\n" +
-        "set track_name to name of current track\n" +
-        "set track_duration to duration of current track\n" +
-        "set track_id to id of current track\n" +
-        "set track_state to player state\n" +
-        "set json to \"type='spotify';album='\" & track_album & \"';genre='';artist='\" & track_artist & \"';id='\" & track_id & \"';name='\" & track_name & \"';state='\" & track_state & \"';duration='\" & track_duration & \"'\"\n" +
-        "end tell\n" +
-        "return json\n";
-
     private itunes_scripts: any = {
         state: {
             file: "get_state.itunes.applescript"
@@ -26,10 +14,12 @@ export class MusicController {
         playPause: 'tell application "iTunes" to playpause',
         pause: 'tell application "iTunes" to pause',
         playTrackInContext:
-            'tell application "iTunes" to play track "%s" in context "%s"'
+            'tell application "iTunes" to play track "%s" of name "%s"'
     };
 
     private spotify_scripts: any = {
+        // state:
+        //     'tell application "Spotify" to get {artist, album, id, index, name, time} of the current track',
         state: {
             file: "get_state.spotify.applescript"
         },
@@ -84,7 +74,6 @@ export class MusicController {
             command = `osascript -e \'${script}\'`;
         }
         const result = await execCmd(command);
-        console.log("getCommandResult result: ", result);
         return result;
     }
 
