@@ -19,6 +19,7 @@ export class MusicController {
         playTrackInContext:
             'tell application "%s" to play track "%s" in context "%s"',
         play: 'tell application "%s" to play',
+        playTrack: 'tell application "%s" to play track %s',
         pause: 'tell application "%s" to pause',
         playPause: 'tell application "%s" to playpause',
         next: 'tell application "%s" to play (next track)',
@@ -83,6 +84,16 @@ export class MusicController {
         const result = await execCmd(command);
         // console.log("exec command result: ", result);
         return result;
+    }
+
+    playTrack(player: string, trackId: string) {
+        let params = null;
+        if (player === "Spotify") {
+            params = [`"${trackId}"`];
+        } else {
+            params = [`${trackId}`];
+        }
+        return this.execScript(player, "playTrack", params);
     }
 
     async run(player: string, scriptName: string) {

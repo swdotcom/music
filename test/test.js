@@ -109,6 +109,14 @@ describe("software music tests", () => {
             result = await index.getState("Spotify");
             expect(result.volume).to.be.within(volume - 1, volume + 1);
 
+            // play track
+            await index.playTrack(
+                "Spotify",
+                "spotify:track:6JEK0CvvjDjjMUBFoXShNZ"
+            );
+            result = await index.getState("Spotify");
+            console.log("spotify play track song: ", result.name);
+
             await index.stopSpotifyIfRunning();
 
             done();
@@ -169,6 +177,11 @@ describe("software music tests", () => {
             await index.unMute("iTunes");
             result = await index.getState("iTunes");
             expect(result.volume).to.equal(volume);
+
+            // play track
+            await index.playTrack("iTunes", 1);
+            result = await index.getState("iTunes");
+            console.log("iTunes play track song: ", result.name);
 
             await index.stopItunesIfRunning();
 

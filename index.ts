@@ -61,6 +61,10 @@ export function play(player: string) {
     return musicCtr.run(player, "play");
 }
 
+export function playTrack(player: string, trackId: string) {
+    return musicCtr.playTrack(player, trackId);
+}
+
 export function pause(player: string) {
     return musicCtr.run(player, "pause");
 }
