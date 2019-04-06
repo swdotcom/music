@@ -84,9 +84,16 @@ export function repeatOff(player: string) {
     return musicCtr.run(player, "repeatOff");
 }
 
+/**
+ * - spotify returns true or false, and itunes returns "off", "one", "all"
+ * @param player
+ */
 export async function isRepeating(player: string) {
-    let isRepeating = await musicCtr.run(player, "isRepeating");
-    return JSON.parse(isRepeating);
+    let val = await musicCtr.run(player, "isRepeating");
+    if (val.toLowerCase() === "true" || val.toLowerCase() === "false") {
+        return JSON.parse(val);
+    }
+    return val;
 }
 
 export function setVolume(player: string, volume: number) {
@@ -99,4 +106,12 @@ export function volumeUp(player: string, volume: number) {
 
 export function volumeDown(player: string, volume: number) {
     return musicCtr.run(player, "volumeDown");
+}
+
+export function mute(player: string) {
+    return musicCtr.run(player, "mute");
+}
+
+export function unMute(player: string) {
+    return musicCtr.run(player, "unMute");
 }

@@ -3,6 +3,7 @@ const util = require("util");
 
 export class MusicController {
     private scriptsPath: string = __dirname + "/scripts/";
+    private lastVolumeLevel: any = null;
 
     // applscript music commands and scripts
     private scripts: any = {
@@ -20,12 +21,14 @@ export class MusicController {
         play: 'tell application "%s" to play',
         pause: 'tell application "%s" to pause',
         playPause: 'tell application "%s" to playpause',
-        next: 'tell application "%s" to next track',
-        previous: 'tell application "%s" to previous track',
-        repeatOn: 'tell application "%s" to set repeating to true',
-        repeatOff: 'tell application "%s" to set repeating to false',
-        isRepeating: 'tell application "%s" to return repeating',
-        setVolume: 'tell application "%s" to set sound volume to %s'
+        next: 'tell application "%s" to %s track',
+        previous: 'tell application "%s" to %s track',
+        repeatOn: 'tell application "%s" to set %s to %s',
+        repeatOff: 'tell application "%s" to set %s to %s',
+        isRepeating: 'tell application "%s" to return %s',
+        setVolume: 'tell application "%s" to set sound volume to %s',
+        mute: 'tell application "%s" to set sound volume to 0',
+        unMute: 'tell application "%s" to set sound volume to %'
     };
 
     async isMusicPlayerActive(player: string) {
@@ -82,11 +85,47 @@ export class MusicController {
         return result;
     }
 
-    run(player: string, scriptName: string) {
-        return this.execScript(player, scriptName);
+    async run(player: string, scriptName: string) {
+        let params = null;
+        if (player === "Spotify") {
+            if (scriptName === "repeatOn") {
+                params = ["repeating", "true"];
+            } else if (scriptName === "repeatOff") {
+                params = ["repeating", "false"];
+            } else if (scriptName === "isRepeating") {
+                params = ["repeating"];
+            } else if (scriptName === "next") {
+                params = ["next"];
+            } else if (scriptName === "previous") {
+                params = ["previous"];
+            }
+        } else if (player === "iTunes") {
+            if (scriptName === "repeatOn") {
+                params = ["song repeat", "on"];
+            } else if (scriptName === "repeatOff") {
+                params = ["song repeat", "off"];
+            } else if (scriptName === "isRepeating") {
+                params = ["song repeat"];
+            } else if (scriptName === "next") {
+                params = ["play next"];
+            } else if (scriptName === "previous") {
+                params = ["play previous"];
+            }
+        }
+
+        if (scriptName === "mute") {
+            // get the current volume state
+            let stateResult = await this.execScript(player, "state");
+            let json = JSON.parse(stateResult);
+            this.lastVolumeLevel = json.volume;
+        } else if (scriptName === "unMute") {
+            params = [this.lastVolumeLevel];
+        }
+        return this.execScript(player, scriptName, params);
     }
 
     setVolume(player: string, volume: number) {
+        this.lastVolumeLevel = volume;
         return this.execScript(player, "setVolume", [volume]);
     }
 

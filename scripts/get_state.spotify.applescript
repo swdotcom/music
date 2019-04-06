@@ -7,18 +7,22 @@ on escape_quotes(string_to_escape)
 	return string_to_escape
 end escape_quotes
 
-tell application "Spotify"
-	set ctrack to "{"
-	set ctrack to ctrack & "\"artist\": \"" & my escape_quotes(current track's artist) & "\""
-	set ctrack to ctrack & ",\"album\": \"" & my escape_quotes(current track's album) & "\""
-	set ctrack to ctrack & ",\"genre\": \"\""
-	set ctrack to ctrack & ",\"disc_number\": " & current track's disc number
-	set ctrack to ctrack & ",\"duration\": " & current track's duration
-	set ctrack to ctrack & ",\"played_count\": " & current track's played count
-	set ctrack to ctrack & ",\"track_number\": " & current track's track number
-	set ctrack to ctrack & ",\"id\": \"" & current track's id & "\""
-	set ctrack to ctrack & ",\"name\": \"" & my escape_quotes(current track's name) & "\""
-	set ctrack to ctrack & ",\"state\":\"" & player state & "\""
-	set ctrack to ctrack & ",\"volume\": " & sound volume
-	set ctrack to ctrack & "}"
-end tell
+try
+	tell application "Spotify"
+		set t_info to "{"
+		set t_info to t_info & "\"artist\": \"" & my escape_quotes(current track's artist) & "\""
+		set t_info to t_info & ",\"album\": \"" & my escape_quotes(current track's album) & "\""
+		set t_info to t_info & ",\"genre\": \"\""
+		set t_info to t_info & ",\"disc_number\": " & current track's disc number
+		set t_info to t_info & ",\"duration\": " & current track's duration
+		set t_info to t_info & ",\"played_count\": " & current track's played count
+		set t_info to t_info & ",\"track_number\": " & current track's track number
+		set t_info to t_info & ",\"id\": \"" & current track's id & "\""
+		set t_info to t_info & ",\"name\": \"" & my escape_quotes(current track's name) & "\""
+		set t_info to t_info & ",\"state\":\"" & player state & "\""
+		set t_info to t_info & ",\"volume\": " & sound volume
+		set t_info to t_info & "}"
+	end tell
+on error
+	return "{}"
+end try

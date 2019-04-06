@@ -8,11 +8,7 @@ describe("software music tests", () => {
     });
 
     after(done => {
-        index.stopItunesIfRunning().then(result => {
-            index.stopSpotifyIfRunning().then(result => {
-                done();
-            });
-        });
+        done();
     });
 
     // example result
@@ -56,7 +52,7 @@ describe("software music tests", () => {
         });
     });
 
-    it("Tell Spotify To Perform Next, Repeat, Previous, Pause, Shuffle", done => {
+    it("Tell Spotify To Perform Next, Repeat, Previous, Pause, Shuffle, Volume Change", done => {
         index.startSpotifyIfNotRunning().then(async () => {
             util.sleep(1000);
             let params = [
@@ -102,6 +98,62 @@ describe("software music tests", () => {
             // check
             result = await index.getState("Spotify");
             expect(result.volume).to.be.greaterThan(5);
+            await index.stopSpotifyIfRunning();
+
+            // TODO: test mute and unMute
+
+            done();
+        });
+    });
+
+    it("Tell Itunes To Perform Next, Repeat, Previous, Pause, Shuffle, Volume Change", done => {
+        index.startSpotifyIfNotRunning().then(async () => {
+            util.sleep(1000);
+            await index.play("iTunes");
+            util.sleep(1000);
+
+            let result = await index.getState("iTunes");
+            // make sure it's playing
+            expect(result.state).to.equal("playing");
+            let songName = result.name;
+
+            // go to the next song
+            await index.next("iTunes");
+            // check
+            result = await index.getState("Spotify");
+            expect(result.name).to.not.equal(songName);
+            songName = result.name;
+            // pause it
+            await index.pause("iTunes");
+            // check
+            result = await index.getState("iTunes");
+            expect(result.state).to.equal("paused");
+            // go to previous
+            await index.previous("iTunes");
+            // check
+            result = await index.getState("iTunes");
+            expect(result.name).to.not.equal(songName);
+            songName = result.name;
+            // turn repeat on
+            await index.repeatOn("iTunes");
+            result = await index.getState("iTunes");
+            // check
+            result = await index.isRepeating("iTunes");
+            expect(result).to.equal("one");
+            // turn repeat off
+            await index.repeatOff("iTunes");
+            // check
+            result = await index.isRepeating("iTunes");
+            expect(result).to.equal("off");
+            // up the volume
+            await index.volumeUp("iTunes");
+            // check
+            result = await index.getState("iTunes");
+            expect(result.volume).to.be.greaterThan(5);
+            await index.stopItunesIfRunning();
+
+            // TODO: test mute and unMute
+
             done();
         });
     });
