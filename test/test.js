@@ -97,10 +97,19 @@ describe("software music tests", () => {
             await index.volumeUp("Spotify");
             // check
             result = await index.getState("Spotify");
-            expect(result.volume).to.be.greaterThan(5);
-            await index.stopSpotifyIfRunning();
+            const volume = result.volume;
+            expect(volume).to.be.greaterThan(5);
 
-            // TODO: test mute and unMute
+            // mute and unmute tests
+            await index.mute("Spotify");
+            result = await index.getState("Spotify");
+            expect(result.volume).to.equal(0);
+
+            await index.unMute("Spotify");
+            result = await index.getState("Spotify");
+            expect(result.volume).to.be.within(volume - 1, volume + 1);
+
+            await index.stopSpotifyIfRunning();
 
             done();
         });
@@ -149,10 +158,19 @@ describe("software music tests", () => {
             await index.volumeUp("iTunes");
             // check
             result = await index.getState("iTunes");
-            expect(result.volume).to.be.greaterThan(5);
-            await index.stopItunesIfRunning();
+            const volume = result.volume;
+            expect(volume).to.be.greaterThan(5);
 
-            // TODO: test mute and unMute
+            // mute and unmute tests
+            await index.mute("iTunes");
+            result = await index.getState("iTunes");
+            expect(result.volume).to.equal(0);
+
+            await index.unMute("iTunes");
+            result = await index.getState("iTunes");
+            expect(result.volume).to.equal(volume);
+
+            await index.stopItunesIfRunning();
 
             done();
         });

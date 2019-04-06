@@ -1,4 +1,5 @@
 import { MusicController } from "./lib/controller";
+import { isBooleanString } from "./lib/util";
 
 const SPOTIFY_NAME = "Spotify";
 const ITUNES_NAME = "iTunes";
@@ -90,7 +91,7 @@ export function repeatOff(player: string) {
  */
 export async function isRepeating(player: string) {
     let val = await musicCtr.run(player, "isRepeating");
-    if (val.toLowerCase() === "true" || val.toLowerCase() === "false") {
+    if (isBooleanString(val)) {
         return JSON.parse(val);
     }
     return val;

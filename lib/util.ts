@@ -14,6 +14,16 @@ export function isMac() {
     return process.platform.indexOf("darwin") !== -1;
 }
 
+export function isBooleanString(val: string) {
+    if (
+        (val && val.toLowerCase() === "true") ||
+        val.toLowerCase() === "false"
+    ) {
+        return true;
+    }
+    return false;
+}
+
 export async function execCmd(cmd: string, projectDir: any = null) {
     let result: any = null;
     try {

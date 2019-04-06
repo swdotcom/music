@@ -21,14 +21,14 @@ export class MusicController {
         play: 'tell application "%s" to play',
         pause: 'tell application "%s" to pause',
         playPause: 'tell application "%s" to playpause',
-        next: 'tell application "%s" to %s track',
-        previous: 'tell application "%s" to %s track',
+        next: 'tell application "%s" to play (next track)',
+        previous: 'tell application "%s" to play (previous track)',
         repeatOn: 'tell application "%s" to set %s to %s',
         repeatOff: 'tell application "%s" to set %s to %s',
         isRepeating: 'tell application "%s" to return %s',
         setVolume: 'tell application "%s" to set sound volume to %s',
         mute: 'tell application "%s" to set sound volume to 0',
-        unMute: 'tell application "%s" to set sound volume to %'
+        unMute: 'tell application "%s" to set sound volume to %s'
     };
 
     async isMusicPlayerActive(player: string) {
@@ -87,6 +87,7 @@ export class MusicController {
 
     async run(player: string, scriptName: string) {
         let params = null;
+
         if (player === "Spotify") {
             if (scriptName === "repeatOn") {
                 params = ["repeating", "true"];
@@ -94,22 +95,17 @@ export class MusicController {
                 params = ["repeating", "false"];
             } else if (scriptName === "isRepeating") {
                 params = ["repeating"];
-            } else if (scriptName === "next") {
-                params = ["next"];
-            } else if (scriptName === "previous") {
-                params = ["previous"];
             }
         } else if (player === "iTunes") {
             if (scriptName === "repeatOn") {
-                params = ["song repeat", "on"];
+                // repeat one for itunes
+                params = ["song repeat", "one"];
             } else if (scriptName === "repeatOff") {
+                // repeat off for itunes
                 params = ["song repeat", "off"];
             } else if (scriptName === "isRepeating") {
+                // get the song repeat value
                 params = ["song repeat"];
-            } else if (scriptName === "next") {
-                params = ["play next"];
-            } else if (scriptName === "previous") {
-                params = ["play previous"];
             }
         }
 
@@ -120,6 +116,13 @@ export class MusicController {
             this.lastVolumeLevel = json.volume;
         } else if (scriptName === "unMute") {
             params = [this.lastVolumeLevel];
+        } else if (scriptName === "next" || scriptName === "previous") {
+            // make sure it's not on repeat
+            if (player === "Spotify") {
+                await this.execScript(player, "state", ["repeating", "false"]);
+            } else {
+                await this.execScript(player, "state", ["song repeat", "off"]);
+            }
         }
         return this.execScript(player, scriptName, params);
     }
