@@ -6,28 +6,15 @@ const fs = require("fs");
 export class MusicController {
     private scriptsPath: string = __dirname + "/scripts/";
 
-    private itunes_scripts: any = {
+    private scripts: any = {
         state: {
-            file: "get_state.itunes.applescript"
+            file: "get_state.%s.applescript"
         },
-        play: 'tell application "iTunes" to play',
-        playPause: 'tell application "iTunes" to playpause',
-        pause: 'tell application "iTunes" to pause',
+        play: 'tell application "%s" to play',
+        playPause: 'tell application "%s" to playpause',
+        pause: 'tell application "%s" to pause',
         playTrackInContext:
-            'tell application "iTunes" to play track "%s" of name "%s"'
-    };
-
-    private spotify_scripts: any = {
-        // state:
-        //     'tell application "Spotify" to get {artist, album, id, index, name, time} of the current track',
-        state: {
-            file: "get_state.spotify.applescript"
-        },
-        play: 'tell application "Spotify" to play',
-        playPause: 'tell application "Spotify" to playpause',
-        pause: 'tell application "Spotify" to pause',
-        playTrackInContext:
-            'tell application "Spotify" to play track "%s" in context "%s"'
+            'tell application "%s" to play track "%s" in context "%s"'
     };
 
     async isMusicPlayerActive(player: string) {
@@ -37,14 +24,6 @@ export class MusicController {
             return { status: "ok", value: true };
         }
         return { status: "ok", value: true };
-    }
-
-    getScript(player: string, script: string) {
-        if (player.toLowerCase() === "spotify") {
-            return this.spotify_scripts[script];
-        } else {
-            return this.itunes_scripts[script];
-        }
     }
 
     async stopPlayer(player: string) {
@@ -59,18 +38,30 @@ export class MusicController {
     }
 
     async execScript(player: string, scriptName: string, params: any = null) {
-        let script = this.getScript(player, scriptName);
+        // let script = this.getScript(player, scriptName);
+        let script = this.scripts[scriptName];
+
+        if (!params) {
+            // set player to the params
+            params = [player];
+        } else {
+            // push the player to the front of the params array
+            params.unshift(player);
+        }
 
         let command = "";
         if (script.file) {
-            let file = `${this.scriptsPath}${script.file}`;
+            // apply the params (which should only have the player name)
+            const scriptFile = util.format.apply(
+                util,
+                [script.file].concat(params)
+            );
+            let file = `${this.scriptsPath}${scriptFile}`;
             command = `osascript ${file}`;
             // script = fs.readFileSync(file).toString();
         } else {
-            if (params) {
-                // apply them to the script
-                script = util.format.apply(util, [script].concat(params));
-            }
+            // apply the params to the script
+            script = util.format.apply(util, [script].concat(params));
             command = `osascript -e \'${script}\'`;
         }
         const result = await execCmd(command);

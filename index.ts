@@ -33,6 +33,10 @@ export async function play(player: string) {
     return await musicCtr.play(player);
 }
 
+export async function pause(player: string) {
+    return await musicCtr.pause(player);
+}
+
 export async function playTrackInContext(player: string, params: any[]) {
     return await musicCtr.playTrackInContext(player, params);
 }
