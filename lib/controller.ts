@@ -1,20 +1,22 @@
 import { execCmd } from "./util";
-const applescript = require("applescript");
 const util = require("util");
 const fs = require("fs");
 
 export class MusicController {
     private scriptsPath: string = __dirname + "/scripts/";
 
+    // applscript music commands and scripts
     private scripts: any = {
         state: {
             file: "get_state.%s.applescript"
         },
-        play: 'tell application "%s" to play',
-        playPause: 'tell application "%s" to playpause',
-        pause: 'tell application "%s" to pause',
         playTrackInContext:
-            'tell application "%s" to play track "%s" in context "%s"'
+            'tell application "%s" to play track "%s" in context "%s"',
+        play: 'tell application "%s" to play',
+        pause: 'tell application "%s" to pause',
+        playPause: 'tell application "%s" to playpause',
+        next: 'tell application "%s" to next track',
+        previous: 'tell application "%s" to previous track'
     };
 
     async isMusicPlayerActive(player: string) {
@@ -50,6 +52,7 @@ export class MusicController {
         }
 
         let command = "";
+        // get the script file if the attribut has one
         if (script.file) {
             // apply the params (which should only have the player name)
             const scriptFile = util.format.apply(
@@ -60,44 +63,20 @@ export class MusicController {
             command = `osascript ${file}`;
             // script = fs.readFileSync(file).toString();
         } else {
-            // apply the params to the script
+            // apply the params to the one line script
             script = util.format.apply(util, [script].concat(params));
             command = `osascript -e \'${script}\'`;
         }
         const result = await execCmd(command);
+        // console.log("exec command result: ", result);
         return result;
     }
 
-    applescriptCallback(err: any, value: any) {
-        if (err) {
-            console.log("error: ", err);
-            // Something went wrong!
-            return { status: "error", value: err.message };
-        } else if (value) {
-            console.log("result: ", value);
-            return { status: "ok", value };
-        }
-        return { status: "ok", value: "" };
+    run(player: string, scriptName: string) {
+        return this.execScript(player, scriptName);
     }
 
-    async play(player: string) {
-        return await this.execScript(player, "play");
-    }
-
-    async pause(player: string) {
-        return await this.execScript(player, "pause");
-    }
-
-    async playPause(player: string) {
-        return await this.execScript(player, "playPause");
-    }
-
-    async playTrackInContext(player: string, params: any[]) {
-        return await this.execScript(player, "playTrackInContext", params);
-    }
-
-    async getState(player: string) {
-        let result = await this.execScript(player, "state");
-        return result;
+    playTrackInContext(player: string, params: any[]) {
+        return this.execScript(player, "playTrackInContext", params);
     }
 }

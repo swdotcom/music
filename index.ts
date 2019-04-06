@@ -29,18 +29,49 @@ export async function startItunesIfNotRunning() {
     return await musicCtr.startPlayer(ITUNES_NAME);
 }
 
-export async function play(player: string) {
-    return await musicCtr.play(player);
-}
-
-export async function pause(player: string) {
-    return await musicCtr.pause(player);
-}
-
-export async function playTrackInContext(player: string, params: any[]) {
-    return await musicCtr.playTrackInContext(player, params);
-}
-
+/**
+ * - Spotify does not return a "genre"
+ * - duration is in milliseconds
+ * @param player
+ * @returns {artist, album, genre, disc_number, duration, played_count, track_number, id, name, state}
+ */
 export async function getState(player: string) {
-    return await musicCtr.getState(player);
+    const state = await musicCtr.run(player, "state");
+    if (state) {
+        return JSON.parse(state);
+    }
+    return null;
+}
+
+/**
+ *
+ * @param player
+ * @param params (e.g. ["spotify:track:0R8P9KfGJCDULmlEoBagcO", "spotify:album:6ZG5lRT77aJ3btmArcykra"]
+ */
+export function playTrackInContext(player: string, params: any[]) {
+    return musicCtr.playTrackInContext(player, params);
+}
+
+//
+// Sinngle line scripts that only require the player (Spotify or iTunes)
+//
+
+export function play(player: string) {
+    return musicCtr.run(player, "play");
+}
+
+export function pause(player: string) {
+    return musicCtr.run(player, "pause");
+}
+
+export function playPause(player: string) {
+    return musicCtr.run(player, "playPause");
+}
+
+export function next(player: string) {
+    return musicCtr.run(player, "next");
+}
+
+export function previous(player: string) {
+    return musicCtr.run(player, "previous");
 }

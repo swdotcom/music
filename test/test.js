@@ -3,12 +3,16 @@ const index = require("../dist/index.js");
 const util = require("../dist/lib/util.js");
 
 describe("software music tests", () => {
-    beforeEach(async () => {
-        //
+    beforeEach(done => {
+        done();
     });
 
-    after(async () => {
-        //
+    after(done => {
+        index.stopItunesIfRunning().then(result => {
+            index.stopSpotifyIfRunning().then(result => {
+                done();
+            });
+        });
     });
 
     // example result
@@ -26,15 +30,9 @@ describe("software music tests", () => {
             index.playTrackInContext("Spotify", params).then(() => {
                 util.sleep(1000);
                 index.getState("Spotify").then(result => {
-                    try {
-                        let obj = JSON.parse(result);
-                        expect(obj.artist).to.equal("Coldplay");
-                    } catch (e) {
-                        console.log("use case error: ", e.message);
-                    } finally {
-                        index.stopSpotifyIfRunning();
-                        done();
-                    }
+                    expect(result.artist).to.equal("Coldplay");
+                    expect(result.name).to.equal("Trouble");
+                    done();
                 });
             });
         });
@@ -50,15 +48,11 @@ describe("software music tests", () => {
             index.play("iTunes").then(() => {
                 util.sleep(1000);
                 index.getState("iTunes").then(result => {
-                    try {
-                        let obj = JSON.parse(result);
-                        expect(obj.artist).to.not.equal(null);
-                    } catch (e) {
-                        console.log("use case error: ", e.message);
-                    } finally {
-                        index.stopItunesIfRunning();
-                        done();
-                    }
+                    expect(result.artist).to.not.equal(null);
+                    // since we were successful, pause it.
+                    // this isn't part of the test, just turning off music.
+                    index.pause("iTunes");
+                    done();
                 });
             });
         });
@@ -76,26 +70,72 @@ describe("software music tests", () => {
                 util.sleep(1000);
                 index.getState("Spotify").then(result => {
                     try {
-                        let obj = JSON.parse(result);
-                        expect(obj.state).to.equal("playing");
+                        expect(result.state).to.equal("playing");
                     } catch (e) {
                         console.log("use case error: ", e.message);
-                        index.stopSpotifyIfRunning();
                         done();
                     }
                     // pause it
                     index.pause("Spotify").then(result => {
                         util.sleep(1000);
                         index.getState("Spotify").then(result => {
-                            try {
-                                let obj = JSON.parse(result);
-                                expect(obj.state).to.equal("paused");
-                            } catch (e) {
-                                console.log("use case error: ", e.message);
-                            } finally {
-                                index.stopSpotifyIfRunning();
-                                done();
-                            }
+                            expect(result.state).to.equal("paused");
+                            done();
+                        });
+                    });
+                });
+            });
+        });
+    });
+
+    it("Get Spotify Play Paused State", done => {
+        index.startSpotifyIfNotRunning().then(() => {
+            util.sleep(2000);
+            let params = [
+                "spotify:track:0R8P9KfGJCDULmlEoBagcO",
+                "spotify:album:6ZG5lRT77aJ3btmArcykra"
+            ];
+
+            index.playTrackInContext("Spotify", params).then(() => {
+                util.sleep(1000);
+                index.getState("Spotify").then(result => {
+                    // make sure it's playing
+                    expect(result.state).to.equal("playing");
+
+                    // pause it
+                    index.playPause("Spotify").then(result => {
+                        util.sleep(1000);
+                        index.getState("Spotify").then(result => {
+                            expect(result.state).to.equal("paused");
+                            done();
+                        });
+                    });
+                });
+            });
+        });
+    });
+
+    it("Go to Next Spotify Track", done => {
+        index.startSpotifyIfNotRunning().then(() => {
+            util.sleep(2000);
+            let params = [
+                "spotify:track:0R8P9KfGJCDULmlEoBagcO",
+                "spotify:album:6ZG5lRT77aJ3btmArcykra"
+            ];
+
+            index.playTrackInContext("Spotify", params).then(() => {
+                util.sleep(1000);
+                index.getState("Spotify").then(result => {
+                    // make sure it's playing
+                    expect(result.state).to.equal("playing");
+                    expect(result.name).to.equal("Trouble");
+
+                    // pause it
+                    index.next("Spotify").then(result => {
+                        util.sleep(1000);
+                        index.getState("Spotify").then(result => {
+                            expect(result.name).not.equal("Trouble");
+                            done();
                         });
                     });
                 });

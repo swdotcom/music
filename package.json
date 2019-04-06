@@ -36,7 +36,5 @@
         "typescript": "^3.3.4000",
         "@types/mocha": "^5.2.6"
     },
-    "dependencies": {
-        "applescript": "1.0.0"
-    }
+    "dependencies": {}
 }
