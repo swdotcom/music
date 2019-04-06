@@ -134,7 +134,35 @@ describe("software music tests", () => {
                     index.next("Spotify").then(result => {
                         util.sleep(1000);
                         index.getState("Spotify").then(result => {
-                            expect(result.name).not.equal("Trouble");
+                            expect(result.name).to.equal("Parachutes");
+                            done();
+                        });
+                    });
+                });
+            });
+        });
+    });
+
+    it("Go to Previous Spotify Track", done => {
+        index.startSpotifyIfNotRunning().then(() => {
+            util.sleep(2000);
+            let params = [
+                "spotify:track:0R8P9KfGJCDULmlEoBagcO",
+                "spotify:album:6ZG5lRT77aJ3btmArcykra"
+            ];
+
+            index.playTrackInContext("Spotify", params).then(() => {
+                util.sleep(1000);
+                index.getState("Spotify").then(result => {
+                    // make sure it's playing
+                    expect(result.state).to.equal("playing");
+                    expect(result.name).to.equal("Trouble");
+
+                    // pause it
+                    index.previous("Spotify").then(result => {
+                        util.sleep(1000);
+                        index.getState("Spotify").then(result => {
+                            expect(result.name).to.equal("Yellow");
                             done();
                         });
                     });

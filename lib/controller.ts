@@ -1,6 +1,5 @@
 import { execCmd } from "./util";
 const util = require("util");
-const fs = require("fs");
 
 export class MusicController {
     private scriptsPath: string = __dirname + "/scripts/";
