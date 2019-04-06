@@ -9,13 +9,23 @@ export class MusicController {
         state: {
             file: "get_state.%s.applescript"
         },
+        volumeUp: {
+            file: "volume_up.%s.applescript"
+        },
+        volumeDown: {
+            file: "volume_down.%s.applescript"
+        },
         playTrackInContext:
             'tell application "%s" to play track "%s" in context "%s"',
         play: 'tell application "%s" to play',
         pause: 'tell application "%s" to pause',
         playPause: 'tell application "%s" to playpause',
         next: 'tell application "%s" to next track',
-        previous: 'tell application "%s" to previous track'
+        previous: 'tell application "%s" to previous track',
+        repeatOn: 'tell application "%s" to set repeating to true',
+        repeatOff: 'tell application "%s" to set repeating to false',
+        isRepeating: 'tell application "%s" to return repeating',
+        setVolume: 'tell application "%s" to set sound volume to %s'
     };
 
     async isMusicPlayerActive(player: string) {
@@ -64,6 +74,7 @@ export class MusicController {
         } else {
             // apply the params to the one line script
             script = util.format.apply(util, [script].concat(params));
+            console.log("script to use: ", script);
             command = `osascript -e \'${script}\'`;
         }
         const result = await execCmd(command);
@@ -73,6 +84,10 @@ export class MusicController {
 
     run(player: string, scriptName: string) {
         return this.execScript(player, scriptName);
+    }
+
+    setVolume(player: string, volume: number) {
+        return this.execScript(player, "setVolume", [volume]);
     }
 
     playTrackInContext(player: string, params: any[]) {

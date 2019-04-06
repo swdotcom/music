@@ -6,7 +6,7 @@
     "types": "dist/index.d.ts",
     "scripts": {
         "build": "tsc && node packaging",
-        "test": "npm run build && mocha --reporter spec --timeout 6000"
+        "test": "npm run build && mocha --reporter spec --timeout 20000"
     },
     "repository": {
         "type": "git",

@@ -75,3 +75,28 @@ export function next(player: string) {
 export function previous(player: string) {
     return musicCtr.run(player, "previous");
 }
+
+export function repeatOn(player: string) {
+    return musicCtr.run(player, "repeatOn");
+}
+
+export function repeatOff(player: string) {
+    return musicCtr.run(player, "repeatOff");
+}
+
+export async function isRepeating(player: string) {
+    let isRepeating = await musicCtr.run(player, "isRepeating");
+    return JSON.parse(isRepeating);
+}
+
+export function setVolume(player: string, volume: number) {
+    return musicCtr.setVolume(player, volume);
+}
+
+export function volumeUp(player: string, volume: number) {
+    return musicCtr.run(player, "volumeUp");
+}
+
+export function volumeDown(player: string, volume: number) {
+    return musicCtr.run(player, "volumeDown");
+}

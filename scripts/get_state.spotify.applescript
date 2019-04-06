@@ -19,5 +19,6 @@ tell application "Spotify"
 	set ctrack to ctrack & ",\"id\": \"" & current track's id & "\""
 	set ctrack to ctrack & ",\"name\": \"" & my escape_quotes(current track's name) & "\""
 	set ctrack to ctrack & ",\"state\":\"" & player state & "\""
+	set ctrack to ctrack & ",\"volume\": " & sound volume
 	set ctrack to ctrack & "}"
 end tell
