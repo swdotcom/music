@@ -1,4 +1,4 @@
-# spotify-node-applescript
+# @software/music
 
 Control Spotify and iTunes on Mac OSX with NodeJS.
 
