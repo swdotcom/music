@@ -1,4 +1,4 @@
-import { execCmd } from "./util";
+import { execCmd, getNormalizedPlayerName } from "./util";
 const util = require("util");
 
 export class MusicController {
@@ -35,6 +35,7 @@ export class MusicController {
     };
 
     async isMusicPlayerActive(player: string) {
+        player = getNormalizedPlayerName(player);
         const command = `pgrep -x ${player}`;
         // this returns the PID of the requested player
         const result = await execCmd(command);
@@ -45,18 +46,20 @@ export class MusicController {
     }
 
     async stopPlayer(player: string) {
+        player = getNormalizedPlayerName(player);
         const command = `pgrep -x ${player} | xargs kill -9`;
         return await execCmd(command);
     }
 
     async startPlayer(player: string) {
+        player = getNormalizedPlayerName(player);
         const command = `open -a ${player}`;
         const result = await execCmd(command);
         return result;
     }
 
     async execScript(player: string, scriptName: string, params: any = null) {
-        // let script = this.getScript(player, scriptName);
+        player = getNormalizedPlayerName(player);
         let script = this.scripts[scriptName];
 
         if (!params) {

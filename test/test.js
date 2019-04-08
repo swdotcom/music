@@ -163,6 +163,8 @@ describe("software music tests", () => {
             result = await music.isShuffling("Spotify");
             expect(result).to.equal(true);
 
+            await music.stopSpotifyIfRunning();
+
             done();
         });
     });
@@ -230,6 +232,8 @@ describe("software music tests", () => {
             await music.setShufflingOn("iTunes");
             result = await music.isShuffling("iTunes");
             expect(result).to.equal(true);
+
+            await music.stopItunesIfRunning();
 
             done();
         });

@@ -58,3 +58,12 @@ export function sleep(delayInMillis: number) {
     var start = new Date().getTime();
     while (new Date().getTime() < start + delayInMillis);
 }
+
+export function getNormalizedPlayerName(player: string) {
+    if (!player || player.trim().length === 0) {
+        player = "Spotify";
+        return player;
+    }
+    player = player.trim().toLowerCase();
+    return player.charAt(0).toUpperCase() + player.slice(1);
+}

@@ -20,7 +20,7 @@ $ npm test
 
 Play a track with Music URI `uri`.
 
-Specify either Spotify or iTunes, it's case-insensitive.
+Specify either "Spotify" or "iTunes" (case-insensitive).
 
 ```javascript
 const music = require("@software/music");
