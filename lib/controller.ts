@@ -38,13 +38,9 @@ export class MusicController {
         const command = `pgrep -x ${player}`;
         // this returns the PID of the requested player
         const result = await execCmd(command);
-        if (result) {
-            console.log(
-                `music player ${player} is active with result ${result}`
-            );
+        if (result && !result.error) {
             return true;
         }
-        console.log(`music player ${player} is not active`);
         return false;
     }
 
@@ -85,7 +81,7 @@ export class MusicController {
         } else {
             // apply the params to the one line script
             script = util.format.apply(util, [script].concat(params));
-            console.log("script to use: ", script);
+            // console.log("script to use: ", script);
             command = `osascript -e \'${script}\'`;
         }
         const result = await execCmd(command);

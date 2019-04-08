@@ -35,16 +35,20 @@ describe("software music tests", () => {
     });
 
     it("Should Show Spotify Is Not Running", done => {
-        index.isSpotifyRunning().then(result => {
-            expect(result).to.equal(false);
-            done();
+        index.stopSpotifyIfRunning().then(() => {
+            index.isSpotifyRunning().then(result => {
+                expect(result).to.equal(false);
+                done();
+            });
         });
     });
 
     it("Should Show Itunes Is Not Running", done => {
-        index.isItunesRunning().then(result => {
-            expect(result).to.equal(false);
-            done();
+        index.stopItunesIfRunning().then(() => {
+            index.isItunesRunning().then(result => {
+                expect(result).to.equal(false);
+                done();
+            });
         });
     });
 
