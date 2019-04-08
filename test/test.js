@@ -2,13 +2,44 @@ const expect = require("chai").expect;
 const index = require("../dist/index.js");
 const util = require("../dist/lib/util.js");
 
+/**
+ * Don't add "async" into the it condition.
+ * i.e. it("description text", async (done) => {
+ *     // do stuff
+ * });
+ * It will return the following error if you do.
+ * "Error: Resolution method is overspecified. Specify a callback *or* return a Promise; not both."
+ */
 describe("software music tests", () => {
     beforeEach(done => {
         done();
     });
 
     after(done => {
-        done();
+        // make sure both players have been killed
+        index.stopSpotifyIfRunning().then(() => {
+            index.stopItunesIfRunning().then(() => {
+                done();
+            });
+        });
+    });
+
+    it("Should Show Spotify Is Not Running", done => {
+        index.stopSpotifyIfRunning().then(() => {
+            index.isSpotifyRunning().then(result => {
+                expect(result).to.equal(false);
+                done();
+            });
+        });
+    });
+
+    it("Should Show Itunes Is Not Running", done => {
+        index.stopItunesIfRunning().then(() => {
+            index.isItunesRunning().then(result => {
+                expect(result).to.equal(false);
+                done();
+            });
+        });
     });
 
     // example result
@@ -122,8 +153,6 @@ describe("software music tests", () => {
             result = await index.isShuffling("Spotify");
             expect(result).to.equal(true);
 
-            await index.stopSpotifyIfRunning();
-
             done();
         });
     });
@@ -192,8 +221,6 @@ describe("software music tests", () => {
             await index.setShufflingOn("iTunes");
             result = await index.isShuffling("iTunes");
             expect(result).to.equal(true);
-
-            await index.stopItunesIfRunning();
 
             done();
         });

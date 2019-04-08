@@ -6,28 +6,32 @@ const ITUNES_NAME = "iTunes";
 
 const musicCtr = new MusicController();
 
-export async function isSpotifyRunning() {
-    return await musicCtr.isMusicPlayerActive(SPOTIFY_NAME);
+export function isSpotifyRunning() {
+    return isRunning(SPOTIFY_NAME);
 }
 
-export async function isItunesRunning() {
-    return await musicCtr.isMusicPlayerActive(ITUNES_NAME);
+export function isItunesRunning() {
+    return isRunning(ITUNES_NAME);
 }
 
-export async function stopSpotifyIfRunning() {
-    return await musicCtr.stopPlayer(SPOTIFY_NAME);
+export async function isRunning(player: string) {
+    return await musicCtr.isMusicPlayerActive(player);
 }
 
-export async function stopItunesIfRunning() {
-    return await musicCtr.stopPlayer(ITUNES_NAME);
+export function stopSpotifyIfRunning() {
+    return musicCtr.stopPlayer(SPOTIFY_NAME);
 }
 
-export async function startSpotifyIfNotRunning() {
-    await musicCtr.startPlayer(SPOTIFY_NAME);
+export function stopItunesIfRunning() {
+    return musicCtr.stopPlayer(ITUNES_NAME);
 }
 
-export async function startItunesIfNotRunning() {
-    return await musicCtr.startPlayer(ITUNES_NAME);
+export function startSpotifyIfNotRunning() {
+    return musicCtr.startPlayer(SPOTIFY_NAME);
+}
+
+export function startItunesIfNotRunning() {
+    return musicCtr.startPlayer(ITUNES_NAME);
 }
 
 /**
@@ -98,7 +102,7 @@ export function setShufflingOff(player: string) {
 }
 
 export async function isShuffling(player: string) {
-    let val = await musicCtr.run(player, "isShuffling");
+    const val = await musicCtr.run(player, "isShuffling");
     if (isBooleanString(val)) {
         return JSON.parse(val);
     }

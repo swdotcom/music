@@ -36,11 +36,16 @@ export class MusicController {
 
     async isMusicPlayerActive(player: string) {
         const command = `pgrep -x ${player}`;
+        // this returns the PID of the requested player
         const result = await execCmd(command);
         if (result) {
-            return { status: "ok", value: true };
+            console.log(
+                `music player ${player} is active with result ${result}`
+            );
+            return true;
         }
-        return { status: "ok", value: true };
+        console.log(`music player ${player} is not active`);
+        return false;
     }
 
     async stopPlayer(player: string) {
