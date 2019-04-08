@@ -115,6 +115,16 @@ music.isRepeating("Spotify").then(isRepeating => {
 });
 ```
 
+### setShufflingOn("Spotify")
+
+Is shuffling on or off?
+
+```js
+music.isShuffling("Spotify").then(isShuffling => {
+    console.log(isShuffling); // true || false
+});
+```
+
 ## Contributors
 
 -   [Cody](https://github.com/xavluiz)
