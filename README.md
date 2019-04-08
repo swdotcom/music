@@ -16,15 +16,83 @@ $ npm test
 
 ## API
 
-### playTrack(uri, callback)
+### playTrack(uri)
 
-Play a track with Spotify URI `uri`.
+Play a track with Music URI `uri`.
 
 ```javascript
 const music = require("@software/music");
 
-music.playTrack("Spotify", "spotify:track:3AhXZa8sUQht0UEdBJgpGc", () => {
+music.playTrack("Spotify", "spotify:track:3AhXZa8sUQht0UEdBJgpGc").then(() => {
     // track is playing
+});
+```
+
+### play("Spotify")
+
+Resume playing current track.
+
+### pause("Spotify")
+
+Pause playing track.
+
+### playPause("Spotify")
+
+Toggle play.
+
+### next("Spotify")
+
+Play next track.
+
+### previous("Spotify")
+
+Play previous track.
+
+### volumeUp("Spotify")
+
+Turn volume up.
+
+### volumeDown("Spotify")
+
+Turn volume down.
+
+### setVolume("Spotify", volume)
+
+Sets the volume.
+
+```javascript
+music.setVolume("Spotify", 42).then(() => {
+    music.getState(state => {
+        console.log(state.volume);
+    });
+});
+```
+
+### muteVolume("Spotify")
+
+Reduces audio to 0, saving the previous volume.
+
+### unmuteVolume("Spotify")
+
+Returns audio to original volume.
+
+### isRunning("Spotify")
+
+Check if the music player is running.
+
+```javascript
+music.isRunning("Spotify").then(isRunning => {
+    console.log(isRunning); // true || false
+});
+```
+
+### isRepeating("Spotify")
+
+Is repeating on or off?
+
+```js
+music.isRepeating("Spotify").then(isRepeating => {
+    console.log(isRepeating); // true || false
 });
 ```
 

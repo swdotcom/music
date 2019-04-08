@@ -89,6 +89,22 @@ export function repeatOff(player: string) {
     return musicCtr.run(player, "repeatOff");
 }
 
+export function setShufflingOn(player: string) {
+    return musicCtr.run(player, "setShuffling", ["true"]);
+}
+
+export function setShufflingOff(player: string) {
+    return musicCtr.run(player, "setShuffling", ["false"]);
+}
+
+export async function isShuffling(player: string) {
+    let val = await musicCtr.run(player, "isShuffling");
+    if (isBooleanString(val)) {
+        return JSON.parse(val);
+    }
+    return val;
+}
+
 /**
  * - spotify returns true or false, and itunes returns "off", "one", "all"
  * @param player

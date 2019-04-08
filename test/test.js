@@ -117,6 +117,11 @@ describe("software music tests", () => {
             result = await index.getState("Spotify");
             console.log("spotify play track song: ", result.name);
 
+            // shuffle test
+            await index.setShufflingOn("Spotify");
+            result = await index.isShuffling("Spotify");
+            expect(result).to.equal(true);
+
             await index.stopSpotifyIfRunning();
 
             done();
@@ -182,6 +187,11 @@ describe("software music tests", () => {
             await index.playTrack("iTunes", 1);
             result = await index.getState("iTunes");
             console.log("iTunes play track song: ", result.name);
+
+            // shuffle test
+            await index.setShufflingOn("iTunes");
+            result = await index.isShuffling("iTunes");
+            expect(result).to.equal(true);
 
             await index.stopItunesIfRunning();
 

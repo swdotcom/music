@@ -29,7 +29,9 @@ export class MusicController {
         isRepeating: 'tell application "%s" to return %s',
         setVolume: 'tell application "%s" to set sound volume to %s',
         mute: 'tell application "%s" to set sound volume to 0',
-        unMute: 'tell application "%s" to set sound volume to %s'
+        unMute: 'tell application "%s" to set sound volume to %s',
+        setShuffling: 'tell application "%s" to set %s to %s',
+        isShuffling: 'tell application "%s" to %s'
     };
 
     async isMusicPlayerActive(player: string) {
@@ -96,9 +98,7 @@ export class MusicController {
         return this.execScript(player, "playTrack", params);
     }
 
-    async run(player: string, scriptName: string) {
-        let params = null;
-
+    async run(player: string, scriptName: string, params: any = null) {
         if (player === "Spotify") {
             if (scriptName === "repeatOn") {
                 params = ["repeating", "true"];
@@ -106,6 +106,11 @@ export class MusicController {
                 params = ["repeating", "false"];
             } else if (scriptName === "isRepeating") {
                 params = ["repeating"];
+            } else if (scriptName === "setShuffling") {
+                // this will already have params
+                params.unshift("shuffling");
+            } else if (scriptName === "isShuffling") {
+                params = ["return shuffling"];
             }
         } else if (player === "iTunes") {
             if (scriptName === "repeatOn") {
@@ -117,6 +122,10 @@ export class MusicController {
             } else if (scriptName === "isRepeating") {
                 // get the song repeat value
                 params = ["song repeat"];
+            } else if (scriptName === "setShuffling") {
+                params.unshift("shuffle enabled");
+            } else if (scriptName === "isShuffling") {
+                params = ["get shuffle enabled"];
             }
         }
 
