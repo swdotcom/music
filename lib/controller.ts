@@ -89,7 +89,6 @@ export class MusicController {
             command = `osascript -e \'${script}\'`;
         }
         const result = await execCmd(command);
-        // console.log("exec command result: ", result);
         return result;
     }
 

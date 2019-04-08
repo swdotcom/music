@@ -33,7 +33,7 @@ export async function execCmd(cmd: string, projectDir: any = null) {
                 : {};
         result = await execPromise(cmd, opts);
     } catch (e) {
-        result = null;
+        result = { error: e.message };
     }
     return result;
 }

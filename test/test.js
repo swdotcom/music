@@ -24,21 +24,27 @@ describe("software music tests", () => {
         });
     });
 
-    it("Should Show Spotify Is Not Running", done => {
-        index.stopSpotifyIfRunning().then(() => {
-            index.isSpotifyRunning().then(result => {
-                expect(result).to.equal(false);
+    it("Should Show An Error", done => {
+        // play a bad track number
+        index.playTrack("iTunes", 1000000000).then(result => {
+            expect(result.error).to.not.equal(null);
+            index.stopItunesIfRunning().then(() => {
                 done();
             });
         });
     });
 
+    it("Should Show Spotify Is Not Running", done => {
+        index.isSpotifyRunning().then(result => {
+            expect(result).to.equal(false);
+            done();
+        });
+    });
+
     it("Should Show Itunes Is Not Running", done => {
-        index.stopItunesIfRunning().then(() => {
-            index.isItunesRunning().then(result => {
-                expect(result).to.equal(false);
-                done();
-            });
+        index.isItunesRunning().then(result => {
+            expect(result).to.equal(false);
+            done();
         });
     });
 
@@ -143,10 +149,10 @@ describe("software music tests", () => {
             // play track
             await index.playTrack(
                 "Spotify",
-                "spotify:track:6JEK0CvvjDjjMUBFoXShNZ"
+                "spotify:track:2YarjDYjBJuH63dUIh9OWv"
             );
             result = await index.getState("Spotify");
-            console.log("spotify play track song: ", result.name);
+            expect(result.artist).to.equal("Wolfgang Amadeus Mozart");
 
             // shuffle test
             await index.setShufflingOn("Spotify");

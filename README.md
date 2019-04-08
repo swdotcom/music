@@ -20,11 +20,30 @@ $ npm test
 
 Play a track with Music URI `uri`.
 
+Specify either Spotify or iTunes, it's case-insensitive.
+
 ```javascript
 const music = require("@software/music");
 
-music.playTrack("Spotify", "spotify:track:3AhXZa8sUQht0UEdBJgpGc").then(() => {
+// play a specific spotify track
+music
+    .playTrack("Spotify", "spotify:track:2YarjDYjBJuH63dUIh9OWv")
+    .then(result => {
+        // track is playing
+    });
+
+// play an iTunes track number
+music.playTrack("iTunes", 1).then(result => {
     // track is playing
+});
+
+// handling errors
+music.playTrack("iTunes", 1000000000).then(result => {
+    // result will not be null and will contain an attribute called "error"
+    const err = result.error || null;
+    if (err) {
+        console.log(`Unable to play track, error: ${err}`);
+    }
 });
 ```
 
