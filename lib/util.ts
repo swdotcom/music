@@ -1,5 +1,8 @@
 const { exec } = require("child_process");
 
+const SPOTIFY_NAME = "Spotify";
+const ITUNES_NAME = "iTunes";
+
 export function isLinux() {
     return isWindows() || isMac() ? false : true;
 }
@@ -59,11 +62,14 @@ export function sleep(delayInMillis: number) {
     while (new Date().getTime() < start + delayInMillis);
 }
 
-export function getNormalizedPlayerName(player: string) {
+export function getPlayerName(player: string) {
     if (!player || player.trim().length === 0) {
         player = "Spotify";
         return player;
     }
     player = player.trim().toLowerCase();
-    return player.charAt(0).toUpperCase() + player.slice(1);
+    if (player === "itunes") {
+        return ITUNES_NAME;
+    }
+    return SPOTIFY_NAME;
 }

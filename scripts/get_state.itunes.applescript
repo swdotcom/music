@@ -14,7 +14,7 @@ try
 		set t_info to t_info & ",\"album\": \"" & my escape_quotes(current track's album) & "\""
 		set t_info to t_info & ",\"genre\":\"" & current track's genre & "\""
 		set t_info to t_info & ",\"disc_number\": " & current track's disc number
-		set t_info to t_info & ",\"duration\": " & current track's duration
+		set t_info to t_info & ",\"duration\": " & (((current track's duration) * 1000) as integer)
 		set t_info to t_info & ",\"played_count\": " & current track's played count
 		set t_info to t_info & ",\"track_number\": " & current track's track number
 		set t_info to t_info & ",\"id\": \"" & current track's id & "\""

@@ -25,6 +25,14 @@ Specify either "Spotify" or "iTunes" (case-insensitive).
 ```javascript
 const music = require("@software/music");
 
+// get the track info using get state
+music.getState("iTunes").then(state => {
+    // - "genre" will be empty from Spotify
+    // - duration is in milliseconds
+    // {artist, album, genre, disc_number, duration, played_count, track_number, id, name, state}
+    console.log(state);
+});
+
 // play a specific spotify track
 music
     .playTrack("Spotify", "spotify:track:2YarjDYjBJuH63dUIh9OWv")
