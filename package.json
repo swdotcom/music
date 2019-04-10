@@ -1,5 +1,5 @@
 {
-    "name": "music-manager",
+    "name": "@software/music",
     "version": "1.0.0",
     "description": "mac osx spotify and itunes music player controller",
     "main": "dist/index.js",
