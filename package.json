@@ -26,9 +26,9 @@
     "author": "software",
     "license": "SEE LICENSE IN LICENSE",
     "bugs": {
-        "url": "https://github.com/swdotcom/tempo/issues"
+        "url": "https://github.com/swdotcom/music/issues"
     },
-    "homepage": "https://github.com/swdotcom/tempo#readme",
+    "homepage": "https://github.com/swdotcom/music#readme",
     "devDependencies": {
         "@types/node": "^11.12.1",
         "chai": "^4.2.0",
