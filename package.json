@@ -1,7 +1,7 @@
 {
     "name": "@software/music",
     "version": "1.0.0",
-    "description": "music player controller",
+    "description": "mac osx spotify and itunes music player controller",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "scripts": {
@@ -10,7 +10,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/swdotcom/tempo.git"
+        "url": "git+https://github.com/swdotcom/music.git"
     },
     "keywords": [
         "music",
@@ -24,7 +24,7 @@
         "playlist"
     ],
     "author": "software",
-    "license": "ISC",
+    "license": "SEE LICENSE IN LICENSE",
     "bugs": {
         "url": "https://github.com/swdotcom/tempo/issues"
     },
