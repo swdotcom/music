@@ -1,11 +1,11 @@
-# @software/music
+# cody-music
 
 Control Spotify and iTunes, currently only on Mac OSX with NodeJS.
 
 ## Installation
 
 ```
-$ npm install @software/music
+$ npm install cody-music
 ```
 
 ## Running unit tests
@@ -23,7 +23,7 @@ Play a track with Music URI `uri`.
 Specify either "Spotify" or "iTunes" (case-insensitive).
 
 ```javascript
-const music = require("@software/music");
+const music = require("cody-music");
 
 // get the track info using get state
 music.getState("iTunes").then(state => {
