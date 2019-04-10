@@ -1,6 +1,6 @@
 # @software/music
 
-Control Spotify and iTunes on Mac OSX with NodeJS.
+Control Spotify and iTunes, currently only on Mac OSX with NodeJS.
 
 ## Installation
 
@@ -135,6 +135,6 @@ music.isShuffling("Spotify").then(isShuffling => {
 
 ## Contributors
 
--   [Cody](https://github.com/xavluiz)
+-   [Cody](https://github.com/codyxio)
 
 ## License
