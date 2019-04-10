@@ -14,6 +14,18 @@ $ npm install cody-music
 $ npm test
 ```
 
+Load the module
+
+```javascript
+import * as music from "cody-music";
+```
+
+OR
+
+```javascript
+const music = require("cody-music");
+```
+
 ## API
 
 ### playTrack(uri)
@@ -23,8 +35,6 @@ Play a track with Music URI `uri`.
 Specify either "Spotify" or "iTunes" (case-insensitive).
 
 ```javascript
-const music = require("cody-music");
-
 // get the track info using get state
 music.getState("iTunes").then(state => {
     // - "genre" will be empty from Spotify
