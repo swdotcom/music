@@ -47,10 +47,9 @@ music.playTrack("iTunes", 1).then(result => {
 
 // handling errors
 music.playTrack("iTunes", 1000000000).then(result => {
-    // result will not be null and will contain an attribute called "error"
-    const err = result.error || null;
-    if (err) {
-        console.log(`Unable to play track, error: ${err}`);
+    // result will contain the "error" attribute with the error message
+    if (result.error) {
+        console.log(`Unable to play track, error: ${result.error}`);
     }
 });
 ```

@@ -1,8 +1,5 @@
 import { MusicController } from "./lib/controller";
-import { isBooleanString } from "./lib/util";
-
-const SPOTIFY_NAME = "Spotify";
-const ITUNES_NAME = "iTunes";
+import { isBooleanString, SPOTIFY_NAME, ITUNES_NAME } from "./lib/util";
 
 const musicCtr = new MusicController();
 

@@ -1,7 +1,7 @@
 const { exec } = require("child_process");
 
-const SPOTIFY_NAME = "Spotify";
-const ITUNES_NAME = "iTunes";
+export const SPOTIFY_NAME = "Spotify";
+export const ITUNES_NAME = "iTunes";
 
 export function isLinux() {
     return isWindows() || isMac() ? false : true;

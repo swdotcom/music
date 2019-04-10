@@ -48,13 +48,20 @@ export class MusicController {
     async stopPlayer(player: string) {
         player = getPlayerName(player);
         const command = `pgrep -x ${player} | xargs kill -9`;
-        return await execCmd(command);
+        let result = await execCmd(command);
+        if (result === null || result === undefined) {
+            result = "ok";
+        }
+        return result;
     }
 
     async startPlayer(player: string) {
         player = getPlayerName(player);
         const command = `open -a ${player}`;
-        const result = await execCmd(command);
+        let result = await execCmd(command);
+        if (result === null || result === undefined) {
+            result = "ok";
+        }
         return result;
     }
 
@@ -87,7 +94,10 @@ export class MusicController {
             // console.log("script to use: ", script);
             command = `osascript -e \'${script}\'`;
         }
-        const result = await execCmd(command);
+        let result = await execCmd(command);
+        if (result === null || result === undefined) {
+            result = "ok";
+        }
         return result;
     }
 
@@ -98,7 +108,12 @@ export class MusicController {
         } else {
             params = [`${trackId}`];
         }
-        return this.execScript(player, "playTrack", params);
+        return this.execScript(player, "playTrack", params).then(result => {
+            if (result === null || result === undefined) {
+                result = "ok";
+            }
+            return result;
+        });
     }
 
     async run(player: string, scriptName: string, params: any = null) {
@@ -147,15 +162,32 @@ export class MusicController {
                 await this.execScript(player, "state", ["song repeat", "off"]);
             }
         }
-        return this.execScript(player, scriptName, params);
+        return this.execScript(player, scriptName, params).then(result => {
+            if (result === null || result === undefined) {
+                result = "ok";
+            }
+            return result;
+        });
     }
 
     setVolume(player: string, volume: number) {
         this.lastVolumeLevel = volume;
-        return this.execScript(player, "setVolume", [volume]);
+        return this.execScript(player, "setVolume", [volume]).then(result => {
+            if (result === null || result === undefined) {
+                result = "ok";
+            }
+            return result;
+        });
     }
 
     playTrackInContext(player: string, params: any[]) {
-        return this.execScript(player, "playTrackInContext", params);
+        return this.execScript(player, "playTrackInContext", params).then(
+            result => {
+                if (result === null || result === undefined) {
+                    result = "ok";
+                }
+                return result;
+            }
+        );
     }
 }
