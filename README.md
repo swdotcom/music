@@ -36,7 +36,7 @@ Specify either "Spotify" or "iTunes" (case-insensitive).
 
 ```javascript
 // get the track info using get state
-music.getState('iTunes').then(state => {
+await music.getState('iTunes').then(state => {
     // - "genre" will be empty from Spotify
     // - duration is in milliseconds
     // {artist, album, genre, disc_number, duration, played_count, track_number, id, name, state}
