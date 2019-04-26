@@ -57,11 +57,18 @@ export async function getTracksByPlaylistName(
         params,
         argv
     );
-    console.log("getTracksByPlaylist result: ", result);
+
+    let jsonResult: any = {};
     if (result) {
-        return JSON.parse(result);
+        let jsonList = result.split("[TRACK_END],");
+        if (jsonList && jsonList.length > 0) {
+            for (let i = 0; i < jsonList.length; i++) {
+                let jsonStr = jsonList[i].trim();
+                jsonResult[i] = JSON.parse(jsonStr);
+            }
+        }
     }
-    return null;
+    return jsonResult;
 }
 
 /**
@@ -157,6 +164,16 @@ export function unMute(player: string) {
     return musicCtr.run(player, "unMute");
 }
 
-export function playlistNames(player: string) {
-    return musicCtr.run(player, "playlistNames");
+export async function playlistNames(player: string) {
+    let result = await musicCtr.run(player, "playlistNames");
+    // turn this into a string list
+    if (result) {
+        result = result.split(",");
+        // now trim
+        result = result.map((name: string) => {
+            return name.trim();
+        });
+    }
+
+    return result;
 }

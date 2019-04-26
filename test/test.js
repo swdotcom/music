@@ -41,18 +41,16 @@ describe("software music tests", () => {
         done();
     });
 
-    it("Should Show The Playlist Names", done => {
-        music.playlistNames("iTunes").then(result => {
-            let names = result.split(",");
+    it("Should Show The Playlist Names AND Show The Tracks Of A Playlist", done => {
+        music.playlistNames("iTunes").then(names => {
             expect(names).to.not.equal(0);
-            done();
-        });
-    });
-
-    it("Should Show The Tracks Of A Playlist", done => {
-        music.getTracksByPlaylistName("iTunes", "Nice").then(result => {
-            console.log("playlist tracks: ", result);
-            done();
+            // get the last name in the list and get the tracks
+            music
+                .getTracksByPlaylistName("iTunes", names[names.length - 1])
+                .then(result => {
+                    expect(result.length).to.not.equal(0);
+                    done();
+                });
         });
     });
 

@@ -110,7 +110,6 @@ export class MusicController {
                 });
                 const argvOptions = argv.join(" ");
                 command = `osascript ${file} ${argvOptions}`;
-                console.log("command: ", command);
             } else {
                 command = `osascript ${file}`;
             }
@@ -122,7 +121,6 @@ export class MusicController {
             }
             // apply the params to the one line script
             script = formatString(script, params);
-            console.log("script to use: ", script);
             command = `osascript -e \'${script}\'`;
         }
         let result = await execCmd(command);

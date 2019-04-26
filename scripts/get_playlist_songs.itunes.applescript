@@ -26,12 +26,12 @@ on run argv
 			if testCount is greater than or equal to len then
 				set t_info to t_info & "}"
 			else
-				set t_info to t_info & "},"
+				set t_info to t_info & "}[TRACK_END]"
 			end if
 			copy t_info to end of myList
 			set counter to counter + 1
 		end repeat
 	end tell
 
-	return "{" & myList & "}"
+	return myList
 end run
