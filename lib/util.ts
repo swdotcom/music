@@ -77,8 +77,8 @@ export function getPlayerName(player: string) {
 export function formatString(source: string, params: any) {
     let formatted = source;
     if (params && params.length > 0) {
-        for (var i = 0; i < params.length; i++) {
-            var regexp = new RegExp("\\{" + i + "\\}", "gi");
+        for (let i = 0; i < params.length; i++) {
+            let regexp = new RegExp("\\{" + i + "\\}", "gi");
             formatted = formatted.replace(regexp, params[i]);
         }
     }
