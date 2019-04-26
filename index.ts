@@ -137,3 +137,7 @@ export function mute(player: string) {
 export function unMute(player: string) {
     return musicCtr.run(player, "unMute");
 }
+
+export function playlistNames(player: string) {
+    return musicCtr.run(player, "playlistNames");
+}

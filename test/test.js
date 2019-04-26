@@ -41,6 +41,14 @@ describe("software music tests", () => {
         done();
     });
 
+    it("Should Show The Playlist Names", done => {
+        music.playlistNames("iTunes").then(result => {
+            let names = result.split(",");
+            expect(names).to.not.equal(0);
+            done();
+        });
+    });
+
     it("Should Show An Error", done => {
         // play a bad track number
         music.playTrack("iTunes", 1000000000).then(result => {
@@ -195,17 +203,19 @@ describe("software music tests", () => {
             .then(async () => {
                 util.sleep(1000);
                 await music.play("iTunes");
-                util.sleep(1000);
+                util.sleep(2000);
 
                 let result = await music.getState("iTunes");
+                console.log("itunes state: ", result);
                 // make sure it's playing
                 expect(result.state).to.equal("playing");
                 let songName = result.name;
 
                 // go to the next song
                 await music.next("iTunes");
+
                 // check
-                result = await music.getState("Spotify");
+                result = await music.getState("iTunes");
                 expect(result.name).to.not.equal(songName);
                 songName = result.name;
                 // pause it
