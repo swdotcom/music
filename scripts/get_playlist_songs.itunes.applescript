@@ -7,22 +7,31 @@ on escape_quotes(string_to_escape)
 	return string_to_escape
 end escape_quotes
 
-on searchItunesPlaylist(playlistName)
+on run argv
+	set playlistName to (item 1 of argv)
 	set myList to {}
 	tell application "iTunes"
-		repeat with i from 1 to count tracks of playlist playlistName
-			set aTrack to track i of current playlist
-			set track_name to my escape_quotes(name of aTrack)
-			set track_album to my escape_quotes(album of aTrack)
-			set track_artist to my escape_quotes(artist of aTrack)
-			set json to {name:track_name, album:track_album, artist:track_artist}
-			copy json to end of myList
+		activate
+		set results to (every file track of playlist playlistName)
+		set counter to 0
+		set len to count of results
+		repeat with aTrack in results
+			set t_info to "{"
+			set t_info to t_info & "\"artist\": \"" & my escape_quotes(artist of aTrack) & "\""
+			set t_info to t_info & ",\"album\": \"" & my escape_quotes(album of aTrack) & "\""
+			set t_info to t_info & ",\"duration\": " & (((duration of aTrack) * 1000) as integer)
+			set t_info to t_info & ",\"played_count\": " & played count of aTrack
+			set t_info to t_info & ",\"name\": \"" & my escape_quotes(name of aTrack) & "\""
+			set testCount to counter + 1
+			if testCount is greater than or equal to len then
+				set t_info to t_info & "}"
+			else
+				set t_info to t_info & "},"
+			end if
+			copy t_info to end of myList
+			set counter to counter + 1
 		end repeat
 	end tell
-	return myList
-end searchItunesPlaylist
 
-on run argv
-    set jsonRecord to searchItunesPlaylist(argv)
-    return jsonRecord
+	return "{" & myList & "}"
 end run

@@ -84,7 +84,7 @@ export class MusicController {
         player: string,
         scriptName: string,
         params: any = null,
-        argsv: any = null
+        argv: any = null
     ) {
         player = getPlayerName(player);
         let script = this.scripts[scriptName];
@@ -103,8 +103,14 @@ export class MusicController {
             // apply the params (which should only have the player name)
             const scriptFile = formatString(script.file, params);
             let file = `${this.scriptsPath}${scriptFile}`;
-            if (argsv) {
-                command = `osascript ${file} ${argsv}`;
+            if (argv) {
+                // make sure they have quotes around the argv
+                argv = argv.map((val: any) => {
+                    return `"${val}"`;
+                });
+                const argvOptions = argv.join(" ");
+                command = `osascript ${file} ${argvOptions}`;
+                console.log("command: ", command);
             } else {
                 command = `osascript ${file}`;
             }
@@ -141,7 +147,12 @@ export class MusicController {
         });
     }
 
-    async run(player: string, scriptName: string, params: any = null) {
+    async run(
+        player: string,
+        scriptName: string,
+        params: any = null,
+        argv: any = null
+    ) {
         if (player === "Spotify") {
             if (scriptName === "repeatOn") {
                 params = ["repeating", "true"];
@@ -187,12 +198,14 @@ export class MusicController {
                 await this.execScript(player, "state", ["song repeat", "off"]);
             }
         }
-        return this.execScript(player, scriptName, params).then(result => {
-            if (result === null || result === undefined) {
-                result = "ok";
+        return this.execScript(player, scriptName, params, argv).then(
+            result => {
+                if (result === null || result === undefined) {
+                    result = "ok";
+                }
+                return result;
             }
-            return result;
-        });
+        );
     }
 
     setVolume(player: string, volume: number) {

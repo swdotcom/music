@@ -45,6 +45,25 @@ export async function getState(player: string) {
     return null;
 }
 
+export async function getTracksByPlaylistName(
+    player: string,
+    playListName: string
+) {
+    const params = null;
+    const argv = [playListName];
+    const result = await musicCtr.run(
+        player,
+        "playlistTracksOfPlaylist",
+        params,
+        argv
+    );
+    console.log("getTracksByPlaylist result: ", result);
+    if (result) {
+        return JSON.parse(result);
+    }
+    return null;
+}
+
 /**
  *
  * @param player

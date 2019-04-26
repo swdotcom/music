@@ -49,6 +49,13 @@ describe("software music tests", () => {
         });
     });
 
+    it("Should Show The Tracks Of A Playlist", done => {
+        music.getTracksByPlaylistName("iTunes", "Nice").then(result => {
+            console.log("playlist tracks: ", result);
+            done();
+        });
+    });
+
     it("Should Show An Error", done => {
         // play a bad track number
         music.playTrack("iTunes", 1000000000).then(result => {
@@ -203,10 +210,9 @@ describe("software music tests", () => {
             .then(async () => {
                 util.sleep(1000);
                 await music.play("iTunes");
-                util.sleep(2000);
+                util.sleep(1000);
 
                 let result = await music.getState("iTunes");
-                console.log("itunes state: ", result);
                 // make sure it's playing
                 expect(result.state).to.equal("playing");
                 let songName = result.name;
