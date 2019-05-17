@@ -164,6 +164,10 @@ export function unMute(player: string) {
     return musicCtr.run(player, "unMute");
 }
 
+export function setItunesLoved(loved: boolean) {
+    return musicCtr.setItunesLoved(loved);
+}
+
 export async function playlistNames(player: string) {
     let result = await musicCtr.run(player, "playlistNames");
     // turn this into a string list

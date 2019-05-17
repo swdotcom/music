@@ -54,6 +54,23 @@ describe("software music tests", () => {
         });
     });
 
+    it("Should Set An Itunes Song's Love State", done => {
+        music.startItunesIfNotRunning().then(async () => {
+            util.sleep(1500);
+            await music.setVolume("iTunes", 5);
+            await music.play("iTunes");
+            util.sleep(1500);
+            let result = await music.getState("iTunes");
+            let loved = result.loved;
+            music.setItunesLoved(!loved).then(async result => {
+                // get the state again
+                result = await music.getState("iTunes");
+                expect(result.loved).to.equal(!loved);
+                done();
+            });
+        });
+    });
+
     it("Should Show An Error", done => {
         // play a bad track number
         music.playTrack("iTunes", 1000000000).then(result => {
@@ -90,16 +107,15 @@ describe("software music tests", () => {
         music.startSpotifyIfNotRunning().then(async () => {
             util.sleep(2000);
             await music.setVolume("Spotify", 5);
-            let params = [
-                "spotify:track:0R8P9KfGJCDULmlEoBagcO",
-                "spotify:album:6ZG5lRT77aJ3btmArcykra"
-            ];
+            let params = ["spotify:track:2xbuycY0MolcTZGENc4PuK"];
 
             await music.playTrackInContext("Spotify", params);
-            util.sleep(1000);
+            util.sleep(1500);
             let result = await music.getState("Spotify");
-            expect(result.artist).to.equal("Coldplay");
-            expect(result.name).to.equal("Trouble");
+            expect(result.artist).to.equal("Hozier");
+            expect(result.name).to.equal(
+                "Say My Name - Recorded at Spotify Studios NYC"
+            );
             done();
         });
     });
@@ -110,10 +126,10 @@ describe("software music tests", () => {
     // "played_count": 120,"track_number": 1,"id": "5601","name": "Out of Sight","state":"playing"}
     it("Get iTunes Track Info", done => {
         music.startItunesIfNotRunning().then(async () => {
-            util.sleep(1000);
+            util.sleep(1500);
             await music.setVolume("iTunes", 5);
             await music.play("iTunes");
-            util.sleep(1000);
+            util.sleep(1500);
             let result = await music.getState("iTunes");
             expect(result.artist).to.not.equal(null);
             done();
@@ -124,14 +140,14 @@ describe("software music tests", () => {
         music
             .startSpotifyIfNotRunning()
             .then(async () => {
-                util.sleep(1000);
+                util.sleep(1500);
                 let params = [
                     "spotify:track:0R8P9KfGJCDULmlEoBagcO",
                     "spotify:album:6ZG5lRT77aJ3btmArcykra"
                 ];
 
                 await music.playTrackInContext("Spotify", params);
-                util.sleep(1000);
+                util.sleep(1500);
 
                 let result = await music.getState("Spotify");
                 // make sure it's playing
@@ -182,10 +198,10 @@ describe("software music tests", () => {
                 // play track
                 await music.playTrack(
                     "Spotify",
-                    "spotify:track:2YarjDYjBJuH63dUIh9OWv"
+                    "spotify:track:4ut5G4rgB1ClpMTMfjoIuy"
                 );
                 result = await music.getState("Spotify");
-                expect(result.artist).to.equal("Wolfgang Amadeus Mozart");
+                expect(result.artist).to.equal("Martin Garrix");
 
                 // shuffle test
                 await music.setShufflingOn("Spotify");
@@ -206,9 +222,9 @@ describe("software music tests", () => {
         music
             .startItunesIfNotRunning()
             .then(async () => {
-                util.sleep(1000);
+                util.sleep(1500);
                 await music.play("iTunes");
-                util.sleep(1000);
+                util.sleep(1500);
 
                 let result = await music.getState("iTunes");
                 // make sure it's playing

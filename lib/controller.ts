@@ -1,4 +1,4 @@
-import { execCmd, getPlayerName, formatString } from "./util";
+import { execCmd, getPlayerName, formatString, ITUNES_NAME } from "./util";
 
 export class MusicController {
     private scriptsPath: string = __dirname + "/scripts/";
@@ -46,7 +46,9 @@ export class MusicController {
         playlistTracksOfPlaylist: {
             file: "get_playlist_songs.{0}.applescript",
             requiresArgv: true
-        }
+        },
+        setItunesLoved:
+            'tell application "{0}" to set loved of current track to {1}'
     };
 
     async isMusicPlayerActive(player: string) {
@@ -214,6 +216,17 @@ export class MusicController {
             }
             return result;
         });
+    }
+
+    setItunesLoved(loved: boolean) {
+        return this.execScript(ITUNES_NAME, "setItunesLoved", [loved]).then(
+            result => {
+                if (result === null || result === undefined) {
+                    result = "ok";
+                }
+                return result;
+            }
+        );
     }
 
     playTrackInContext(player: string, params: any[]) {

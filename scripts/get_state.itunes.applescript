@@ -21,6 +21,7 @@ try
 		set t_info to t_info & ",\"name\": \"" & my escape_quotes(current track's name) & "\""
 		set t_info to t_info & ",\"state\":\"" & player state & "\""
 		set t_info to t_info & ",\"volume\": " & sound volume
+		set t_info to t_info & ",\"loved\": " & current track's loved
 		set t_info to t_info & "}"
 	end tell
 on error
