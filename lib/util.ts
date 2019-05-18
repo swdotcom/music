@@ -17,6 +17,17 @@ export function isMac() {
     return process.platform.indexOf("darwin") !== -1;
 }
 
+export function isEmptyObj(obj: any) {
+    return Object.keys(obj).length === 0 && obj.constructor === Object;
+}
+
+export function isResponseOk(resp: any) {
+    if (resp && resp.statusText === "OK") {
+        return true;
+    }
+    return false;
+}
+
 export function isBooleanString(val: string) {
     if (
         (val && val.toLowerCase() === "true") ||
@@ -83,4 +94,20 @@ export function formatString(source: string, params: any) {
         }
     }
     return formatted;
+}
+
+export function extractAristFromSpotifyTrack(track: any) {
+    if (!track) {
+        return;
+    }
+
+    if (track["artists"]) {
+        const len = track["artists"].length;
+        let artistNames = [];
+        for (let y = 0; y < len; y++) {
+            const artist = track["artists"][y];
+            artistNames.push(artist.name);
+        }
+        track["artist"] = artistNames.join(", ");
+    }
 }
