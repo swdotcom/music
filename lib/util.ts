@@ -1,4 +1,4 @@
-import { exec } from "child_process";
+const cp = require("child_process");
 
 export const SPOTIFY_NAME = "Spotify";
 export const ITUNES_NAME = "iTunes";
@@ -54,7 +54,7 @@ export async function execCmd(cmd: string, projectDir: any = null) {
 
 async function execPromise(command: string, opts: {}) {
     return new Promise((resolve, reject) => {
-        exec(command, opts, (error: any, stdout: string, stderr: any) => {
+        cp.exec(command, opts, (error: any, stdout: string, stderr: any) => {
             if (error) {
                 reject(error);
                 return;
@@ -110,4 +110,21 @@ export function extractAristFromSpotifyTrack(track: any) {
         }
         track["artist"] = artistNames.join(", ");
     }
+}
+
+export async function launchWebUrl(url: string): Promise<any> {
+    let open = "open";
+    let args = [url];
+    if (isWindows()) {
+        open = "cmd";
+        // adds the following args to the beginning of the array
+        args.unshift("/c", "start", '""');
+    } else if (!isMac()) {
+        open = "xdg-open";
+    }
+
+    args.unshift(open);
+    const cmd = args.join(" ");
+
+    execCmd(cmd);
 }

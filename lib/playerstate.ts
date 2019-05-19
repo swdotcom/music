@@ -4,17 +4,16 @@ import {
     isWindows,
     isEmptyObj,
     isResponseOk,
-    extractAristFromSpotifyTrack
+    extractAristFromSpotifyTrack,
+    launchWebUrl
 } from "./util";
 import { MusicController } from "./controller";
 import { MusicStore } from "./store";
 import { MusicClient } from "./client";
-import { CodyMusic } from "./music";
 
 const musicCtr = new MusicController();
 const musicStore = new MusicStore();
 const musicClient = new MusicClient();
-const codyMusic = new CodyMusic();
 
 export enum TrackType {
     MacItunesDesktop = 1,
@@ -188,7 +187,11 @@ export class MusicPlayerState {
             );
             // spotify first
             if (spotifyRunning) {
-                playingTrack = await codyMusic.getState("Spotify");
+                const state = await musicCtr.run("Spotify", "state");
+                if (state) {
+                    playingTrack = JSON.parse(state);
+                }
+
                 if (playingTrack) {
                     playingTrack.type = "spotify";
                 }
@@ -207,7 +210,11 @@ export class MusicPlayerState {
             // next itunes
             const itunesRunning = await musicCtr.isMusicPlayerActive("iTunes");
             if (itunesRunning) {
-                playingTrack = await codyMusic.getState("iTunes");
+                const state = await musicCtr.run("iTunes", "state");
+                if (state) {
+                    playingTrack = JSON.parse(state);
+                }
+
                 if (playingTrack) {
                     playingTrack.type = "itunes";
                 }
@@ -382,5 +389,9 @@ export class MusicPlayerState {
             playerContext = response.data;
         }
         return playerContext;
+    }
+
+    launchSpotifyWebPlayer() {
+        launchWebUrl("https://open.spotify.com/browse/featured");
     }
 }

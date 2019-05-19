@@ -1,6 +1,7 @@
 import axios, { AxiosInstance } from "axios";
 import { MusicStore } from "./store";
-import { promises } from "fs";
+
+const superagent = require("superagent");
 
 const musicStore = new MusicStore();
 
@@ -12,30 +13,55 @@ const connectServerClient: AxiosInstance = axios.create({
 });
 
 export class MusicClient {
+    /**
+     * Refresh the spotify access token
+     */
     async refreshSpotifyToken() {
         const payload = `${musicStore.spotifyClientId}:${
             musicStore.spotifyClientSecret
         }`;
         const encodedPayload = Buffer.from(payload).toString("base64");
 
-        connectServerClient.defaults.headers.common[
-            "Authorization"
-        ] = `Basic ${encodedPayload}`;
-        connectServerClient.defaults.headers.common["Content-Type"] =
-            "application/x-www-form-urlencoded";
-        const body = {
-            grant_type: "refresh_token",
-            refresh_token: musicStore.spotifyRefreshToken
-        };
-
-        return await connectServerClient
-            .post("/api/token", body)
-            .then(resp => {
-                return resp;
+        let response = await superagent
+            .post("https://accounts.spotify.com/api/token")
+            .send({
+                grant_type: "refresh_token",
+                refresh_token: musicStore.spotifyRefreshToken
+            }) // sends a JSON post body
+            .set("Authorization", `Basic ${encodedPayload}`)
+            .set("Accept", "application/json")
+            .set("Content-Type", "application/x-www-form-urlencoded")
+            .then((resp: any) => {
+                /**
+                 * -- main attributes --
+                 * ok:true
+                 * status:200
+                 * statusCode:200
+                 * unauthorized:false
+                 * noContent:false
+                 * notAcceptable:false
+                 * notFound:false
+                 * body:Object {
+                        access_token:"BQAXPZVQT5_7tBViPq_u5xb8iczA0cjMAls6xk35Tg5_ahSTg-SoZfd5KfOp_bvDcRQQwYhbzFMzU2OrNz1heDf4qtRcbTvadzJaZjSWonahP3cjXhuT2J-UoW-kfZXXWHJvDpG6D7tcqNrssbaaQqi-zPZcdRkL0HM6g8BRtJxH4WKnVQsujH-sIkFsOHFsCFd8LT9o2XBVTqUbUEsgERyayXOf3v-rFwRLFqgSawtlv99oftxFemKZ-IwgSgOs4tww2zh43jIGPLQF1ECJsQgNQ-m5ELRwfdL77-5dgGqe"
+                        expires_in:3600
+                        scope:"playlist-read-private playlist-read-collaborative user-follow-read playlist-modify-private user-read-email user-read-private app-remote-control streaming user-follow-modify user-modify-playback-state user-library-read user-library-modify playlist-modify-public user-read-playback-state user-read-currently-playing user-read-recently-played user-top-read"
+                        token_type:"Bearer"
+                */
+                if (resp.ok && resp.body) {
+                    return { status: "success", data: resp.body.access_token };
+                }
+                return {
+                    status: "failed",
+                    message: `Response info: ${JSON.stringify(resp)}`
+                };
             })
-            .catch(err => {
-                return err;
+            .catch((error: any) => {
+                return { status: "failed", message: error.message };
             });
+        if (response.status === "success") {
+            musicStore.spotifyAccessToken = response.data;
+        }
+        return response;
     }
 
     spotifyApiGet(api: string): Promise<any> {

@@ -6,7 +6,7 @@
     "types": "dist/index.d.ts",
     "scripts": {
         "build": "babel --presets es2015 -d dist/ lib && tsc && node packaging",
-        "test": "npm run build && mocha --reporter spec --timeout 20000"
+        "test": "npm run build && mocha --reporter spec --recursive --timeout 20000 --exit"
     },
     "repository": {
         "type": "git",
@@ -43,6 +43,7 @@
         "typescript": "3.4.5"
     },
     "dependencies": {
-        "axios": "^0.18.0"
+        "axios": "^0.18.0",
+        "superagent": "^5.0.5"
     }
 }

@@ -1,6 +1,6 @@
 const expect = require("chai").expect;
-const music = require("../dist/index.js");
-const util = require("../dist/lib/util.js");
+const CodyMusic = require("../../dist/index.js");
+const util = require("../../dist/lib/util.js");
 
 /**
  * Don't add "async" into the it condition.
@@ -10,13 +10,11 @@ const util = require("../dist/lib/util.js");
  * It will return the following error if you do.
  * "Error: Resolution method is overspecified. Specify a callback *or* return a Promise; not both."
  */
-describe("software music tests", () => {
+describe("desktop player tests", () => {
     beforeEach(done => {
-        music
-            .stopSpotifyIfRunning()
+        CodyMusic.stopSpotifyIfRunning()
             .then(result => {
-                music
-                    .stopItunesIfRunning()
+                CodyMusic.stopItunesIfRunning()
                     .then(result => {
                         done();
                     })
@@ -25,8 +23,7 @@ describe("software music tests", () => {
                     });
             })
             .catch(err => {
-                music
-                    .stopItunesIfRunning()
+                CodyMusic.stopItunesIfRunning()
                     .then(result => {
                         done();
                     })
@@ -41,58 +38,59 @@ describe("software music tests", () => {
         done();
     });
 
-    it("Should Show The Playlist Names AND Show The Tracks Of A Playlist", done => {
-        music.playlistNames("iTunes").then(names => {
+    xit("Should Show The Playlist Names AND Show The Tracks Of A Playlist", done => {
+        CodyMusic.playlistNames("iTunes").then(names => {
             expect(names).to.not.equal(0);
             // get the last name in the list and get the tracks
-            music
-                .getTracksByPlaylistName("iTunes", names[names.length - 1])
-                .then(result => {
-                    expect(result.length).to.not.equal(0);
-                    done();
-                });
+            CodyMusic.getTracksByPlaylistName(
+                "iTunes",
+                names[names.length - 1]
+            ).then(result => {
+                expect(result.length).to.not.equal(0);
+                done();
+            });
         });
     });
 
-    it("Should Set An Itunes Song's Love State", done => {
-        music.startItunesIfNotRunning().then(async () => {
+    xit("Should Set An Itunes Song's Love State", done => {
+        CodyMusic.startItunesIfNotRunning().then(async () => {
             util.sleep(1500);
-            await music.setVolume("iTunes", 5);
-            await music.play("iTunes");
+            await CodyMusic.setVolume("iTunes", 5);
+            await CodyMusic.play("iTunes");
             util.sleep(1500);
-            let result = await music.getState("iTunes");
+            let result = await CodyMusic.getState("iTunes");
             let loved = result.loved;
-            music.setItunesLoved(!loved).then(async result => {
+            CodyMusic.setItunesLoved(!loved).then(async result => {
                 // get the state again
-                result = await music.getState("iTunes");
+                result = await CodyMusic.getState("iTunes");
                 expect(result.loved).to.equal(!loved);
                 done();
             });
         });
     });
 
-    it("Should Show An Error", done => {
+    xit("Should Show An Error", done => {
         // play a bad track number
-        music.playTrack("iTunes", 1000000000).then(result => {
+        CodyMusic.playTrack("iTunes", 1000000000).then(result => {
             expect(result.error).to.not.equal(null);
-            music.stopItunesIfRunning().then(() => {
+            CodyMusic.stopItunesIfRunning().then(() => {
                 done();
             });
         });
     });
 
     it("Should Show Spotify Is Not Running", done => {
-        music.stopSpotifyIfRunning().then(() => {
-            music.isSpotifyRunning().then(result => {
+        CodyMusic.stopSpotifyIfRunning().then(() => {
+            CodyMusic.isSpotifyRunning().then(result => {
                 expect(result).to.equal(false);
                 done();
             });
         });
     });
 
-    it("Should Show Itunes Is Not Running", done => {
-        music.stopItunesIfRunning().then(() => {
-            music.isItunesRunning().then(result => {
+    xit("Should Show Itunes Is Not Running", done => {
+        CodyMusic.stopItunesIfRunning().then(() => {
+            CodyMusic.isItunesRunning().then(result => {
                 expect(result).to.equal(false);
                 done();
             });
@@ -103,19 +101,19 @@ describe("software music tests", () => {
     // {"artist": "Coldplay","album": "Parachutes","genre": "",
     // "disc_number": 1,"duration": 273426,"played_count": 0,"track_number": 6,
     // "id": "spotify:track:0R8P9KfGJCDULmlEoBagcO","name": "Trouble","state":"playing"}
-    it("Get Spotify Track Info", done => {
-        music.startSpotifyIfNotRunning().then(async () => {
+    xit("Get Spotify Track Info", done => {
+        CodyMusic.startSpotifyIfNotRunning().then(async () => {
             util.sleep(2000);
-            await music.setVolume("Spotify", 5);
-            let params = ["spotify:track:2xbuycY0MolcTZGENc4PuK"];
+            await CodyMusic.setVolume("Spotify", 5);
+            // artist: 'Martin Garrix',
+            // album: 'High On Life (feat. Bonn)'
+            // id: spotify:track:4ut5G4rgB1ClpMTMfjoIuy
+            let params = ["spotify:track:4ut5G4rgB1ClpMTMfjoIuy"];
 
-            await music.playTrackInContext("Spotify", params);
+            await CodyMusic.playTrackInContext("Spotify", params);
             util.sleep(1500);
-            let result = await music.getState("Spotify");
-            expect(result.artist).to.equal("Hozier");
-            expect(result.name).to.equal(
-                "Say My Name - Recorded at Spotify Studios NYC"
-            );
+            let result = await CodyMusic.getState("Spotify");
+            expect(result.id).to.equal("spotify:track:4ut5G4rgB1ClpMTMfjoIuy");
             done();
         });
     });
@@ -124,21 +122,20 @@ describe("software music tests", () => {
     // {"artist": "Loud Forest","album": "Out of Sight - Single",
     // "genre":"Alternative","disc_number": 1,"duration": 212.042007446289,
     // "played_count": 120,"track_number": 1,"id": "5601","name": "Out of Sight","state":"playing"}
-    it("Get iTunes Track Info", done => {
-        music.startItunesIfNotRunning().then(async () => {
+    xit("Get iTunes Track Info", done => {
+        CodyMusic.startItunesIfNotRunning().then(async () => {
             util.sleep(1500);
-            await music.setVolume("iTunes", 5);
-            await music.play("iTunes");
+            await CodyMusic.setVolume("iTunes", 5);
+            await CodyMusic.play("iTunes");
             util.sleep(1500);
-            let result = await music.getState("iTunes");
+            let result = await CodyMusic.getState("iTunes");
             expect(result.artist).to.not.equal(null);
             done();
         });
     });
 
-    it("Tell Spotify To Perform Next, Repeat, Previous, Pause, Shuffle, Volume Change, Mute, Unmute, Shuffle, Check Shuffle", done => {
-        music
-            .startSpotifyIfNotRunning()
+    xit("Tell Spotify To Perform Next, Repeat, Previous, Pause, Shuffle, Volume Change, Mute, Unmute, Shuffle, Check Shuffle", done => {
+        CodyMusic.startSpotifyIfNotRunning()
             .then(async () => {
                 util.sleep(1500);
                 let params = [
@@ -146,69 +143,69 @@ describe("software music tests", () => {
                     "spotify:album:6ZG5lRT77aJ3btmArcykra"
                 ];
 
-                await music.playTrackInContext("Spotify", params);
+                await CodyMusic.playTrackInContext("Spotify", params);
                 util.sleep(1500);
 
-                let result = await music.getState("Spotify");
+                let result = await CodyMusic.getState("Spotify");
                 // make sure it's playing
                 expect(result.state).to.equal("playing");
                 expect(result.name).to.equal("Trouble");
 
                 // go to the previous song
-                await music.previous("Spotify");
+                await CodyMusic.previous("Spotify");
                 // check
-                result = await music.getState("Spotify");
+                result = await CodyMusic.getState("Spotify");
                 expect(result.name).to.equal("Yellow");
                 // pause it
-                await music.pause("Spotify");
+                await CodyMusic.pause("Spotify");
                 // check
-                result = await music.getState("Spotify");
+                result = await CodyMusic.getState("Spotify");
                 expect(result.state).to.equal("paused");
                 // go to next
-                await music.next("Spotify");
+                await CodyMusic.next("Spotify");
                 // check
-                result = await music.getState("Spotify");
+                result = await CodyMusic.getState("Spotify");
                 expect(result.name).to.equal("Trouble");
                 // turn repeat on
-                await music.repeatOn("Spotify");
+                await CodyMusic.repeatOn("Spotify");
                 // check
-                result = await music.isRepeating("Spotify");
+                result = await CodyMusic.isRepeating("Spotify");
                 expect(result).to.equal(true);
                 // turn repeat off
-                await music.repeatOff("Spotify");
+                await CodyMusic.repeatOff("Spotify");
                 // check
-                result = await music.isRepeating("Spotify");
+                result = await CodyMusic.isRepeating("Spotify");
                 expect(result).to.equal(false);
                 // up the volume
-                await music.volumeUp("Spotify");
+                await CodyMusic.volumeUp("Spotify");
                 // check
-                result = await music.getState("Spotify");
+                result = await CodyMusic.getState("Spotify");
                 const volume = result.volume;
                 expect(volume).to.be.greaterThan(5);
 
                 // mute and unmute tests
-                await music.mute("Spotify");
-                result = await music.getState("Spotify");
+                await CodyMusic.mute("Spotify");
+                result = await CodyMusic.getState("Spotify");
                 expect(result.volume).to.equal(0);
 
-                await music.unMute("Spotify");
-                result = await music.getState("Spotify");
+                await CodyMusic.unMute("Spotify");
+                result = await CodyMusic.getState("Spotify");
                 expect(result.volume).to.be.within(volume - 1, volume + 1);
 
                 // play track
-                await music.playTrack(
+                await CodyMusic.playTrack(
                     "Spotify",
                     "spotify:track:4ut5G4rgB1ClpMTMfjoIuy"
                 );
-                result = await music.getState("Spotify");
+                result = await CodyMusic.getState("Spotify");
                 expect(result.artist).to.equal("Martin Garrix");
 
                 // shuffle test
-                await music.setShufflingOn("Spotify");
-                result = await music.isShuffling("Spotify");
+                await CodyMusic.setShufflingOn("Spotify");
+                result = await CodyMusic.isShuffling("Spotify");
                 expect(result).to.equal(true);
 
-                await music.stopSpotifyIfRunning();
+                await CodyMusic.stopSpotifyIfRunning();
 
                 done();
             })
@@ -218,74 +215,73 @@ describe("software music tests", () => {
             });
     });
 
-    it("Tell Itunes To Perform Next, Repeat, Previous, Pause, Shuffle, Volume Change, Mute, Unmute, Shuffle, Check Shuffle", done => {
-        music
-            .startItunesIfNotRunning()
+    xit("Tell Itunes To Perform Next, Repeat, Previous, Pause, Shuffle, Volume Change, Mute, Unmute, Shuffle, Check Shuffle", done => {
+        CodyMusic.startItunesIfNotRunning()
             .then(async () => {
                 util.sleep(1500);
-                await music.play("iTunes");
+                await CodyMusic.play("iTunes");
                 util.sleep(1500);
 
-                let result = await music.getState("iTunes");
+                let result = await CodyMusic.getState("iTunes");
                 // make sure it's playing
                 expect(result.state).to.equal("playing");
                 let songName = result.name;
 
                 // go to the next song
-                await music.next("iTunes");
+                await CodyMusic.next("iTunes");
 
                 // check
-                result = await music.getState("iTunes");
+                result = await CodyMusic.getState("iTunes");
                 expect(result.name).to.not.equal(songName);
                 songName = result.name;
                 // pause it
-                await music.pause("iTunes");
+                await CodyMusic.pause("iTunes");
                 // check
-                result = await music.getState("iTunes");
+                result = await CodyMusic.getState("iTunes");
                 expect(result.state).to.equal("paused");
                 // go to previous
-                await music.previous("iTunes");
+                await CodyMusic.previous("iTunes");
                 // check
-                result = await music.getState("iTunes");
+                result = await CodyMusic.getState("iTunes");
                 expect(result.name).to.not.equal(songName);
                 songName = result.name;
                 // turn repeat on
-                await music.repeatOn("iTunes");
-                result = await music.getState("iTunes");
+                await CodyMusic.repeatOn("iTunes");
+                result = await CodyMusic.getState("iTunes");
                 // check
-                result = await music.isRepeating("iTunes");
+                result = await CodyMusic.isRepeating("iTunes");
                 expect(result).to.equal("one");
                 // turn repeat off
-                await music.repeatOff("iTunes");
+                await CodyMusic.repeatOff("iTunes");
                 // check
-                result = await music.isRepeating("iTunes");
+                result = await CodyMusic.isRepeating("iTunes");
                 expect(result).to.equal("off");
                 // up the volume
-                await music.volumeUp("iTunes");
+                await CodyMusic.volumeUp("iTunes");
                 // check
-                result = await music.getState("iTunes");
+                result = await CodyMusic.getState("iTunes");
                 const volume = result.volume;
                 expect(volume).to.be.greaterThan(5);
 
                 // mute and unmute tests
-                await music.mute("iTunes");
-                result = await music.getState("iTunes");
+                await CodyMusic.mute("iTunes");
+                result = await CodyMusic.getState("iTunes");
                 expect(result.volume).to.equal(0);
 
-                await music.unMute("iTunes");
-                result = await music.getState("iTunes");
+                await CodyMusic.unMute("iTunes");
+                result = await CodyMusic.getState("iTunes");
                 expect(result.volume).to.equal(volume);
 
                 // play track
-                await music.playTrack("iTunes", 1);
-                result = await music.getState("iTunes");
+                await CodyMusic.playTrack("iTunes", 1);
+                result = await CodyMusic.getState("iTunes");
 
                 // shuffle test
-                await music.setShufflingOn("iTunes");
-                result = await music.isShuffling("iTunes");
+                await CodyMusic.setShufflingOn("iTunes");
+                result = await CodyMusic.isShuffling("iTunes");
                 expect(result).to.equal(true);
 
-                await music.stopItunesIfRunning();
+                await CodyMusic.stopItunesIfRunning();
 
                 done();
             })
