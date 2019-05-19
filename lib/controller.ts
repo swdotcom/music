@@ -1,4 +1,7 @@
 import { execCmd, getPlayerName, formatString, ITUNES_NAME } from "./util";
+import { MusicClient } from "./client";
+
+const musicClient = MusicClient.getInstance();
 
 export class MusicController {
     static readonly WINDOWS_SPOTIFY_TRACK_FIND: string =
@@ -53,6 +56,17 @@ export class MusicController {
         setItunesLoved:
             'tell application "{0}" to set loved of current track to {1}'
     };
+
+    private static instance: MusicController;
+    private constructor() {
+        //
+    }
+    static getInstance() {
+        if (!MusicController.instance) {
+            MusicController.instance = new MusicController();
+        }
+        return MusicController.instance;
+    }
 
     async isMusicPlayerActive(player: string) {
         player = getPlayerName(player);
@@ -241,5 +255,21 @@ export class MusicController {
                 return result;
             }
         );
+    }
+
+    public async spotifyWebPlay() {
+        musicClient.spotifyApiPut("/v1/me/player/play");
+    }
+
+    public async spotifyWebPause() {
+        musicClient.spotifyApiPut("/v1/me/player/pause");
+    }
+
+    public async spotifyWebPrevious() {
+        musicClient.spotifyApiPost("/v1/me/player/previous");
+    }
+
+    public async spotifyWebNext() {
+        musicClient.spotifyApiPost("/v1/me/player/next");
     }
 }

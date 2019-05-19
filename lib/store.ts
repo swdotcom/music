@@ -9,6 +9,44 @@ export class MusicStore {
     private _spotifyClientSecret: string = "2b40b4975b2743189c87f4712c0cd59e";
     private _spotifyClientId: string = "eb67e22ba1c6474aad8ec8067480d9dc";
 
+    private static instance: MusicStore;
+    private constructor() {
+        //
+    }
+    static getInstance() {
+        if (!MusicStore.instance) {
+            MusicStore.instance = new MusicStore();
+        }
+        return MusicStore.instance;
+    }
+
+    setCredentials(creds: any) {
+        Object.keys(creds).forEach(key => {
+            if (key === "clientId") {
+                this.spotifyClientId = creds[key];
+            } else if (key === "clientSecret") {
+                this.spotifyClientSecret = creds[key];
+            } else if (key === "refreshToken") {
+                this.spotifyRefreshToken = creds[key];
+            } else if (key === "accessToken") {
+                this.spotifyAccessToken = creds[key];
+            }
+        });
+    }
+
+    credentialByKey(key: string): any {
+        if (key === "clientId") {
+            return this.spotifyClientId;
+        } else if (key === "clientSecret") {
+            return this.spotifyClientSecret;
+        } else if (key === "refreshToken") {
+            return this.spotifyRefreshToken;
+        } else if (key === "accessToken") {
+            return this.spotifyAccessToken;
+        }
+        return null;
+    }
+
     get spotifyAccessToken(): string {
         return this._spotifyAccessToken;
     }

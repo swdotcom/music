@@ -2,10 +2,20 @@
 
 import { MusicController } from "./lib/controller";
 import { MusicPlayerState } from "./lib/playerstate";
+import { MusicStore } from "./lib/store";
 import { isBooleanString, SPOTIFY_NAME, ITUNES_NAME } from "./lib/util";
 
-const musicCtr = new MusicController();
-const musicPlayerCtr = new MusicPlayerState();
+const musicCtr = MusicController.getInstance();
+const musicPlayerCtr = MusicPlayerState.getInstance();
+const musicStore = MusicStore.getInstance();
+
+export function setCredentials(credentials: any) {
+    musicStore.setCredentials(credentials);
+}
+
+export function getAccessToken() {
+    return musicStore.credentialByKey("accessToken");
+}
 
 export function isSpotifyRunning() {
     return isRunning(SPOTIFY_NAME);
@@ -89,7 +99,11 @@ export function playTrackInContext(player: string, params: any[]) {
 //
 
 export function play(player: string) {
-    return musicCtr.run(player, "play");
+    if (player === "spotify-web") {
+        return musicCtr.spotifyWebPlay();
+    } else {
+        return musicCtr.run(player, "play");
+    }
 }
 
 export function playTrack(player: string, trackId: string) {
@@ -187,7 +201,7 @@ export async function playlistNames(player: string) {
 }
 
 export function launchSpotifyWebPlayer() {
-    musicPlayerCtr.launchSpotifyWebPlayer();
+    return musicPlayerCtr.launchSpotifyWebPlayer();
 }
 
 export function getSpotifyWebDevices() {

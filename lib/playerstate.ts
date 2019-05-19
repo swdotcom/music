@@ -11,9 +11,9 @@ import { MusicController } from "./controller";
 import { MusicStore } from "./store";
 import { MusicClient } from "./client";
 
-const musicCtr = new MusicController();
-const musicStore = new MusicStore();
-const musicClient = new MusicClient();
+const musicCtr = MusicController.getInstance();
+const musicStore = MusicStore.getInstance();
+const musicClient = MusicClient.getInstance();
 
 export enum TrackType {
     MacItunesDesktop = 1,
@@ -80,6 +80,17 @@ export class PlayerContext {
 }
 
 export class MusicPlayerState {
+    private static instance: MusicPlayerState;
+    private constructor() {
+        //
+    }
+    static getInstance() {
+        if (!MusicPlayerState.instance) {
+            MusicPlayerState.instance = new MusicPlayerState();
+        }
+        return MusicPlayerState.instance;
+    }
+
     async getCurrentlyRunningTrackState(): Promise<TrackState> {
         let trackState: TrackState = new TrackState();
         let spotifyDesktopRunning = await this.isSpotifyDesktopRunning();
@@ -159,10 +170,10 @@ export class MusicPlayerState {
      */
     async spotifyWebUsersDevices() {
         let devices: PlayerDevice[] = [];
-        const accessToken = musicStore.spotifyAccessToken;
 
         let api = "/v1/me/player/devices";
         let response = await musicClient.spotifyApiGet(api);
+
         // check if the token needs to be refreshed
         if (response.statusText === "EXPIRED") {
             // refresh the token
@@ -392,6 +403,6 @@ export class MusicPlayerState {
     }
 
     launchSpotifyWebPlayer() {
-        launchWebUrl("https://open.spotify.com/browse/featured");
+        return launchWebUrl("https://open.spotify.com/browse/featured");
     }
 }

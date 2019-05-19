@@ -1,7 +1,15 @@
+import { MusicStore } from "./store";
+
 const cp = require("child_process");
+
+const musicStore = MusicStore.getInstance();
 
 export const SPOTIFY_NAME = "Spotify";
 export const ITUNES_NAME = "iTunes";
+
+export function credentialByKey(key: string): any {
+    return musicStore.credentialByKey(key);
+}
 
 export function isLinux() {
     return isWindows() || isMac() ? false : true;
@@ -112,7 +120,7 @@ export function extractAristFromSpotifyTrack(track: any) {
     }
 }
 
-export async function launchWebUrl(url: string): Promise<any> {
+export function launchWebUrl(url: string): Promise<any> {
     let open = "open";
     let args = [url];
     if (isWindows()) {
@@ -126,5 +134,5 @@ export async function launchWebUrl(url: string): Promise<any> {
     args.unshift(open);
     const cmd = args.join(" ");
 
-    execCmd(cmd);
+    return execCmd(cmd);
 }

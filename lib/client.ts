@@ -3,7 +3,7 @@ import { MusicStore } from "./store";
 
 const superagent = require("superagent");
 
-const musicStore = new MusicStore();
+const musicStore = MusicStore.getInstance();
 
 const spotifyClient: AxiosInstance = axios.create({
     baseURL: "https://api.spotify.com"
@@ -13,6 +13,17 @@ const connectServerClient: AxiosInstance = axios.create({
 });
 
 export class MusicClient {
+    private static instance: MusicClient;
+    private constructor() {
+        //
+    }
+    static getInstance() {
+        if (!MusicClient.instance) {
+            MusicClient.instance = new MusicClient();
+        }
+        return MusicClient.instance;
+    }
+
     /**
      * Refresh the spotify access token
      */
@@ -76,5 +87,33 @@ export class MusicClient {
                 return { statusText: "ERROR", error, message: error.message };
             }
         });
+    }
+
+    spotifyApiPut(api: string, payload: any = {}) {
+        spotifyClient.defaults.headers.common["Authorization"] = `Bearer ${
+            musicStore.spotifyAccessToken
+        }`;
+        return spotifyClient
+            .put(api, payload)
+            .then(resp => {
+                return resp;
+            })
+            .catch(err => {
+                return err;
+            });
+    }
+
+    spotifyApiPost(api: string, payload: any = {}) {
+        spotifyClient.defaults.headers.common["Authorization"] = `Bearer ${
+            musicStore.spotifyAccessToken
+        }`;
+        return spotifyClient
+            .post(api, payload)
+            .then(resp => {
+                return resp;
+            })
+            .catch(err => {
+                return err;
+            });
     }
 }
