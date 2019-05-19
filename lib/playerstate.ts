@@ -1,12 +1,4 @@
-import {
-    execCmd,
-    isMac,
-    isWindows,
-    isEmptyObj,
-    isResponseOk,
-    extractAristFromSpotifyTrack,
-    launchWebUrl
-} from "./util";
+import { MusicUtil } from "./util";
 import { MusicController } from "./controller";
 import { MusicStore } from "./store";
 import { MusicClient } from "./client";
@@ -14,6 +6,7 @@ import { MusicClient } from "./client";
 const musicCtr = MusicController.getInstance();
 const musicStore = MusicStore.getInstance();
 const musicClient = MusicClient.getInstance();
+const musicUtil = new MusicUtil();
 
 export enum TrackType {
     MacItunesDesktop = 1,
@@ -108,15 +101,15 @@ export class MusicPlayerState {
          * /tasklist /fi "imagename eq Spotify.exe" /fo list /v |find " - "
          * Window Title: Dexys Midnight Runners - Come On Eileen
          */
-        let result = await execCmd(
-            MusicController.WINDOWS_SPOTIFY_TRACK_FIND
-        ).catch(e => {
-            console.log(
-                "Error trying to identify if spotify is running on windows: ",
-                e.message
-            );
-            return null;
-        });
+        let result = await musicUtil
+            .execCmd(MusicController.WINDOWS_SPOTIFY_TRACK_FIND)
+            .catch(e => {
+                console.log(
+                    "Error trying to identify if spotify is running on windows: ",
+                    e.message
+                );
+                return null;
+            });
         if (result && result.toLowerCase().includes("title")) {
             return true;
         }
@@ -125,9 +118,9 @@ export class MusicPlayerState {
 
     async isSpotifyDesktopRunning() {
         let isRunning = false;
-        if (isMac()) {
+        if (musicUtil.isMac()) {
             isRunning = await musicCtr.isMusicPlayerActive("Spotify");
-        } else if (isWindows()) {
+        } else if (musicUtil.isWindows()) {
             isRunning = await this.isWindowsSpotifyRunning();
         }
         // currently do not support linux desktop for spotify
@@ -136,7 +129,7 @@ export class MusicPlayerState {
 
     async isItunesDesktopRunning() {
         let isRunning = false;
-        if (isMac()) {
+        if (musicUtil.isMac()) {
             isRunning = await musicCtr.isMusicPlayerActive("iTunes");
         }
         // currently do not supoport windows or linux desktop for itunes
@@ -192,7 +185,7 @@ export class MusicPlayerState {
         let playingTrack: Track = new Track();
         let pausedTrack: Track = new Track();
         let pausedType: TrackType = TrackType.NotAssigned;
-        if (isMac()) {
+        if (musicUtil.isMac()) {
             const spotifyRunning = await musicCtr.isMusicPlayerActive(
                 "Spotify"
             );
@@ -243,7 +236,7 @@ export class MusicPlayerState {
             if (pausedTrack) {
                 trackState = { type: pausedType, track: pausedTrack };
             }
-        } else if (isWindows()) {
+        } else if (musicUtil.isWindows()) {
             // supports only spotify for now
             const winSpotifyRunning = await this.isWindowsSpotifyRunning();
             if (winSpotifyRunning) {
@@ -259,7 +252,7 @@ export class MusicPlayerState {
         }
 
         // make sure it's not an advertisement
-        if (trackState && !isEmptyObj(trackState.track)) {
+        if (trackState && !musicUtil.isEmptyObj(trackState.track)) {
             // "artist":"","album":"","id":"spotify:ad:000000012c603a6600000020316a17a1"
             if (
                 trackState.type === TrackType.MacSpotifyDesktop &&
@@ -276,7 +269,7 @@ export class MusicPlayerState {
         // include common attributes
         if (
             trackState &&
-            !isEmptyObj(trackState.track) &&
+            !musicUtil.isEmptyObj(trackState.track) &&
             trackState.track.duration
         ) {
             // create the attributes
@@ -307,15 +300,15 @@ export class MusicPlayerState {
     async getWindowsSpotifyTrackInfo() {
         let windowTitleStr = "Window Title:";
         // get the artist - song name from the command result, then get the rest of the info from spotify
-        let songInfo = await execCmd(
-            MusicController.WINDOWS_SPOTIFY_TRACK_FIND
-        ).catch(e => {
-            console.log(
-                "Error trying to identify if spotify is running on windows: ",
-                e.message
-            );
-            return null;
-        });
+        let songInfo = await musicUtil
+            .execCmd(MusicController.WINDOWS_SPOTIFY_TRACK_FIND)
+            .catch(e => {
+                console.log(
+                    "Error trying to identify if spotify is running on windows: ",
+                    e.message
+                );
+                return null;
+            });
         if (!songInfo || !songInfo.includes(windowTitleStr)) {
             // it must have paused, or an ad, or it was closed
             return null;
@@ -333,7 +326,7 @@ export class MusicPlayerState {
         let resp = await musicClient.spotifyApiGet(api);
         let trackInfo = null;
         if (
-            isResponseOk(resp) &&
+            musicUtil.isResponseOk(resp) &&
             resp.data &&
             resp.data.tracks &&
             resp.data.tracks.items
@@ -371,7 +364,7 @@ export class MusicPlayerState {
             if (track.duration_ms) {
                 track.duration = track.duration_ms;
             }
-            extractAristFromSpotifyTrack(track);
+            musicUtil.extractAristFromSpotifyTrack(track);
 
             trackState.track = track;
             trackState.type = TrackType.WebSpotify;
@@ -396,13 +389,15 @@ export class MusicPlayerState {
         if (response && response.data && response.data.item) {
             // override "type" with "spotify"
             response.data.item["type"] = "spotify";
-            extractAristFromSpotifyTrack(response.data.item);
+            musicUtil.extractAristFromSpotifyTrack(response.data.item);
             playerContext = response.data;
         }
         return playerContext;
     }
 
     launchSpotifyWebPlayer() {
-        return launchWebUrl("https://open.spotify.com/browse/featured");
+        return musicUtil.launchWebUrl(
+            "https://open.spotify.com/browse/featured"
+        );
     }
 }

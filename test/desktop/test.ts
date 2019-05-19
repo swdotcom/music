@@ -1,6 +1,8 @@
 const expect = require("chai").expect;
 const CodyMusic = require("../../dist/index.js");
-const util = require("../../dist/lib/util.js");
+import { MusicUtil } from "../../lib/util";
+
+const musicUtil = new MusicUtil();
 
 /**
  * Don't add "async" into the it condition.
@@ -13,21 +15,21 @@ const util = require("../../dist/lib/util.js");
 describe("desktop player tests", () => {
     beforeEach(done => {
         CodyMusic.stopSpotifyIfRunning()
-            .then(result => {
+            .then((result: any) => {
                 CodyMusic.stopItunesIfRunning()
-                    .then(result => {
+                    .then((result: any) => {
                         done();
                     })
-                    .catch(err => {
+                    .catch((err: any) => {
                         done();
                     });
             })
-            .catch(err => {
+            .catch((err: any) => {
                 CodyMusic.stopItunesIfRunning()
-                    .then(result => {
+                    .then((result: any) => {
                         done();
                     })
-                    .catch(err => {
+                    .catch((err: any) => {
                         done();
                     });
             });
@@ -39,13 +41,13 @@ describe("desktop player tests", () => {
     });
 
     xit("Should Show The Playlist Names AND Show The Tracks Of A Playlist", done => {
-        CodyMusic.playlistNames("iTunes").then(names => {
+        CodyMusic.playlistNames("iTunes").then((names: []) => {
             expect(names).to.not.equal(0);
             // get the last name in the list and get the tracks
             CodyMusic.getTracksByPlaylistName(
                 "iTunes",
                 names[names.length - 1]
-            ).then(result => {
+            ).then((result: any) => {
                 expect(result.length).to.not.equal(0);
                 done();
             });
@@ -54,13 +56,13 @@ describe("desktop player tests", () => {
 
     xit("Should Set An Itunes Song's Love State", done => {
         CodyMusic.startItunesIfNotRunning().then(async () => {
-            util.sleep(1500);
+            musicUtil.sleep(1500);
             await CodyMusic.setVolume("iTunes", 5);
             await CodyMusic.play("iTunes");
-            util.sleep(1500);
+            musicUtil.sleep(1500);
             let result = await CodyMusic.getState("iTunes");
             let loved = result.loved;
-            CodyMusic.setItunesLoved(!loved).then(async result => {
+            CodyMusic.setItunesLoved(!loved).then(async (result: any) => {
                 // get the state again
                 result = await CodyMusic.getState("iTunes");
                 expect(result.loved).to.equal(!loved);
@@ -71,7 +73,7 @@ describe("desktop player tests", () => {
 
     xit("Should Show An Error", done => {
         // play a bad track number
-        CodyMusic.playTrack("iTunes", 1000000000).then(result => {
+        CodyMusic.playTrack("iTunes", 1000000000).then((result: any) => {
             expect(result.error).to.not.equal(null);
             CodyMusic.stopItunesIfRunning().then(() => {
                 done();
@@ -81,7 +83,7 @@ describe("desktop player tests", () => {
 
     it("Should Show Spotify Is Not Running", done => {
         CodyMusic.stopSpotifyIfRunning().then(() => {
-            CodyMusic.isSpotifyRunning().then(result => {
+            CodyMusic.isSpotifyRunning().then((result: any) => {
                 expect(result).to.equal(false);
                 done();
             });
@@ -90,7 +92,7 @@ describe("desktop player tests", () => {
 
     xit("Should Show Itunes Is Not Running", done => {
         CodyMusic.stopItunesIfRunning().then(() => {
-            CodyMusic.isItunesRunning().then(result => {
+            CodyMusic.isItunesRunning().then((result: any) => {
                 expect(result).to.equal(false);
                 done();
             });
@@ -103,7 +105,7 @@ describe("desktop player tests", () => {
     // "id": "spotify:track:0R8P9KfGJCDULmlEoBagcO","name": "Trouble","state":"playing"}
     xit("Get Spotify Track Info", done => {
         CodyMusic.startSpotifyIfNotRunning().then(async () => {
-            util.sleep(2000);
+            musicUtil.sleep(2000);
             await CodyMusic.setVolume("Spotify", 5);
             // artist: 'Martin Garrix',
             // album: 'High On Life (feat. Bonn)'
@@ -111,7 +113,7 @@ describe("desktop player tests", () => {
             let params = ["spotify:track:4ut5G4rgB1ClpMTMfjoIuy"];
 
             await CodyMusic.playTrackInContext("Spotify", params);
-            util.sleep(1500);
+            musicUtil.sleep(1500);
             let result = await CodyMusic.getState("Spotify");
             expect(result.id).to.equal("spotify:track:4ut5G4rgB1ClpMTMfjoIuy");
             done();
@@ -124,10 +126,10 @@ describe("desktop player tests", () => {
     // "played_count": 120,"track_number": 1,"id": "5601","name": "Out of Sight","state":"playing"}
     xit("Get iTunes Track Info", done => {
         CodyMusic.startItunesIfNotRunning().then(async () => {
-            util.sleep(1500);
+            musicUtil.sleep(1500);
             await CodyMusic.setVolume("iTunes", 5);
             await CodyMusic.play("iTunes");
-            util.sleep(1500);
+            musicUtil.sleep(1500);
             let result = await CodyMusic.getState("iTunes");
             expect(result.artist).to.not.equal(null);
             done();
@@ -137,14 +139,14 @@ describe("desktop player tests", () => {
     xit("Tell Spotify To Perform Next, Repeat, Previous, Pause, Shuffle, Volume Change, Mute, Unmute, Shuffle, Check Shuffle", done => {
         CodyMusic.startSpotifyIfNotRunning()
             .then(async () => {
-                util.sleep(1500);
+                musicUtil.sleep(1500);
                 let params = [
                     "spotify:track:0R8P9KfGJCDULmlEoBagcO",
                     "spotify:album:6ZG5lRT77aJ3btmArcykra"
                 ];
 
                 await CodyMusic.playTrackInContext("Spotify", params);
-                util.sleep(1500);
+                musicUtil.sleep(1500);
 
                 let result = await CodyMusic.getState("Spotify");
                 // make sure it's playing
@@ -209,7 +211,7 @@ describe("desktop player tests", () => {
 
                 done();
             })
-            .catch(err => {
+            .catch((err: any) => {
                 console.log("failed to run itunes tests: ", err.message);
                 done();
             });
@@ -218,9 +220,9 @@ describe("desktop player tests", () => {
     xit("Tell Itunes To Perform Next, Repeat, Previous, Pause, Shuffle, Volume Change, Mute, Unmute, Shuffle, Check Shuffle", done => {
         CodyMusic.startItunesIfNotRunning()
             .then(async () => {
-                util.sleep(1500);
+                musicUtil.sleep(1500);
                 await CodyMusic.play("iTunes");
-                util.sleep(1500);
+                musicUtil.sleep(1500);
 
                 let result = await CodyMusic.getState("iTunes");
                 // make sure it's playing
@@ -285,7 +287,7 @@ describe("desktop player tests", () => {
 
                 done();
             })
-            .catch(err => {
+            .catch((err: any) => {
                 console.log("failed to run itunes tests: ", err.message);
                 done();
             });

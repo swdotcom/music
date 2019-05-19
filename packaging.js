@@ -68,7 +68,7 @@ function execPromise(command, opts) {
 }
 
 function debug(message) {
-    console.log("#### " + message + "\n");
+    console.log("#### " + message);
 }
 
 packageScripts();

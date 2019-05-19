@@ -1,7 +1,8 @@
-import { execCmd, getPlayerName, formatString, ITUNES_NAME } from "./util";
+import { MusicUtil, ITUNES_NAME } from "./util";
 import { MusicClient } from "./client";
 
 const musicClient = MusicClient.getInstance();
+const musicUtil = new MusicUtil();
 
 export class MusicController {
     static readonly WINDOWS_SPOTIFY_TRACK_FIND: string =
@@ -69,10 +70,10 @@ export class MusicController {
     }
 
     async isMusicPlayerActive(player: string) {
-        player = getPlayerName(player);
+        player = musicUtil.getPlayerName(player);
         const command = `pgrep -x ${player}`;
         // this returns the PID of the requested player
-        const result = await execCmd(command);
+        const result = await musicUtil.execCmd(command);
         if (result && !result.error) {
             return true;
         }
@@ -80,9 +81,9 @@ export class MusicController {
     }
 
     async stopPlayer(player: string) {
-        player = getPlayerName(player);
+        player = musicUtil.getPlayerName(player);
         const command = `pgrep -x ${player} | xargs kill -9`;
-        let result = await execCmd(command);
+        let result = await musicUtil.execCmd(command);
         if (result === null || result === undefined) {
             result = "ok";
         }
@@ -90,9 +91,9 @@ export class MusicController {
     }
 
     async startPlayer(player: string) {
-        player = getPlayerName(player);
+        player = musicUtil.getPlayerName(player);
         const command = `open -a ${player}`;
-        let result = await execCmd(command);
+        let result = await musicUtil.execCmd(command);
         if (result === null || result === undefined) {
             result = "ok";
         }
@@ -105,7 +106,7 @@ export class MusicController {
         params: any = null,
         argv: any = null
     ) {
-        player = getPlayerName(player);
+        player = musicUtil.getPlayerName(player);
         let script = this.scripts[scriptName];
 
         if (!params) {
@@ -120,7 +121,7 @@ export class MusicController {
         // get the script file if the attribut has one
         if (script.file) {
             // apply the params (which should only have the player name)
-            const scriptFile = formatString(script.file, params);
+            const scriptFile = musicUtil.formatString(script.file, params);
             let file = `${this.scriptsPath}${scriptFile}`;
             if (argv) {
                 // make sure they have quotes around the argv
@@ -139,10 +140,10 @@ export class MusicController {
                 params.push("Library");
             }
             // apply the params to the one line script
-            script = formatString(script, params);
+            script = musicUtil.formatString(script, params);
             command = `osascript -e \'${script}\'`;
         }
-        let result = await execCmd(command);
+        let result = await musicUtil.execCmd(command);
         if (result === null || result === undefined) {
             result = "ok";
         }
@@ -257,19 +258,46 @@ export class MusicController {
         );
     }
 
-    public async spotifyWebPlay() {
-        musicClient.spotifyApiPut("/v1/me/player/play");
+    public async playOnSpotifyDevice(
+        device_ids: string[],
+        play: boolean = true
+    ) {
+        const payload = {
+            device_ids,
+            play
+        };
+        return musicClient.spotifyApiPut("v1/me/player", {}, payload);
     }
 
-    public async spotifyWebPause() {
-        musicClient.spotifyApiPut("/v1/me/player/pause");
+    public async spotifyWebPlay(qsOptions: any = {}, payload: any = {}) {
+        return musicClient.spotifyApiPut(
+            "/v1/me/player/play",
+            qsOptions,
+            payload
+        );
     }
 
-    public async spotifyWebPrevious() {
-        musicClient.spotifyApiPost("/v1/me/player/previous");
+    public async spotifyWebPause(qsOptions: any = {}, payload: any = {}) {
+        return musicClient.spotifyApiPut(
+            "/v1/me/player/pause",
+            qsOptions,
+            payload
+        );
     }
 
-    public async spotifyWebNext() {
-        musicClient.spotifyApiPost("/v1/me/player/next");
+    public async spotifyWebPrevious(qsOptions: any = {}, payload: any = {}) {
+        return musicClient.spotifyApiPost(
+            "/v1/me/player/previous",
+            qsOptions,
+            payload
+        );
+    }
+
+    public async spotifyWebNext(qsOptions: any = {}, payload: any = {}) {
+        return musicClient.spotifyApiPost(
+            "/v1/me/player/next",
+            qsOptions,
+            payload
+        );
     }
 }

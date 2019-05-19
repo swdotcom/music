@@ -1,6 +1,6 @@
 import axios, { AxiosInstance } from "axios";
 import { MusicStore } from "./store";
-
+const querystring = require("querystring");
 const superagent = require("superagent");
 
 const musicStore = MusicStore.getInstance();
@@ -11,6 +11,16 @@ const spotifyClient: AxiosInstance = axios.create({
 const connectServerClient: AxiosInstance = axios.create({
     baseURL: "http://localhost:5000"
 });
+
+/**
+ * Spotify Error Cases
+ * When performing an action that is restricted,
+ * 404 NOT FOUND or 403 FORBIDDEN will be returned together with a player error message.
+ * For example, if there are no active devices found, the request will
+ * return 404 NOT FOUND response code and the reason NO_ACTIVE_DEVICE, or,
+ * if the user making the request is non-premium, a 403 FORBIDDEN response
+ * code will be returned together with the PREMIUM_REQUIRED reason.
+ */
 
 export class MusicClient {
     private static instance: MusicClient;
@@ -89,31 +99,43 @@ export class MusicClient {
         });
     }
 
-    spotifyApiPut(api: string, payload: any = {}) {
+    spotifyApiPut(api: string, qsOptions: any = {}, payload: any = {}) {
+        const qs = querystring.stringify(qsOptions);
+        if (qs) {
+            api += `?${qs}`;
+        }
         spotifyClient.defaults.headers.common["Authorization"] = `Bearer ${
             musicStore.spotifyAccessToken
         }`;
-        return spotifyClient
-            .put(api, payload)
-            .then(resp => {
-                return resp;
-            })
-            .catch(err => {
-                return err;
-            });
+        return spotifyClient.put(api, payload).catch(err => {
+            if (err.response) {
+                return {
+                    status: err.response.status,
+                    statusText: err.response.statusText,
+                    message: err.message
+                };
+            }
+            return err;
+        });
     }
 
-    spotifyApiPost(api: string, payload: any = {}) {
+    spotifyApiPost(api: string, qsOptions: any = {}, payload: any = {}) {
+        const qs = querystring.stringify(qsOptions);
+        if (qs) {
+            api += `?${qs}`;
+        }
         spotifyClient.defaults.headers.common["Authorization"] = `Bearer ${
             musicStore.spotifyAccessToken
         }`;
-        return spotifyClient
-            .post(api, payload)
-            .then(resp => {
-                return resp;
-            })
-            .catch(err => {
-                return err;
-            });
+        return spotifyClient.post(api, payload).catch(err => {
+            if (err.response) {
+                return {
+                    status: err.response.status,
+                    statusText: err.response.statusText,
+                    message: err.message
+                };
+            }
+            return err;
+        });
     }
 }

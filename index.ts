@@ -3,11 +3,12 @@
 import { MusicController } from "./lib/controller";
 import { MusicPlayerState } from "./lib/playerstate";
 import { MusicStore } from "./lib/store";
-import { isBooleanString, SPOTIFY_NAME, ITUNES_NAME } from "./lib/util";
+import { MusicUtil, SPOTIFY_NAME, ITUNES_NAME } from "./lib/util";
 
 const musicCtr = MusicController.getInstance();
 const musicPlayerCtr = MusicPlayerState.getInstance();
 const musicStore = MusicStore.getInstance();
+const musicUtil = new MusicUtil();
 
 export function setCredentials(credentials: any) {
     musicStore.setCredentials(credentials);
@@ -98,12 +99,20 @@ export function playTrackInContext(player: string, params: any[]) {
 // Sinngle line scripts that only require the player (Spotify or iTunes)
 //
 
-export function play(player: string) {
+export function play(player: string, qsOptions: any = {}) {
+    console.log("player: ", player);
     if (player === "spotify-web") {
-        return musicCtr.spotifyWebPlay();
+        return musicCtr.spotifyWebPlay(qsOptions);
     } else {
         return musicCtr.run(player, "play");
     }
+}
+
+export function playOnSpotifyDevice(
+    device_ids: string[],
+    play: boolean = true
+) {
+    return musicCtr.playOnSpotifyDevice(device_ids, play);
 }
 
 export function playTrack(player: string, trackId: string) {
@@ -144,7 +153,7 @@ export function setShufflingOff(player: string) {
 
 export async function isShuffling(player: string) {
     const val = await musicCtr.run(player, "isShuffling");
-    if (isBooleanString(val)) {
+    if (musicUtil.isBooleanString(val)) {
         return JSON.parse(val);
     }
     return val;
@@ -156,7 +165,7 @@ export async function isShuffling(player: string) {
  */
 export async function isRepeating(player: string) {
     let val = await musicCtr.run(player, "isRepeating");
-    if (isBooleanString(val)) {
+    if (musicUtil.isBooleanString(val)) {
         return JSON.parse(val);
     }
     return val;
