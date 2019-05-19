@@ -1,5 +1,6 @@
 import { MusicUtil, ITUNES_NAME } from "./util";
 import { MusicClient } from "./client";
+import { PlayerName } from "./models";
 
 const musicClient = MusicClient.getInstance();
 const musicUtil = new MusicUtil();
@@ -171,7 +172,8 @@ export class MusicController {
         params: any = null,
         argv: any = null
     ) {
-        if (player === "Spotify") {
+        player = musicUtil.getPlayerName(player);
+        if (player === PlayerName.SpotifyDesktop) {
             if (scriptName === "repeatOn") {
                 params = ["repeating", "true"];
             } else if (scriptName === "repeatOff") {
@@ -184,7 +186,7 @@ export class MusicController {
             } else if (scriptName === "isShuffling") {
                 params = ["return shuffling"];
             }
-        } else if (player === "iTunes") {
+        } else if (player === PlayerName.ItunesDesktop) {
             if (scriptName === "repeatOn") {
                 // repeat one for itunes
                 params = ["song repeat", "one"];
@@ -258,12 +260,9 @@ export class MusicController {
         );
     }
 
-    public async playOnSpotifyDevice(
-        device_ids: string[],
-        play: boolean = true
-    ) {
+    public async playSpotifyDevice(device_id: string, play: boolean = true) {
         const payload = {
-            device_ids,
+            device_ids: [device_id],
             play
         };
         return musicClient.spotifyApiPut("v1/me/player", {}, payload);

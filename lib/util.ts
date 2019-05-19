@@ -1,4 +1,5 @@
 import { MusicStore } from "./store";
+import { PlayerName } from "./models";
 
 const cp = require("child_process");
 
@@ -88,14 +89,15 @@ export class MusicUtil {
 
     getPlayerName(player: string) {
         if (!player || player.trim().length === 0) {
-            player = "Spotify";
-            return player;
+            return PlayerName.SpotifyDesktop;
         }
         player = player.trim().toLowerCase();
         if (player === "itunes") {
-            return ITUNES_NAME;
+            return PlayerName.ItunesDesktop;
+        } else if (player === "spotify-web") {
+            return PlayerName.SpotifyWeb;
         }
-        return SPOTIFY_NAME;
+        return PlayerName.SpotifyDesktop;
     }
 
     formatString(source: string, params: any) {

@@ -1,6 +1,7 @@
+import { PlayerName, PlayerType } from "../../lib/models";
+import { MusicUtil } from "../../lib/util";
 const expect = require("chai").expect;
 const CodyMusic = require("../../dist/index.js");
-import { MusicUtil } from "../../lib/util";
 
 const musicUtil = new MusicUtil();
 
@@ -32,7 +33,9 @@ describe("web player music tests", () => {
                 // launch the web player
                 // High on Life
                 const albumId = "1GUfof1gHsqYjoHFym3aim";
-                CodyMusic.launchSpotifyWeb({ album: albumId }).then(() => {
+                CodyMusic.launchPlayer(PlayerType.WebSpotify, {
+                    album: albumId
+                }).then(() => {
                     musicUtil.sleep(3000);
                     done();
                 });
@@ -62,29 +65,46 @@ describe("web player music tests", () => {
         CodyMusic.getSpotifyWebDevices().then((response: any) => {
             // get the 1st device id
             const device_id = response[0].id;
-            CodyMusic.playOnSpotifyDevice([device_id], true).then(
+            CodyMusic.playSpotifyDevice(device_id, true /* play */).then(
                 (response: any) => {
+                    expect(response.status).to.equal(204);
                     done();
-                    // artist: 'Martin Garrix',
-                    // album: 'High On Life (feat. Bonn)'
-                    // id: spotify:track:4ut5G4rgB1ClpMTMfjoIuy
-                    // const qsOptions = {
-                    //     device_id,
-                    //     uris: ["spotify:track:4ut5G4rgB1ClpMTMfjoIuy"]
-                    // };
-                    // CodyMusic.play("spotify-web", qsOptions).then(
-                    //     (result: any) => {
-                    //         done();
-                    //     }
-                    // );
                 }
             );
         });
     });
 
     it("Pause web player", done => {
-        CodyMusic.pause("spotify-web").then((response: any) => {
-            done();
+        CodyMusic.getSpotifyWebDevices().then((response: any) => {
+            // get the 1st device id
+            const device_id = response[0].id;
+            const qsOptions = {
+                device_id
+            };
+            CodyMusic.pause(PlayerName.SpotifyWeb, qsOptions).then(
+                (response: any) => {
+                    expect(response.status).to.equal(204);
+                    done();
+                }
+            );
+        });
+    });
+
+    it("Play specific track", done => {
+        CodyMusic.getSpotifyWebDevices().then((response: any) => {
+            // get the 1st device id
+            const device_id = response[0].id;
+            // https://open.spotify.com/track/0i0wnv9UoFdZ5MfuFGQzMy
+            // name: 'Last Hurrah'
+            // id: spotify:track:0i0wnv9UoFdZ5MfuFGQzMy
+            const qsOptions = {
+                device_id,
+                uris: ["spotify:track:0i0wnv9UoFdZ5MfuFGQzMy"]
+            };
+            CodyMusic.play("spotify-web", qsOptions).then((response: any) => {
+                expect(response.status).to.equal(204);
+                done();
+            });
         });
     });
 });

@@ -2,75 +2,19 @@ import { MusicUtil } from "./util";
 import { MusicController } from "./controller";
 import { MusicStore } from "./store";
 import { MusicClient } from "./client";
+import {
+    TrackState,
+    PlayerDevice,
+    Track,
+    PlayerType,
+    TrackStatus,
+    PlayerContext
+} from "./models";
 
 const musicCtr = MusicController.getInstance();
 const musicStore = MusicStore.getInstance();
 const musicClient = MusicClient.getInstance();
 const musicUtil = new MusicUtil();
-
-export enum TrackType {
-    MacItunesDesktop = 1,
-    MacSpotifyDesktop = 2,
-    WindowsSpotifyDesktop = 3,
-    WebSpotify = 4,
-    NotAssigned = 5,
-    Advertisement = 6
-}
-
-export class TrackState {
-    /**
-     * type of the player
-     */
-    type: TrackType = TrackType.NotAssigned;
-    /**
-     * The track data
-     */
-    track: Track = new Track();
-}
-
-// {artist, album, genre, disc_number, duration, played_count, track_number, id, name, state}
-export class Track {
-    artist: string = "";
-    album: string = "";
-    genre: string = "";
-    disc_number: number = 0;
-    duration: number = 0;
-    duration_ms: number = 0;
-    played_count: number = 0;
-    track_number: number = 0;
-    popularity: number = 0;
-    id: string = "";
-    uri: string = "";
-    name: string = "";
-    state: string = "";
-    explicit: boolean = false;
-    // href:"https://api.spotify.com/v1/playlists/0mwG8hCL4scWi8Nkt7jyoV/tracks"
-    href: string = "";
-    // "spotify", "itunes"
-    type: string = "";
-}
-
-export class PlayerDevice {
-    id: string = "";
-    is_active: string = "";
-    is_restricted: boolean = false;
-    name: string = "";
-    type: string = "";
-    volume_percent: number = 0;
-}
-
-export class PlayerContext {
-    timestamp: number = 0;
-    device: PlayerDevice = new PlayerDevice();
-    progress_ms: string = "";
-    is_playing: boolean = false;
-    currently_playing_type: string = "";
-    actions: any = null;
-    item: any = null;
-    shuffle_state: boolean = false;
-    repeat_state: string = "";
-    context: any = null;
-}
 
 export class MusicPlayerState {
     private static instance: MusicPlayerState;
@@ -184,7 +128,7 @@ export class MusicPlayerState {
         let trackState: TrackState = new TrackState();
         let playingTrack: Track = new Track();
         let pausedTrack: Track = new Track();
-        let pausedType: TrackType = TrackType.NotAssigned;
+        let pausedType: PlayerType = PlayerType.NotAssigned;
         if (musicUtil.isMac()) {
             const spotifyRunning = await musicCtr.isMusicPlayerActive(
                 "Spotify"
@@ -201,13 +145,13 @@ export class MusicPlayerState {
                 }
                 if (playingTrack && playingTrack.state === "playing") {
                     trackState = {
-                        type: TrackType.MacSpotifyDesktop,
+                        type: PlayerType.MacSpotifyDesktop,
                         track: playingTrack
                     };
                 } else if (playingTrack) {
                     // save this one if itunes isn't running
                     pausedTrack = playingTrack;
-                    pausedType = TrackType.MacSpotifyDesktop;
+                    pausedType = PlayerType.MacSpotifyDesktop;
                 }
             }
 
@@ -224,12 +168,12 @@ export class MusicPlayerState {
                 }
                 if (playingTrack && playingTrack.state === "playing") {
                     trackState = {
-                        type: TrackType.MacItunesDesktop,
+                        type: PlayerType.MacItunesDesktop,
                         track: playingTrack
                     };
                 } else if (!pausedTrack && playingTrack) {
                     pausedTrack = playingTrack;
-                    pausedType = TrackType.MacItunesDesktop;
+                    pausedType = PlayerType.MacItunesDesktop;
                 }
             }
 
@@ -244,7 +188,7 @@ export class MusicPlayerState {
                 if (playingTrack) {
                     playingTrack.type = "spotify";
                     trackState = {
-                        type: TrackType.MacSpotifyDesktop,
+                        type: PlayerType.MacSpotifyDesktop,
                         track: playingTrack
                     };
                 }
@@ -255,14 +199,14 @@ export class MusicPlayerState {
         if (trackState && !musicUtil.isEmptyObj(trackState.track)) {
             // "artist":"","album":"","id":"spotify:ad:000000012c603a6600000020316a17a1"
             if (
-                trackState.type === TrackType.MacSpotifyDesktop &&
+                trackState.type === PlayerType.MacSpotifyDesktop &&
                 trackState.track.id.includes("spotify:ad:")
             ) {
                 // it's a spotify ad
-                trackState.type = TrackType.Advertisement;
+                trackState.track.status = TrackStatus.Advertisement;
             } else if (!trackState.track.artist && !trackState.track.album) {
                 // not enough info to send
-                trackState.type = TrackType.NotAssigned;
+                trackState.track.status = TrackStatus.NotAssigned;
             }
         }
 
@@ -367,7 +311,7 @@ export class MusicPlayerState {
             musicUtil.extractAristFromSpotifyTrack(track);
 
             trackState.track = track;
-            trackState.type = TrackType.WebSpotify;
+            trackState.type = PlayerType.WebSpotify;
 
             return trackState;
         }
@@ -395,15 +339,17 @@ export class MusicPlayerState {
         return playerContext;
     }
 
-    launchSpotifyWebPlayer(options: any) {
+    launchPlayer(playerType: PlayerType, options: any) {
         if (options.album) {
             return musicUtil.launchWebUrl(
                 `https://open.spotify.com/album/${options.album}`
             );
-        } else {
+        } else if (options.track) {
             return musicUtil.launchWebUrl(
-                "https://open.spotify.com/browse/featured"
+                `https://open.spotify.com/track/${options.track}`
             );
+        } else {
+            return musicUtil.launchWebUrl("https://open.spotify.com/browse");
         }
     }
 }
