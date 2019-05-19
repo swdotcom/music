@@ -30,7 +30,9 @@ describe("web player music tests", () => {
         CodyMusic.getSpotifyWebDevices().then((response: []) => {
             if (response.length === 0) {
                 // launch the web player
-                CodyMusic.launchSpotifyWebPlayer().then(() => {
+                // High on Life
+                const albumId = "1GUfof1gHsqYjoHFym3aim";
+                CodyMusic.launchSpotifyWeb({ album: albumId }).then(() => {
                     musicUtil.sleep(3000);
                     done();
                 });
@@ -56,26 +58,33 @@ describe("web player music tests", () => {
         });
     });
 
-    it("Play/pause web player track", done => {
+    it("Play on spotify device", done => {
         CodyMusic.getSpotifyWebDevices().then((response: any) => {
             // get the 1st device id
             const device_id = response[0].id;
             CodyMusic.playOnSpotifyDevice([device_id], true).then(
                 (response: any) => {
+                    done();
                     // artist: 'Martin Garrix',
                     // album: 'High On Life (feat. Bonn)'
                     // id: spotify:track:4ut5G4rgB1ClpMTMfjoIuy
-                    const qsOptions = {
-                        device_id,
-                        uris: ["spotify:track:4ut5G4rgB1ClpMTMfjoIuy"]
-                    };
-                    CodyMusic.play("spotify-web", qsOptions).then(
-                        (result: any) => {
-                            done();
-                        }
-                    );
+                    // const qsOptions = {
+                    //     device_id,
+                    //     uris: ["spotify:track:4ut5G4rgB1ClpMTMfjoIuy"]
+                    // };
+                    // CodyMusic.play("spotify-web", qsOptions).then(
+                    //     (result: any) => {
+                    //         done();
+                    //     }
+                    // );
                 }
             );
+        });
+    });
+
+    it("Pause web player", done => {
+        CodyMusic.pause("spotify-web").then((response: any) => {
+            done();
         });
     });
 });

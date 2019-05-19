@@ -395,9 +395,15 @@ export class MusicPlayerState {
         return playerContext;
     }
 
-    launchSpotifyWebPlayer() {
-        return musicUtil.launchWebUrl(
-            "https://open.spotify.com/browse/featured"
-        );
+    launchSpotifyWebPlayer(options: any) {
+        if (options.album) {
+            return musicUtil.launchWebUrl(
+                `https://open.spotify.com/album/${options.album}`
+            );
+        } else {
+            return musicUtil.launchWebUrl(
+                "https://open.spotify.com/browse/featured"
+            );
+        }
     }
 }

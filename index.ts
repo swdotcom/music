@@ -209,8 +209,8 @@ export async function playlistNames(player: string) {
     return result;
 }
 
-export function launchSpotifyWebPlayer() {
-    return musicPlayerCtr.launchSpotifyWebPlayer();
+export function launchSpotifyWeb(options: any) {
+    return musicPlayerCtr.launchSpotifyWebPlayer(options);
 }
 
 export function getSpotifyWebDevices() {
