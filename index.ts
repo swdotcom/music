@@ -5,6 +5,7 @@ import { PlayerName, TrackState, PlayerDevice } from "./lib/models";
 import { MusicPlayerState } from "./lib/playerstate";
 import { MusicStore } from "./lib/store";
 import { MusicUtil } from "./lib/util";
+import { deprecate } from "util";
 
 const musicCtr = MusicController.getInstance();
 const musicPlayerCtr = MusicPlayerState.getInstance();
@@ -92,7 +93,7 @@ export function startItunesIfNotRunning() {
  * @param player
  * @returns {artist, album, genre, disc_number, duration, played_count, track_number, id, name, state}
  */
-export async function getState(player: PlayerName) {
+export async function getState(player: PlayerName): Promise<TrackState> {
     if (player === PlayerName.SpotifyWeb) {
         return await musicPlayerCtr.getSpotifyWebCurrentTrack();
     }
@@ -100,9 +101,15 @@ export async function getState(player: PlayerName) {
     if (state) {
         return JSON.parse(state);
     }
-    return null;
+    return new TrackState();
 }
 
+/**
+ * Returns the currently running track info (player and track).
+ * This only supports returning the state for itunes and spotify desktop
+ * on Mac and spotify desktop on windows.
+ * Deprecated - use "getState(player:PlayerName)" instead
+ */
 export async function getCurrentlyRunningTrackState(): Promise<TrackState> {
     return await musicPlayerCtr.getCurrentlyRunningTrackState();
 }
