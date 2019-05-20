@@ -8,7 +8,8 @@ import {
     Track,
     PlayerType,
     TrackStatus,
-    PlayerContext
+    PlayerContext,
+    PlayerName
 } from "./models";
 
 const musicCtr = MusicController.getInstance();
@@ -63,7 +64,9 @@ export class MusicPlayerState {
     async isSpotifyDesktopRunning() {
         let isRunning = false;
         if (musicUtil.isMac()) {
-            isRunning = await musicCtr.isMusicPlayerActive("Spotify");
+            isRunning = await musicCtr.isMusicPlayerActive(
+                PlayerName.SpotifyDesktop
+            );
         } else if (musicUtil.isWindows()) {
             isRunning = await this.isWindowsSpotifyRunning();
         }
@@ -74,7 +77,9 @@ export class MusicPlayerState {
     async isItunesDesktopRunning() {
         let isRunning = false;
         if (musicUtil.isMac()) {
-            isRunning = await musicCtr.isMusicPlayerActive("iTunes");
+            isRunning = await musicCtr.isMusicPlayerActive(
+                PlayerName.ItunesDesktop
+            );
         }
         // currently do not supoport windows or linux desktop for itunes
         return isRunning;
@@ -131,17 +136,20 @@ export class MusicPlayerState {
         let pausedType: PlayerType = PlayerType.NotAssigned;
         if (musicUtil.isMac()) {
             const spotifyRunning = await musicCtr.isMusicPlayerActive(
-                "Spotify"
+                PlayerName.SpotifyDesktop
             );
             // spotify first
             if (spotifyRunning) {
-                const state = await musicCtr.run("Spotify", "state");
+                const state = await musicCtr.run(
+                    PlayerName.SpotifyDesktop,
+                    "state"
+                );
                 if (state) {
                     playingTrack = JSON.parse(state);
                 }
 
                 if (playingTrack) {
-                    playingTrack.type = "spotify";
+                    playingTrack.type = PlayerName.SpotifyDesktop;
                 }
                 if (playingTrack && playingTrack.state === "playing") {
                     trackState = {
@@ -156,15 +164,20 @@ export class MusicPlayerState {
             }
 
             // next itunes
-            const itunesRunning = await musicCtr.isMusicPlayerActive("iTunes");
+            const itunesRunning = await musicCtr.isMusicPlayerActive(
+                PlayerName.ItunesDesktop
+            );
             if (itunesRunning) {
-                const state = await musicCtr.run("iTunes", "state");
+                const state = await musicCtr.run(
+                    PlayerName.ItunesDesktop,
+                    "state"
+                );
                 if (state) {
                     playingTrack = JSON.parse(state);
                 }
 
                 if (playingTrack) {
-                    playingTrack.type = "itunes";
+                    playingTrack.type = PlayerName.ItunesDesktop;
                 }
                 if (playingTrack && playingTrack.state === "playing") {
                     trackState = {
@@ -186,7 +199,7 @@ export class MusicPlayerState {
             if (winSpotifyRunning) {
                 playingTrack = await this.getWindowsSpotifyTrackInfo();
                 if (playingTrack) {
-                    playingTrack.type = "spotify";
+                    playingTrack.type = PlayerName.SpotifyDesktop;
                     trackState = {
                         type: PlayerType.MacSpotifyDesktop,
                         track: playingTrack
@@ -339,7 +352,7 @@ export class MusicPlayerState {
         return playerContext;
     }
 
-    launchPlayer(playerType: PlayerType, options: any) {
+    launchWebPlayer(options: any) {
         if (options.album) {
             return musicUtil.launchWebUrl(
                 `https://open.spotify.com/album/${options.album}`
@@ -348,8 +361,7 @@ export class MusicPlayerState {
             return musicUtil.launchWebUrl(
                 `https://open.spotify.com/track/${options.track}`
             );
-        } else {
-            return musicUtil.launchWebUrl("https://open.spotify.com/browse");
         }
+        return musicUtil.launchWebUrl("https://open.spotify.com/browse");
     }
 }

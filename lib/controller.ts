@@ -1,4 +1,4 @@
-import { MusicUtil, ITUNES_NAME } from "./util";
+import { MusicUtil } from "./util";
 import { MusicClient } from "./client";
 import { PlayerName } from "./models";
 
@@ -70,7 +70,7 @@ export class MusicController {
         return MusicController.instance;
     }
 
-    async isMusicPlayerActive(player: string) {
+    async isMusicPlayerActive(player: PlayerName) {
         player = musicUtil.getPlayerName(player);
         const command = `pgrep -x ${player}`;
         // this returns the PID of the requested player
@@ -81,9 +81,16 @@ export class MusicController {
         return false;
     }
 
-    async stopPlayer(player: string) {
-        player = musicUtil.getPlayerName(player);
-        const command = `pgrep -x ${player} | xargs kill -9`;
+    async stopPlayer(player: PlayerName) {
+        /**
+         * ps -ef | grep "Spotify.app" | grep -v grep | awk '{print $2}' | xargs kill
+         * ps -ef | grep "iTunes.app" | grep -v grep | awk '{print $2}' | xargs kill
+         */
+        let appName = "Spotify.app";
+        if (player === PlayerName.ItunesDesktop) {
+            appName = "iTunes.app";
+        }
+        const command = `ps -ef | grep "${appName}" | grep -v grep | awk '{print $2}' | xargs kill`;
         let result = await musicUtil.execCmd(command);
         if (result === null || result === undefined) {
             result = "ok";
@@ -167,7 +174,7 @@ export class MusicController {
     }
 
     async run(
-        player: string,
+        player: PlayerName,
         scriptName: string,
         params: any = null,
         argv: any = null
@@ -212,7 +219,7 @@ export class MusicController {
             params = [this.lastVolumeLevel];
         } else if (scriptName === "next" || scriptName === "previous") {
             // make sure it's not on repeat
-            if (player === "Spotify") {
+            if (player === PlayerName.SpotifyDesktop) {
                 await this.execScript(player, "state", ["repeating", "false"]);
             } else {
                 await this.execScript(player, "state", ["song repeat", "off"]);
@@ -239,14 +246,14 @@ export class MusicController {
     }
 
     setItunesLoved(loved: boolean) {
-        return this.execScript(ITUNES_NAME, "setItunesLoved", [loved]).then(
-            result => {
-                if (result === null || result === undefined) {
-                    result = "ok";
-                }
-                return result;
+        return this.execScript(PlayerName.ItunesDesktop, "setItunesLoved", [
+            loved
+        ]).then(result => {
+            if (result === null || result === undefined) {
+                result = "ok";
             }
-        );
+            return result;
+        });
     }
 
     playTrackInContext(player: string, params: any[]) {
@@ -268,7 +275,11 @@ export class MusicController {
         return musicClient.spotifyApiPut("v1/me/player", {}, payload);
     }
 
-    public async spotifyWebPlay(qsOptions: any = {}, payload: any = {}) {
+    public async spotifyWebPlay(options: any) {
+        const qsOptions = options.device_id
+            ? { device_id: options.device_id }
+            : {};
+        const payload = options.track_id ? { uris: [options.track_id] } : {};
         return musicClient.spotifyApiPut(
             "/v1/me/player/play",
             qsOptions,
@@ -276,7 +287,11 @@ export class MusicController {
         );
     }
 
-    public async spotifyWebPause(qsOptions: any = {}, payload: any = {}) {
+    public async spotifyWebPause(options: any) {
+        const qsOptions = options.device_id
+            ? { device_id: options.device_id }
+            : {};
+        const payload = options.track_id ? { uris: [options.track_id] } : {};
         return musicClient.spotifyApiPut(
             "/v1/me/player/pause",
             qsOptions,
@@ -284,7 +299,11 @@ export class MusicController {
         );
     }
 
-    public async spotifyWebPrevious(qsOptions: any = {}, payload: any = {}) {
+    public async spotifyWebPrevious(options: any) {
+        const qsOptions = options.device_id
+            ? { device_id: options.device_id }
+            : {};
+        const payload = options.track_id ? { uris: [options.track_id] } : {};
         return musicClient.spotifyApiPost(
             "/v1/me/player/previous",
             qsOptions,
@@ -292,7 +311,11 @@ export class MusicController {
         );
     }
 
-    public async spotifyWebNext(qsOptions: any = {}, payload: any = {}) {
+    public async spotifyWebNext(options: any) {
+        const qsOptions = options.device_id
+            ? { device_id: options.device_id }
+            : {};
+        const payload = options.track_id ? { uris: [options.track_id] } : {};
         return musicClient.spotifyApiPost(
             "/v1/me/player/next",
             qsOptions,

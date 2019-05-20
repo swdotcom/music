@@ -4,7 +4,7 @@ import { MusicController } from "./lib/controller";
 import { PlayerName, PlayerType } from "./lib/models";
 import { MusicPlayerState } from "./lib/playerstate";
 import { MusicStore } from "./lib/store";
-import { MusicUtil, SPOTIFY_NAME, ITUNES_NAME } from "./lib/util";
+import { MusicUtil } from "./lib/util";
 
 const musicCtr = MusicController.getInstance();
 const musicPlayerCtr = MusicPlayerState.getInstance();
@@ -20,31 +20,31 @@ export function getAccessToken() {
 }
 
 export function isSpotifyRunning() {
-    return isRunning(SPOTIFY_NAME);
+    return isRunning(PlayerName.SpotifyDesktop);
 }
 
 export function isItunesRunning() {
-    return isRunning(ITUNES_NAME);
+    return isRunning(PlayerName.ItunesDesktop);
 }
 
-export async function isRunning(player: string) {
+export async function isRunning(player: PlayerName) {
     return await musicCtr.isMusicPlayerActive(player);
 }
 
 export function stopSpotifyIfRunning() {
-    return musicCtr.stopPlayer(SPOTIFY_NAME);
+    return musicCtr.stopPlayer(PlayerName.SpotifyDesktop);
 }
 
 export function stopItunesIfRunning() {
-    return musicCtr.stopPlayer(ITUNES_NAME);
+    return musicCtr.stopPlayer(PlayerName.ItunesDesktop);
 }
 
 export function startSpotifyIfNotRunning() {
-    return musicCtr.startPlayer(SPOTIFY_NAME);
+    return musicCtr.startPlayer(PlayerName.SpotifyDesktop);
 }
 
 export function startItunesIfNotRunning() {
-    return musicCtr.startPlayer(ITUNES_NAME);
+    return musicCtr.startPlayer(PlayerName.ItunesDesktop);
 }
 
 /**
@@ -53,7 +53,10 @@ export function startItunesIfNotRunning() {
  * @param player
  * @returns {artist, album, genre, disc_number, duration, played_count, track_number, id, name, state}
  */
-export async function getState(player: string) {
+export async function getState(player: PlayerName) {
+    if (player === PlayerName.SpotifyWeb) {
+        return await musicPlayerCtr.getSpotifyWebCurrentTrack();
+    }
     const state = await musicCtr.run(player, "state");
     if (state) {
         return JSON.parse(state);
@@ -62,7 +65,7 @@ export async function getState(player: string) {
 }
 
 export async function getTracksByPlaylistName(
-    player: string,
+    player: PlayerName,
     playListName: string
 ) {
     const params = null;
@@ -104,9 +107,9 @@ export function playSpotifyDevice(device_id: string, play: boolean = true) {
 // Sinngle line scripts that only require the player (Spotify or iTunes)
 //
 
-export function play(player: PlayerName, qsOptions: any = {}) {
+export function play(player: PlayerName, options: any) {
     if (player === PlayerName.SpotifyWeb) {
-        return musicCtr.spotifyWebPlay(qsOptions);
+        return musicCtr.spotifyWebPlay(options);
     } else {
         return musicCtr.run(player, "play");
     }
@@ -116,9 +119,9 @@ export function playTrack(player: PlayerName, trackId: string) {
     return musicCtr.playTrack(player, trackId);
 }
 
-export function pause(player: PlayerName, qsOptions: any = {}) {
+export function pause(player: PlayerName, options: any) {
     if (player === PlayerName.SpotifyWeb) {
-        return musicCtr.spotifyWebPause(qsOptions);
+        return musicCtr.spotifyWebPause(options);
     } else {
         return musicCtr.run(player, "pause");
     }
@@ -128,12 +131,20 @@ export function playPause(player: PlayerName) {
     return musicCtr.run(player, "playPause");
 }
 
-export function next(player: PlayerName) {
-    return musicCtr.run(player, "next");
+export function next(player: PlayerName, options: any) {
+    if (player === PlayerName.SpotifyWeb) {
+        return musicCtr.spotifyWebNext(options);
+    } else {
+        return musicCtr.run(player, "next");
+    }
 }
 
-export function previous(player: PlayerName) {
-    return musicCtr.run(player, "previous");
+export function previous(player: PlayerName, options: any) {
+    if (player === PlayerName.SpotifyWeb) {
+        return musicCtr.spotifyWebPrevious(options);
+    } else {
+        return musicCtr.run(player, "previous");
+    }
 }
 
 export function repeatOn(player: PlayerName) {
@@ -210,8 +221,12 @@ export async function playlistNames(player: PlayerName) {
     return result;
 }
 
-export function launchPlayer(playerType: PlayerType, options: any) {
-    return musicPlayerCtr.launchPlayer(playerType, options);
+export function launchPlayer(playerName: PlayerName, options: any) {
+    if (playerName === PlayerName.SpotifyWeb) {
+        return musicPlayerCtr.launchWebPlayer(options);
+    } else {
+        return musicCtr.startPlayer(playerName);
+    }
 }
 
 export function getSpotifyWebDevices() {

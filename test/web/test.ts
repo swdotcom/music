@@ -14,7 +14,7 @@ const musicUtil = new MusicUtil();
  * "Error: Resolution method is overspecified. Specify a callback *or* return a Promise; not both."
  */
 describe("web player music tests", () => {
-    beforeEach(done => {
+    before(done => {
         const accessToken = "123abc";
         CodyMusic.setCredentials({
             refreshToken:
@@ -28,20 +28,28 @@ describe("web player music tests", () => {
 
         expect(setAccessToken).to.equal(accessToken);
 
-        CodyMusic.getSpotifyWebDevices().then((response: []) => {
-            if (response.length === 0) {
+        CodyMusic.getSpotifyWebDevices().then(async (response: []) => {
+            let hasComputerDevice = false;
+            if (response) {
+                for (let i = 0; i < response.length; i++) {
+                    let element: any = response[i];
+                    if (element.type === "Computer") {
+                        hasComputerDevice = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!hasComputerDevice) {
                 // launch the web player
                 // High on Life
                 const albumId = "1GUfof1gHsqYjoHFym3aim";
-                CodyMusic.launchPlayer(PlayerType.WebSpotify, {
+                await CodyMusic.launchPlayer(PlayerName.SpotifyWeb, {
                     album: albumId
-                }).then(() => {
-                    musicUtil.sleep(3000);
-                    done();
                 });
-            } else {
-                done();
+                musicUtil.sleep(5000);
             }
+            done();
         });
     });
 
@@ -62,47 +70,51 @@ describe("web player music tests", () => {
     });
 
     it("Play on spotify device", done => {
-        CodyMusic.getSpotifyWebDevices().then((response: any) => {
+        CodyMusic.getSpotifyWebDevices().then(async (response: any) => {
             // get the 1st device id
             const device_id = response[0].id;
-            CodyMusic.playSpotifyDevice(device_id, true /* play */).then(
-                (response: any) => {
-                    expect(response.status).to.equal(204);
-                    done();
-                }
+            response = await CodyMusic.playSpotifyDevice(
+                device_id,
+                true /* play */
             );
+            musicUtil.sleep(3000);
+            expect(response.status).to.equal(204);
+            done();
         });
     });
 
     it("Pause web player", done => {
-        CodyMusic.getSpotifyWebDevices().then((response: any) => {
+        CodyMusic.getSpotifyWebDevices().then(async (response: any) => {
             // get the 1st device id
             const device_id = response[0].id;
-            const qsOptions = {
+            const options = {
                 device_id
             };
-            CodyMusic.pause(PlayerName.SpotifyWeb, qsOptions).then(
-                (response: any) => {
-                    expect(response.status).to.equal(204);
-                    done();
-                }
-            );
+            response = await CodyMusic.pause(PlayerName.SpotifyWeb, options);
+            musicUtil.sleep(3000);
+            expect(response.status).to.equal(204);
+            done();
         });
     });
 
-    it("Play specific track", done => {
-        CodyMusic.getSpotifyWebDevices().then((response: any) => {
+    it("Play specific track and validate track is playing", done => {
+        CodyMusic.getSpotifyWebDevices().then(async (response: any) => {
             // get the 1st device id
             const device_id = response[0].id;
             // https://open.spotify.com/track/0i0wnv9UoFdZ5MfuFGQzMy
             // name: 'Last Hurrah'
             // id: spotify:track:0i0wnv9UoFdZ5MfuFGQzMy
-            const qsOptions = {
+            const track_id = "spotify:track:0i0wnv9UoFdZ5MfuFGQzMy";
+            const options = {
                 device_id,
-                uris: ["spotify:track:0i0wnv9UoFdZ5MfuFGQzMy"]
+                track_id
             };
-            CodyMusic.play("spotify-web", qsOptions).then((response: any) => {
-                expect(response.status).to.equal(204);
+            response = await CodyMusic.play(PlayerName.SpotifyWeb, options);
+            musicUtil.sleep(3000);
+
+            expect(response.status).to.equal(204);
+            CodyMusic.getState(PlayerName.SpotifyWeb).then((response: any) => {
+                expect(response.track.uri).to.equal(track_id);
                 done();
             });
         });

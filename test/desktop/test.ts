@@ -1,6 +1,7 @@
 const expect = require("chai").expect;
 const CodyMusic = require("../../dist/index.js");
 import { MusicUtil } from "../../lib/util";
+import { PlayerName } from "../../lib/models";
 
 const musicUtil = new MusicUtil();
 
@@ -37,15 +38,21 @@ describe("desktop player tests", () => {
 
     after(done => {
         // make sure both players have been killed
-        done();
+        CodyMusic.stopSpotifyIfRunning()
+            .then((result: any) => {
+                done();
+            })
+            .catch((err: any) => {
+                done();
+            });
     });
 
-    xit("Should Show The Playlist Names AND Show The Tracks Of A Playlist", done => {
+    it("Should Show The Playlist Names AND Show The Tracks Of A Playlist", done => {
         CodyMusic.playlistNames("iTunes").then((names: []) => {
             expect(names).to.not.equal(0);
             // get the last name in the list and get the tracks
             CodyMusic.getTracksByPlaylistName(
-                "iTunes",
+                PlayerName.ItunesDesktop,
                 names[names.length - 1]
             ).then((result: any) => {
                 expect(result.length).to.not.equal(0);
@@ -54,7 +61,7 @@ describe("desktop player tests", () => {
         });
     });
 
-    xit("Should Set An Itunes Song's Love State", done => {
+    it("Should Set An Itunes Song's Love State", done => {
         CodyMusic.startItunesIfNotRunning().then(async () => {
             musicUtil.sleep(1500);
             await CodyMusic.setVolume("iTunes", 5);
@@ -71,7 +78,7 @@ describe("desktop player tests", () => {
         });
     });
 
-    xit("Should Show An Error", done => {
+    it("Should Show An Error", done => {
         // play a bad track number
         CodyMusic.playTrack("iTunes", 1000000000).then((result: any) => {
             expect(result.error).to.not.equal(null);
@@ -90,7 +97,7 @@ describe("desktop player tests", () => {
         });
     });
 
-    xit("Should Show Itunes Is Not Running", done => {
+    it("Should Show Itunes Is Not Running", done => {
         CodyMusic.stopItunesIfRunning().then(() => {
             CodyMusic.isItunesRunning().then((result: any) => {
                 expect(result).to.equal(false);
@@ -103,7 +110,7 @@ describe("desktop player tests", () => {
     // {"artist": "Coldplay","album": "Parachutes","genre": "",
     // "disc_number": 1,"duration": 273426,"played_count": 0,"track_number": 6,
     // "id": "spotify:track:0R8P9KfGJCDULmlEoBagcO","name": "Trouble","state":"playing"}
-    xit("Get Spotify Track Info", done => {
+    it("Get Spotify Track Info", done => {
         CodyMusic.startSpotifyIfNotRunning().then(async () => {
             musicUtil.sleep(2000);
             await CodyMusic.setVolume("Spotify", 5);
@@ -124,7 +131,7 @@ describe("desktop player tests", () => {
     // {"artist": "Loud Forest","album": "Out of Sight - Single",
     // "genre":"Alternative","disc_number": 1,"duration": 212.042007446289,
     // "played_count": 120,"track_number": 1,"id": "5601","name": "Out of Sight","state":"playing"}
-    xit("Get iTunes Track Info", done => {
+    it("Get iTunes Track Info", done => {
         CodyMusic.startItunesIfNotRunning().then(async () => {
             musicUtil.sleep(1500);
             await CodyMusic.setVolume("iTunes", 5);
@@ -136,7 +143,7 @@ describe("desktop player tests", () => {
         });
     });
 
-    xit("Tell Spotify To Perform Next, Repeat, Previous, Pause, Shuffle, Volume Change, Mute, Unmute, Shuffle, Check Shuffle", done => {
+    it("Tell Spotify To Perform Next, Repeat, Previous, Pause, Shuffle, Volume Change, Mute, Unmute, Shuffle, Check Shuffle", done => {
         CodyMusic.startSpotifyIfNotRunning()
             .then(async () => {
                 musicUtil.sleep(1500);
@@ -217,7 +224,7 @@ describe("desktop player tests", () => {
             });
     });
 
-    xit("Tell Itunes To Perform Next, Repeat, Previous, Pause, Shuffle, Volume Change, Mute, Unmute, Shuffle, Check Shuffle", done => {
+    it("Tell Itunes To Perform Next, Repeat, Previous, Pause, Shuffle, Volume Change, Mute, Unmute, Shuffle, Check Shuffle", done => {
         CodyMusic.startItunesIfNotRunning()
             .then(async () => {
                 musicUtil.sleep(1500);

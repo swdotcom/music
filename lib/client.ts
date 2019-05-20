@@ -104,6 +104,7 @@ export class MusicClient {
         if (qs) {
             api += `?${qs}`;
         }
+
         spotifyClient.defaults.headers.common["Authorization"] = `Bearer ${
             musicStore.spotifyAccessToken
         }`;

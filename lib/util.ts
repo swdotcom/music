@@ -5,9 +5,6 @@ const cp = require("child_process");
 
 const musicStore = MusicStore.getInstance();
 
-export const SPOTIFY_NAME = "Spotify";
-export const ITUNES_NAME = "iTunes";
-
 export class MusicUtil {
     credentialByKey(key: string): any {
         return musicStore.credentialByKey(key);
