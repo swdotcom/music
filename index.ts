@@ -7,6 +7,7 @@ import { MusicStore } from "./lib/store";
 import { MusicUtil } from "./lib/util";
 import { deprecate } from "util";
 
+// get the instances
 const musicCtr = MusicController.getInstance();
 const musicPlayerCtr = MusicPlayerState.getInstance();
 const musicStore = MusicStore.getInstance();
