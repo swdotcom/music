@@ -1,7 +1,7 @@
 "use strict";
 
 import { MusicController } from "./lib/controller";
-import { PlayerName, PlayerType } from "./lib/models";
+import { PlayerName, TrackState, PlayerDevice } from "./lib/models";
 import { MusicPlayerState } from "./lib/playerstate";
 import { MusicStore } from "./lib/store";
 import { MusicUtil } from "./lib/util";
@@ -62,6 +62,10 @@ export async function getState(player: PlayerName) {
         return JSON.parse(state);
     }
     return null;
+}
+
+export async function getCurrentlyRunningTrackState(): Promise<TrackState> {
+    return await musicPlayerCtr.getCurrentlyRunningTrackState();
 }
 
 export async function getTracksByPlaylistName(
@@ -229,6 +233,16 @@ export function launchPlayer(playerName: PlayerName, options: any) {
     }
 }
 
-export function getSpotifyWebDevices() {
-    return musicPlayerCtr.spotifyWebUsersDevices();
+/**
+ * Returns available devices
+ */
+export function getSpotifyDevices(): Promise<PlayerDevice[]> {
+    return musicPlayerCtr.getSpotifyDevices();
+}
+
+export async function getGenre(
+    artist: string,
+    songName: string = ""
+): Promise<string> {
+    return musicCtr.getGenreFromItunes(artist, songName);
 }

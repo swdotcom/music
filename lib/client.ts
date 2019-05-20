@@ -1,15 +1,18 @@
 import axios, { AxiosInstance } from "axios";
 import { MusicStore } from "./store";
 const querystring = require("querystring");
-const superagent = require("superagent");
 
 const musicStore = MusicStore.getInstance();
 
 const spotifyClient: AxiosInstance = axios.create({
     baseURL: "https://api.spotify.com"
 });
-const connectServerClient: AxiosInstance = axios.create({
-    baseURL: "http://localhost:5000"
+const spotifyAccountClient: AxiosInstance = axios.create({
+    baseURL: "https://accounts.spotify.com",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" }
+});
+const itunesSearchClient: AxiosInstance = axios.create({
+    baseURL: "https://itunes.apple.com"
 });
 
 /**
@@ -34,50 +37,110 @@ export class MusicClient {
         return MusicClient.instance;
     }
 
+    // getGenreFromSpotify(artist: string): Promise<any> {
+    //     const qParam = encodeURIComponent(`artist:${artist}`);
+    //     const qryStr = `q=${qParam}&type=artist&limit=1`;
+    //     const api = `/v1/search?${qryStr}`;
+
+    //     spotifyClient.defaults.headers.common["Authorization"] = `Bearer ${
+    //         musicStore.spotifyAccessToken
+    //     }`;
+    //     return spotifyClient
+    //         .get(api)
+    //         .then(resp => {
+    //             return { statusText: resp.statusText, data: resp };
+    //         })
+    //         .catch(error => {
+    //             if (error.response && error.response.status === 401) {
+    //                 return {
+    //                     statusText: "EXPIRED",
+    //                     error,
+    //                     message: error.message
+    //                 };
+    //             } else {
+    //                 return {
+    //                     statusText: "ERROR",
+    //                     error,
+    //                     message: error.message
+    //                 };
+    //             }
+    //         });
+    // }
+
+    async getGenreFromItunes(
+        artist: string,
+        songName: string = ""
+    ): Promise<string> {
+        // try from itunes
+        // search?term=${terms}&limit=3
+        let terms = songName ? `${artist} ${songName}` : artist;
+        const api = `search?term=${terms}`;
+        return itunesSearchClient
+            .get(api)
+            .then(resp => {
+                let secondaryGenreName = "";
+                if (resp.data && resp.data.resultCount > 0) {
+                    for (let i = 0; i < resp.data.resultCount; i++) {
+                        let result = resp.data.results[i];
+                        if (result.kind === "song" && result.primaryGenreName) {
+                            return result.primaryGenreName;
+                        } else if (result.primaryGenreName) {
+                            secondaryGenreName = result.primaryGenreName;
+                        }
+                    }
+                }
+                return secondaryGenreName;
+            })
+            .catch(err => {
+                console.error(
+                    "Unable to retrieve genre from itunes search: ",
+                    err.message
+                );
+                return "";
+            });
+    }
+
     /**
      * Refresh the spotify access token
      */
     async refreshSpotifyToken() {
-        const payload = `${musicStore.spotifyClientId}:${
+        const authPayload = `${musicStore.spotifyClientId}:${
             musicStore.spotifyClientSecret
         }`;
-        const encodedPayload = Buffer.from(payload).toString("base64");
+        const encodedAuthPayload = Buffer.from(authPayload).toString("base64");
 
-        let response = await superagent
-            .post("https://accounts.spotify.com/api/token")
-            .send({
-                grant_type: "refresh_token",
-                refresh_token: musicStore.spotifyRefreshToken
-            }) // sends a JSON post body
-            .set("Authorization", `Basic ${encodedPayload}`)
-            .set("Accept", "application/json")
-            .set("Content-Type", "application/x-www-form-urlencoded")
-            .then((resp: any) => {
-                /**
-                 * -- main attributes --
-                 * ok:true
-                 * status:200
-                 * statusCode:200
-                 * unauthorized:false
-                 * noContent:false
-                 * notAcceptable:false
-                 * notFound:false
-                 * body:Object {
-                        access_token:"BQAXPZVQT5_7tBViPq_u5xb8iczA0cjMAls6xk35Tg5_ahSTg-SoZfd5KfOp_bvDcRQQwYhbzFMzU2OrNz1heDf4qtRcbTvadzJaZjSWonahP3cjXhuT2J-UoW-kfZXXWHJvDpG6D7tcqNrssbaaQqi-zPZcdRkL0HM6g8BRtJxH4WKnVQsujH-sIkFsOHFsCFd8LT9o2XBVTqUbUEsgERyayXOf3v-rFwRLFqgSawtlv99oftxFemKZ-IwgSgOs4tww2zh43jIGPLQF1ECJsQgNQ-m5ELRwfdL77-5dgGqe"
-                        expires_in:3600
-                        scope:"playlist-read-private playlist-read-collaborative user-follow-read playlist-modify-private user-read-email user-read-private app-remote-control streaming user-follow-modify user-modify-playback-state user-library-read user-library-modify playlist-modify-public user-read-playback-state user-read-currently-playing user-read-recently-played user-top-read"
-                        token_type:"Bearer"
-                */
-                if (resp.ok && resp.body) {
-                    return { status: "success", data: resp.body.access_token };
+        spotifyAccountClient.defaults.headers.common[
+            "Authorization"
+        ] = `Basic ${encodedAuthPayload}`;
+        spotifyAccountClient.defaults.headers.post["Content-Type"] =
+            "application/x-www-form-urlencoded";
+        const payload = {
+            grant_type: "refresh_token",
+            refresh_token: musicStore.spotifyRefreshToken
+        };
+        const params = new URLSearchParams();
+        params.append("grant_type", "refresh_token");
+        params.append("refresh_token", musicStore.spotifyRefreshToken);
+        let response = await spotifyAccountClient
+            .post("/api/token", params)
+            .then(resp => {
+                if (resp.data && resp.data.access_token) {
+                    return { status: "success", data: resp.data.access_token };
+                } else {
+                    return {
+                        status: "failed",
+                        message: "Unable refresh the access token"
+                    };
                 }
-                return {
-                    status: "failed",
-                    message: `Response info: ${JSON.stringify(resp)}`
-                };
             })
-            .catch((error: any) => {
-                return { status: "failed", message: error.message };
+            .catch(err => {
+                if (err.response) {
+                    return {
+                        status: "failed",
+                        message: err.message
+                    };
+                }
+                return err;
             });
         if (response.status === "success") {
             musicStore.spotifyAccessToken = response.data;
@@ -125,6 +188,7 @@ export class MusicClient {
         if (qs) {
             api += `?${qs}`;
         }
+
         spotifyClient.defaults.headers.common["Authorization"] = `Bearer ${
             musicStore.spotifyAccessToken
         }`;

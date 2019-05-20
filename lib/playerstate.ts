@@ -88,7 +88,7 @@ export class MusicPlayerState {
     async isSpotifyWebRunning(): Promise<boolean> {
         let accessToken = musicStore.spotifyAccessToken;
         if (accessToken) {
-            let spotifyDevices: PlayerDevice[] = await this.spotifyWebUsersDevices();
+            let spotifyDevices: PlayerDevice[] = await this.getSpotifyDevices();
             if (spotifyDevices.length > 0) {
                 return true;
             }
@@ -110,7 +110,7 @@ export class MusicPlayerState {
         } ]
         }
      */
-    async spotifyWebUsersDevices() {
+    async getSpotifyDevices(): Promise<PlayerDevice[]> {
         let devices: PlayerDevice[] = [];
 
         let api = "/v1/me/player/devices";

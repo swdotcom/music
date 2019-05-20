@@ -279,7 +279,7 @@ export class MusicController {
         const qsOptions = options.device_id
             ? { device_id: options.device_id }
             : {};
-        const payload = options.track_id ? { uris: [options.track_id] } : {};
+        const payload = options.track_ids ? { uris: options.track_ids } : {};
         return musicClient.spotifyApiPut(
             "/v1/me/player/play",
             qsOptions,
@@ -291,7 +291,7 @@ export class MusicController {
         const qsOptions = options.device_id
             ? { device_id: options.device_id }
             : {};
-        const payload = options.track_id ? { uris: [options.track_id] } : {};
+        const payload = options.track_ids ? { uris: options.track_ids } : {};
         return musicClient.spotifyApiPut(
             "/v1/me/player/pause",
             qsOptions,
@@ -303,7 +303,7 @@ export class MusicController {
         const qsOptions = options.device_id
             ? { device_id: options.device_id }
             : {};
-        const payload = options.track_id ? { uris: [options.track_id] } : {};
+        const payload = options.track_ids ? { uris: options.track_ids } : {};
         return musicClient.spotifyApiPost(
             "/v1/me/player/previous",
             qsOptions,
@@ -315,11 +315,31 @@ export class MusicController {
         const qsOptions = options.device_id
             ? { device_id: options.device_id }
             : {};
-        const payload = options.track_id ? { uris: [options.track_id] } : {};
+        const payload = options.track_ids ? { uris: options.track_ids } : {};
         return musicClient.spotifyApiPost(
             "/v1/me/player/next",
             qsOptions,
             payload
         );
     }
+
+    public getGenreFromItunes(
+        artist: string,
+        songName: string = ""
+    ): Promise<string> {
+        return musicClient.getGenreFromItunes(artist, songName);
+    }
+
+    // public async getGenreFromSpotify(artist: string): Promise<string> {
+    //     let response = await musicClient.getGenreFromSpotify(artist);
+    //     // check if the token needs to be refreshed
+    //     if (response.statusText === "EXPIRED") {
+    //         // refresh the token
+    //         await musicClient.refreshSpotifyToken();
+    //         // try again
+    //         response = await musicClient.getGenreFromSpotify(artist);
+    //     }
+
+    //     return response;
+    // }
 }

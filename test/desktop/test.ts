@@ -162,16 +162,19 @@ describe("desktop player tests", () => {
 
                 // go to the previous song
                 await CodyMusic.previous("Spotify");
+                musicUtil.sleep(1500);
                 // check
                 result = await CodyMusic.getState("Spotify");
                 expect(result.name).to.equal("Yellow");
                 // pause it
                 await CodyMusic.pause("Spotify");
+                musicUtil.sleep(1500);
                 // check
                 result = await CodyMusic.getState("Spotify");
                 expect(result.state).to.equal("paused");
                 // go to next
                 await CodyMusic.next("Spotify");
+                musicUtil.sleep(1500);
                 // check
                 result = await CodyMusic.getState("Spotify");
                 expect(result.name).to.equal("Trouble");

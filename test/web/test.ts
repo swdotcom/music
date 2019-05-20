@@ -28,7 +28,7 @@ describe("web player music tests", () => {
 
         expect(setAccessToken).to.equal(accessToken);
 
-        CodyMusic.getSpotifyWebDevices().then(async (response: []) => {
+        CodyMusic.getSpotifyDevices().then(async (response: []) => {
             let hasComputerDevice = false;
             if (response) {
                 for (let i = 0; i < response.length; i++) {
@@ -63,14 +63,14 @@ describe("web player music tests", () => {
             type: 'Computer',
             volume_percent: 100 } ]
          */
-        CodyMusic.getSpotifyWebDevices().then((response: any) => {
+        CodyMusic.getSpotifyDevices().then((response: any) => {
             expect(response.length).to.not.equal(0);
             done();
         });
     });
 
     it("Play on spotify device", done => {
-        CodyMusic.getSpotifyWebDevices().then(async (response: any) => {
+        CodyMusic.getSpotifyDevices().then(async (response: any) => {
             // get the 1st device id
             const device_id = response[0].id;
             response = await CodyMusic.playSpotifyDevice(
@@ -84,7 +84,7 @@ describe("web player music tests", () => {
     });
 
     it("Pause web player", done => {
-        CodyMusic.getSpotifyWebDevices().then(async (response: any) => {
+        CodyMusic.getSpotifyDevices().then(async (response: any) => {
             // get the 1st device id
             const device_id = response[0].id;
             const options = {
@@ -98,7 +98,7 @@ describe("web player music tests", () => {
     });
 
     it("Play specific track and validate track is playing", done => {
-        CodyMusic.getSpotifyWebDevices().then(async (response: any) => {
+        CodyMusic.getSpotifyDevices().then(async (response: any) => {
             // get the 1st device id
             const device_id = response[0].id;
             // https://open.spotify.com/track/0i0wnv9UoFdZ5MfuFGQzMy
@@ -107,7 +107,7 @@ describe("web player music tests", () => {
             const track_id = "spotify:track:0i0wnv9UoFdZ5MfuFGQzMy";
             const options = {
                 device_id,
-                track_id
+                track_ids: [track_id]
             };
             response = await CodyMusic.play(PlayerName.SpotifyWeb, options);
             musicUtil.sleep(3000);
@@ -117,6 +117,33 @@ describe("web player music tests", () => {
                 expect(response.track.uri).to.equal(track_id);
                 done();
             });
+        });
+    });
+
+    it("Go to the next and previous track", done => {
+        CodyMusic.getSpotifyDevices().then(async (response: any) => {
+            // get the 1st device id
+            const device_id = response[0].id;
+            let options = {
+                device_id,
+                track_ids: [
+                    "spotify:track:4ut5G4rgB1ClpMTMfjoIuy",
+                    "spotify:track:0i0wnv9UoFdZ5MfuFGQzMy"
+                ]
+            };
+
+            response = await CodyMusic.play(PlayerName.SpotifyWeb, options);
+            musicUtil.sleep(3000);
+
+            delete options["track_ids"];
+
+            response = await CodyMusic.next(PlayerName.SpotifyWeb, options);
+            musicUtil.sleep(1000);
+
+            response = await CodyMusic.next(PlayerName.SpotifyWeb, options);
+            musicUtil.sleep(1000);
+
+            done();
         });
     });
 });
