@@ -67,24 +67,8 @@ export class MusicClient {
                     data: genre
                 };
             })
-            .catch(error => {
-                if (error.response && error.response.status === 401) {
-                    return {
-                        status: "failed",
-                        statusText: "EXPIRED",
-                        error,
-                        message: error.message,
-                        data: ""
-                    };
-                } else {
-                    return {
-                        status: "failed",
-                        statusText: "ERROR",
-                        error,
-                        message: error.message,
-                        data: ""
-                    };
-                }
+            .catch(err => {
+                return this.buildErrorResponse(err);
             });
     }
 
@@ -182,12 +166,8 @@ export class MusicClient {
             musicStore.spotifyAccessToken
         }`;
 
-        return spotifyClient.get(api).catch(async error => {
-            if (error.response && error.response.status === 401) {
-                return { statusText: "EXPIRED", error, message: error.message };
-            } else {
-                return { statusText: "ERROR", error, message: error.message };
-            }
+        return spotifyClient.get(api).catch(async err => {
+            return this.buildErrorResponse(err);
         });
     }
 
@@ -205,14 +185,7 @@ export class MusicClient {
             musicStore.spotifyAccessToken
         }`;
         return spotifyClient.put(api, payload).catch(err => {
-            if (err.response) {
-                return {
-                    status: err.response.status,
-                    statusText: err.response.statusText,
-                    message: err.message
-                };
-            }
-            return err;
+            return this.buildErrorResponse(err);
         });
     }
 
@@ -230,14 +203,25 @@ export class MusicClient {
             musicStore.spotifyAccessToken
         }`;
         return spotifyClient.post(api, payload).catch(err => {
-            if (err.response) {
-                return {
-                    status: err.response.status,
-                    statusText: err.response.statusText,
-                    message: err.message
-                };
-            }
-            return err;
+            return this.buildErrorResponse(err);
         });
+    }
+
+    buildErrorResponse(err: any) {
+        if (err.response && err.response.status === 401) {
+            return {
+                status: "failed",
+                statusText: "EXPIRED",
+                error: err,
+                message: err.message
+            };
+        } else {
+            return {
+                status: "failed",
+                statusText: "ERROR",
+                error: err,
+                message: err.message
+            };
+        }
     }
 }
