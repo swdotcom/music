@@ -323,23 +323,27 @@ export class MusicController {
         );
     }
 
-    public getGenreFromItunes(
+    public async getGenre(
         artist: string,
         songName: string = ""
     ): Promise<string> {
-        return musicClient.getGenreFromItunes(artist, songName);
+        let genre = await musicClient.getGenreFromItunes(artist, songName);
+        if (!genre || genre === "") {
+            genre = await this.getGenreFromSpotify(artist);
+        }
+        return genre;
     }
 
-    // public async getGenreFromSpotify(artist: string): Promise<string> {
-    //     let response = await musicClient.getGenreFromSpotify(artist);
-    //     // check if the token needs to be refreshed
-    //     if (response.statusText === "EXPIRED") {
-    //         // refresh the token
-    //         await musicClient.refreshSpotifyToken();
-    //         // try again
-    //         response = await musicClient.getGenreFromSpotify(artist);
-    //     }
+    public async getGenreFromSpotify(artist: string): Promise<string> {
+        let response = await musicClient.getGenreFromSpotify(artist);
+        // check if the token needs to be refreshed
+        if (response.statusText === "EXPIRED") {
+            // refresh the token
+            await musicClient.refreshSpotifyToken();
+            // try again
+            response = await musicClient.getGenreFromSpotify(artist);
+        }
 
-    //     return response;
-    // }
+        return response.data;
+    }
 }

@@ -244,5 +244,9 @@ export async function getGenre(
     artist: string,
     songName: string = ""
 ): Promise<string> {
-    return musicCtr.getGenreFromItunes(artist, songName);
+    return musicCtr.getGenre(artist, songName);
+}
+
+export async function getSpotifyGenre(artist: string): Promise<string> {
+    return musicCtr.getGenreFromSpotify(artist);
 }

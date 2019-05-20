@@ -37,35 +37,56 @@ export class MusicClient {
         return MusicClient.instance;
     }
 
-    // getGenreFromSpotify(artist: string): Promise<any> {
-    //     const qParam = encodeURIComponent(`artist:${artist}`);
-    //     const qryStr = `q=${qParam}&type=artist&limit=1`;
-    //     const api = `/v1/search?${qryStr}`;
+    getGenreFromSpotify(artist: string): Promise<any> {
+        const qParam = encodeURIComponent(`artist:${artist}`);
+        const qryStr = `q=${qParam}&type=artist&limit=1`;
+        const api = `/v1/search?${qryStr}`;
 
-    //     spotifyClient.defaults.headers.common["Authorization"] = `Bearer ${
-    //         musicStore.spotifyAccessToken
-    //     }`;
-    //     return spotifyClient
-    //         .get(api)
-    //         .then(resp => {
-    //             return { statusText: resp.statusText, data: resp };
-    //         })
-    //         .catch(error => {
-    //             if (error.response && error.response.status === 401) {
-    //                 return {
-    //                     statusText: "EXPIRED",
-    //                     error,
-    //                     message: error.message
-    //                 };
-    //             } else {
-    //                 return {
-    //                     statusText: "ERROR",
-    //                     error,
-    //                     message: error.message
-    //                 };
-    //             }
-    //         });
-    // }
+        spotifyClient.defaults.headers.common["Authorization"] = `Bearer ${
+            musicStore.spotifyAccessToken
+        }`;
+        return spotifyClient
+            .get(api)
+            .then(resp => {
+                let genre = "";
+                if (resp.data && resp.data.artists && resp.data.artists.items) {
+                    const items = resp.data.artists.items;
+                    if (items && items.length > 0) {
+                        for (let i = 0; i < items.length; i++) {
+                            const item = items[i];
+                            if (item && item.genres && item.genres.length > 0) {
+                                genre = item.genres.join(", ");
+                                break;
+                            }
+                        }
+                    }
+                }
+                return {
+                    status: "success",
+                    statusText: resp.statusText,
+                    data: genre
+                };
+            })
+            .catch(error => {
+                if (error.response && error.response.status === 401) {
+                    return {
+                        status: "failed",
+                        statusText: "EXPIRED",
+                        error,
+                        message: error.message,
+                        data: ""
+                    };
+                } else {
+                    return {
+                        status: "failed",
+                        statusText: "ERROR",
+                        error,
+                        message: error.message,
+                        data: ""
+                    };
+                }
+            });
+    }
 
     async getGenreFromItunes(
         artist: string,
@@ -104,6 +125,14 @@ export class MusicClient {
      * Refresh the spotify access token
      */
     async refreshSpotifyToken() {
+        if (!musicStore.spotifyRefreshToken) {
+            return {
+                status: "failed",
+                statusText: "ERROR",
+                data: "",
+                message: "Missing Spotify Credentials"
+            };
+        }
         const authPayload = `${musicStore.spotifyClientId}:${
             musicStore.spotifyClientSecret
         }`;
@@ -162,7 +191,11 @@ export class MusicClient {
         });
     }
 
-    spotifyApiPut(api: string, qsOptions: any = {}, payload: any = {}) {
+    spotifyApiPut(
+        api: string,
+        qsOptions: any = {},
+        payload: any = {}
+    ): Promise<any> {
         const qs = querystring.stringify(qsOptions);
         if (qs) {
             api += `?${qs}`;
@@ -183,7 +216,11 @@ export class MusicClient {
         });
     }
 
-    spotifyApiPost(api: string, qsOptions: any = {}, payload: any = {}) {
+    spotifyApiPost(
+        api: string,
+        qsOptions: any = {},
+        payload: any = {}
+    ): Promise<any> {
         const qs = querystring.stringify(qsOptions);
         if (qs) {
             api += `?${qs}`;
