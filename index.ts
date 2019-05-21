@@ -1,12 +1,17 @@
 "use strict";
 
 import { MusicController } from "./lib/controller";
-import { PlayerName, TrackState, PlayerDevice } from "./lib/models";
+import {
+    PlayerName,
+    TrackState,
+    PlayerDevice,
+    SpotifyAudioFeature
+} from "./lib/models";
 import { MusicPlayerState } from "./lib/playerstate";
 import { MusicStore } from "./lib/store";
 import { MusicUtil } from "./lib/util";
-import { deprecate } from "util";
 
+// get the instances
 const musicCtr = MusicController.getInstance();
 const musicPlayerCtr = MusicPlayerState.getInstance();
 const musicStore = MusicStore.getInstance();
@@ -30,19 +35,24 @@ export function getAccessToken() {
 }
 
 /**
- * Checks if the Spotify desktop is running or not
+ * Checks if the Spotify desktop or web player is running or not
  * @returns {Promise<boolean>}
  */
-export function isSpotifyRunning() {
-    return isRunning(PlayerName.SpotifyDesktop);
+export async function isSpotifyRunning() {
+    let running = await isPlayerRunning(PlayerName.SpotifyDesktop);
+    if (!running) {
+        // check the web
+        running = await musicPlayerCtr.isSpotifyWebRunning();
+    }
+    return running;
 }
 
 /**
- * Checks if the iTunes desktop is running or not
+ * Checks if the iTunes desktop player is running or not
  * @returns {Promise<boolean>}
  */
 export function isItunesRunning() {
-    return isRunning(PlayerName.ItunesDesktop);
+    return isPlayerRunning(PlayerName.ItunesDesktop);
 }
 
 /**
@@ -50,7 +60,7 @@ export function isItunesRunning() {
  * @param player {spotify|spotify-web|itunes}
  * @returns {Promise<boolean>}
  */
-export async function isRunning(player: PlayerName) {
+export async function isPlayerRunning(player: PlayerName) {
     if (player === PlayerName.SpotifyWeb) {
         return await musicPlayerCtr.isSpotifyWebRunning();
     } else {
@@ -59,41 +69,13 @@ export async function isRunning(player: PlayerName) {
 }
 
 /**
- * Kills the Spotify desktop if it's running
- */
-export function stopSpotifyIfRunning() {
-    return musicCtr.stopPlayer(PlayerName.SpotifyDesktop);
-}
-
-/**
- * Kills the iTunes desktop if it's running
- */
-export function stopItunesIfRunning() {
-    return musicCtr.stopPlayer(PlayerName.ItunesDesktop);
-}
-
-/**
- * Launches the Spotify desktop if it's not running
- */
-export function startSpotifyIfNotRunning() {
-    return musicCtr.startPlayer(PlayerName.SpotifyDesktop);
-}
-
-/**
- * Launches the iTunes desktop if it's not running
- */
-export function startItunesIfNotRunning() {
-    return musicCtr.startPlayer(PlayerName.ItunesDesktop);
-}
-
-/**
  * Returns the player state and track of a given player {spotify|spotify-web|itunes}
  * - Spotify does not return a "genre"
  * - duration is in milliseconds
- * @param player
+ * @param player {spotify|spotif-web|itunes}
  * @returns {artist, album, genre, disc_number, duration, played_count, track_number, id, name, state}
  */
-export async function getState(player: PlayerName): Promise<TrackState> {
+export async function getPlayerState(player: PlayerName): Promise<TrackState> {
     if (player === PlayerName.SpotifyWeb) {
         return await musicPlayerCtr.getSpotifyWebCurrentTrack();
     }
@@ -110,8 +92,8 @@ export async function getState(player: PlayerName): Promise<TrackState> {
  * on Mac and spotify desktop on windows.
  * Deprecated - use "getState(player:PlayerName)" instead
  */
-export async function getCurrentlyRunningTrackState(): Promise<TrackState> {
-    return await musicPlayerCtr.getCurrentlyRunningTrackState();
+export function getCurrentlyRunningTrackState(): Promise<TrackState> {
+    return musicPlayerCtr.getCurrentlyRunningTrackState();
 }
 
 /**
@@ -159,8 +141,8 @@ export function playTrackInContext(player: PlayerName, params: any[]) {
  * @param device_id {string}
  * @param play {boolean}
  */
-export function playSpotifyDevice(device_id: string, play: boolean = true) {
-    return musicCtr.playSpotifyDevice(device_id, play);
+export function playSpotifyDevice(device_id: string) {
+    return musicCtr.playSpotifyDevice(device_id);
 }
 
 /**
@@ -234,36 +216,22 @@ export function previous(player: PlayerName, options: any) {
 }
 
 /**
- * Turn on repeat for a given player
+ * Turn on/off repeat for a given player
  * @param player {spotify|spotify-web|itunes}
  * @param options
  */
-export function repeatOn(player: PlayerName) {
-    return musicCtr.run(player, "repeatOn");
+export function setRepeat(player: PlayerName, repeat: boolean) {
+    let repeatParam = repeat ? "repeatOn" : "repeatOff";
+    return musicCtr.run(player, repeatParam);
 }
 
 /**
- * Turn off repeat for a given player
+ * Turn on/off shuffling for a given player
  * @param player {spotify|spotify-web|itunes}
  */
-export function repeatOff(player: PlayerName) {
-    return musicCtr.run(player, "repeatOff");
-}
-
-/**
- * Turn on shuffline for a given player
- * @param player {spotify|spotify-web|itunes}
- */
-export function setShufflingOn(player: PlayerName) {
-    return musicCtr.run(player, "setShuffling", ["true"]);
-}
-
-/**
- * Turn off shuffling for a given player
- * @param player {spotify|spotify-web|itunes}
- */
-export function setShufflingOff(player: PlayerName) {
-    return musicCtr.run(player, "setShuffling", ["false"]);
+export function setShuffle(player: PlayerName, shuffle: boolean) {
+    let shuffleParam = shuffle ? ["true"] : ["false"];
+    return musicCtr.run(player, "setShuffling", shuffleParam);
 }
 
 /**
@@ -329,7 +297,7 @@ export function mute(player: PlayerName) {
  * Unmutes the players volume
  * @param player {spotify|spotify-web|itunes}
  */
-export function unMute(player: PlayerName) {
+export function unmute(player: PlayerName) {
     return musicCtr.run(player, "unMute");
 }
 
@@ -345,7 +313,7 @@ export function setItunesLoved(loved: boolean) {
  * Get the full list of the playlist names for a given player
  * @param player {spotify|spotify-web|itunes}
  */
-export async function playlistNames(player: PlayerName) {
+export async function getPlaylistNames(player: PlayerName) {
     let result = await musicCtr.run(player, "playlistNames");
     // turn this into a string list
     if (result) {
@@ -385,7 +353,7 @@ export function getSpotifyDevices(): Promise<PlayerDevice[]> {
  * @param artist {string} is required
  * @param songName {string} is optional
  */
-export async function getGenre(
+export function getGenre(
     artist: string,
     songName: string = ""
 ): Promise<string> {
@@ -396,6 +364,40 @@ export async function getGenre(
  * Returns the spotify genre for a provided arguments
  * @param artist {string} is required
  */
-export async function getSpotifyGenre(artist: string): Promise<string> {
+export function getSpotifyGenre(artist: string): Promise<string> {
     return musicCtr.getGenreFromSpotify(artist);
+}
+
+/**
+ * Returns the audio features of the given track IDs
+ * @param ids these are the track ids (sans spotify:track)
+ */
+export function getSpotifyAudioFeatures(
+    ids: string[]
+): Promise<SpotifyAudioFeature[]> {
+    return musicPlayerCtr.getSpotifyAudioFeatures(ids);
+}
+
+//
+// Deprecated functions
+//
+
+// deprecated, please use "getPlayerState"
+export function getState(player: PlayerName): Promise<TrackState> {
+    return getPlayerState(player);
+}
+
+// deprecated, please use "launchPlayer('spotify')"
+export function startSpotifyIfNotRunning() {
+    return musicCtr.launchApp(PlayerName.SpotifyDesktop);
+}
+
+// deprecated, please use "launchPlayer('itunes')"
+export function startItunesIfNotRunning() {
+    return musicCtr.launchApp(PlayerName.ItunesDesktop);
+}
+
+// deprecated, please use "isSpotifyRunning" or "isItunesRunning"
+export function isRunning(player: PlayerName): Promise<boolean> {
+    return isPlayerRunning(player);
 }

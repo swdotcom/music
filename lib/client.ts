@@ -161,7 +161,12 @@ export class MusicClient {
         return response;
     }
 
-    spotifyApiGet(api: string): Promise<any> {
+    spotifyApiGet(api: string, qsOptions: any = {}): Promise<any> {
+        const qs = querystring.stringify(qsOptions);
+        if (qs) {
+            api += `?${qs}`;
+        }
+
         spotifyClient.defaults.headers.common["Authorization"] = `Bearer ${
             musicStore.spotifyAccessToken
         }`;

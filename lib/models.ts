@@ -74,3 +74,23 @@ export class PlayerContext {
     repeat_state: string = "";
     context: any = null;
 }
+
+export class SpotifyAudioFeature {
+    danceability: number = 0;
+    energy: number = 0;
+    key: number = 0;
+    loudness: number = 0;
+    mode: number = 0;
+    speechiness: number = 0;
+    acousticness: number = 0;
+    instrumentalness: number = 0;
+    liveness: number = 0;
+    valence: number = 0;
+    tempo: number = 0;
+    id: string = "";
+    uri: string = "";
+    track_href: string = "";
+    analysis_url: string = "";
+    duration_ms: number = 0;
+    time_signature: number = 0;
+}
