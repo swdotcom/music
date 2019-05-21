@@ -1,7 +1,12 @@
 "use strict";
 
 import { MusicController } from "./lib/controller";
-import { PlayerName, TrackState, PlayerDevice } from "./lib/models";
+import {
+    PlayerName,
+    TrackState,
+    PlayerDevice,
+    SpotifyAudioFeature
+} from "./lib/models";
 import { MusicPlayerState } from "./lib/playerstate";
 import { MusicStore } from "./lib/store";
 import { MusicUtil } from "./lib/util";
@@ -30,15 +35,20 @@ export function getAccessToken() {
 }
 
 /**
- * Checks if the Spotify desktop is running or not
+ * Checks if the Spotify desktop or web player is running or not
  * @returns {Promise<boolean>}
  */
-export function isSpotifyRunning() {
-    return isPlayerRunning(PlayerName.SpotifyDesktop);
+export async function isSpotifyRunning() {
+    let running = await isPlayerRunning(PlayerName.SpotifyDesktop);
+    if (!running) {
+        // check the web
+        running = await musicPlayerCtr.isSpotifyWebRunning();
+    }
+    return running;
 }
 
 /**
- * Checks if the iTunes desktop is running or not
+ * Checks if the iTunes desktop player is running or not
  * @returns {Promise<boolean>}
  */
 export function isItunesRunning() {
@@ -56,11 +66,6 @@ export async function isPlayerRunning(player: PlayerName) {
     } else {
         return await musicCtr.isMusicPlayerActive(player);
     }
-}
-
-// deprecated, please use "getPlayerState"
-export async function getState(player: PlayerName): Promise<TrackState> {
-    return getPlayerState(player);
 }
 
 /**
@@ -87,8 +92,8 @@ export async function getPlayerState(player: PlayerName): Promise<TrackState> {
  * on Mac and spotify desktop on windows.
  * Deprecated - use "getState(player:PlayerName)" instead
  */
-export async function getCurrentlyRunningTrackState(): Promise<TrackState> {
-    return await musicPlayerCtr.getCurrentlyRunningTrackState();
+export function getCurrentlyRunningTrackState(): Promise<TrackState> {
+    return musicPlayerCtr.getCurrentlyRunningTrackState();
 }
 
 /**
@@ -348,7 +353,7 @@ export function getSpotifyDevices(): Promise<PlayerDevice[]> {
  * @param artist {string} is required
  * @param songName {string} is optional
  */
-export async function getGenre(
+export function getGenre(
     artist: string,
     songName: string = ""
 ): Promise<string> {
@@ -359,6 +364,40 @@ export async function getGenre(
  * Returns the spotify genre for a provided arguments
  * @param artist {string} is required
  */
-export async function getSpotifyGenre(artist: string): Promise<string> {
+export function getSpotifyGenre(artist: string): Promise<string> {
     return musicCtr.getGenreFromSpotify(artist);
+}
+
+/**
+ * Returns the audio features of the given track IDs
+ * @param ids these are the track ids (sans spotify:track)
+ */
+export function getSpotifyAudioFeatures(
+    ids: string[]
+): Promise<SpotifyAudioFeature[]> {
+    return musicPlayerCtr.getSpotifyAudioFeatures(ids);
+}
+
+//
+// Deprecated functions
+//
+
+// deprecated, please use "getPlayerState"
+export function getState(player: PlayerName): Promise<TrackState> {
+    return getPlayerState(player);
+}
+
+// deprecated, please use "launchPlayer('spotify')"
+export function startSpotifyIfNotRunning() {
+    return musicCtr.launchApp(PlayerName.SpotifyDesktop);
+}
+
+// deprecated, please use "launchPlayer('itunes')"
+export function startItunesIfNotRunning() {
+    return musicCtr.launchApp(PlayerName.ItunesDesktop);
+}
+
+// deprecated, please use "isSpotifyRunning" or "isItunesRunning"
+export function isRunning(player: PlayerName): Promise<boolean> {
+    return isPlayerRunning(player);
 }

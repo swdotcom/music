@@ -181,7 +181,7 @@ describe("desktop player tests", () => {
                 // check
                 result = await CodyMusic.getState("Spotify");
                 let previousSong = result.name;
-                expect(previousSong).not.equal.to("Trouble");
+                expect(previousSong).to.not.equal("Trouble");
                 // pause it
                 await CodyMusic.pause("Spotify");
                 musicUtil.sleep(1500);
@@ -194,7 +194,7 @@ describe("desktop player tests", () => {
                 // check
                 result = await CodyMusic.getState("Spotify");
                 let nextSong = result.name;
-                expect(nextSong).not.equal.to(previousSong);
+                expect(nextSong).to.not.equal(previousSong);
                 // turn repeat on
                 await CodyMusic.repeatOn("Spotify");
                 // check

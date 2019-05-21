@@ -349,6 +349,7 @@ export class MusicController {
 
     /**
      * Kills the Spotify desktop player if it's running
+     * @param player {spotify|spotify-web|itunes}
      */
     public quitApp(player: PlayerName) {
         if (player === PlayerName.ItunesDesktop) {
@@ -358,11 +359,14 @@ export class MusicController {
         }
     }
 
+    /**
+     * Launches the desktop player
+     * @param player {spotify|spotify-web|itunes}
+     */
     public launchApp(player: PlayerName) {
         if (player === PlayerName.ItunesDesktop) {
             return this.startPlayer(PlayerName.ItunesDesktop);
-        } else {
-            return this.startPlayer(PlayerName.SpotifyDesktop);
         }
+        return this.startPlayer(PlayerName.SpotifyDesktop);
     }
 }

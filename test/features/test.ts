@@ -37,4 +37,16 @@ describe("feature api tests", () => {
             done();
         });
     });
+
+    it("Fetch spotify audio features", done => {
+        const ids = [
+            "4JpKVNYnVcJ8tuMKjAj50A",
+            "2NRANZE9UCmPAS5XVbXL40",
+            "24JygzOLM0EmRQeGtFcIcG"
+        ];
+        CodyMusic.getSpotifyAudioFeatures(ids).then((result: any) => {
+            console.log("spotify feature result: ", result);
+            done();
+        });
+    });
 });
