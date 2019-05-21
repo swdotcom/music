@@ -53,6 +53,18 @@ describe("web player music tests", () => {
         });
     });
 
+    after("web play music test completion", done => {
+        CodyMusic.getSpotifyDevices().then(async (response: any) => {
+            // get the 1st device id
+            const device_id = response[0].id;
+            const options = {
+                device_id
+            };
+            response = await CodyMusic.pause(PlayerName.SpotifyWeb, options);
+            done();
+        });
+    });
+
     it("Check the spotify web player devices", done => {
         /**
          * [ { id: '116ab2c405ba92f106f4d10d45bb42cba89ec9e2',

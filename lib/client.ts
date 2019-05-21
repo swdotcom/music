@@ -172,6 +172,7 @@ export class MusicClient {
         }`;
 
         return spotifyClient.get(api).catch(async err => {
+            console.log(`error for api ${api}, error: ${err.message}`);
             return this.buildErrorResponse(err);
         });
     }

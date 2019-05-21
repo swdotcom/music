@@ -105,7 +105,7 @@ export class MusicPlayerState {
             return audiofeatures;
         }
         const qstr = `?ids=${ids.join(",")}`;
-        const api = `/vi/audio-features${qstr}`;
+        const api = `/v1/audio-features${qstr}`;
         let response = await musicClient.spotifyApiGet(api);
         // check if the token needs to be refreshed
         if (response.statusText === "EXPIRED") {

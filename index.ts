@@ -401,3 +401,18 @@ export function startItunesIfNotRunning() {
 export function isRunning(player: PlayerName): Promise<boolean> {
     return isPlayerRunning(player);
 }
+
+// deprecated, pluse use "setRepat(player, repeat)"
+export function repeatOn(player: PlayerName) {
+    return setRepeat(player, true);
+}
+
+// deprecated, pluse use "setRepat(player, repeat)"
+export function repeatOff(player: PlayerName) {
+    return setRepeat(player, false);
+}
+
+// deprecated, pluse use "unmute(player)"
+export function unMute(player: PlayerName) {
+    return unmute(player);
+}

@@ -39,13 +39,28 @@ describe("feature api tests", () => {
     });
 
     it("Fetch spotify audio features", done => {
+        const spotifyTrackIdOne = "0i0wnv9UoFdZ5MfuFGQzMy";
+        const spotifyTrackIdTwo = "4ut5G4rgB1ClpMTMfjoIuy";
         const ids = [
-            "4JpKVNYnVcJ8tuMKjAj50A",
-            "2NRANZE9UCmPAS5XVbXL40",
-            "24JygzOLM0EmRQeGtFcIcG"
+            spotifyTrackIdOne, // 'Last Hurrah'
+            spotifyTrackIdTwo
         ];
         CodyMusic.getSpotifyAudioFeatures(ids).then((result: any) => {
-            console.log("spotify feature result: ", result);
+            // make sure we have features for both
+            let map: any = {};
+            let foundTrackOne = false;
+            let foundTrackTwo = false;
+            for (let i = 0; i < result.length; i++) {
+                let feature = result[i];
+                if (feature.id === spotifyTrackIdOne) {
+                    foundTrackOne = true;
+                } else if (feature.id === spotifyTrackIdTwo) {
+                    foundTrackTwo = true;
+                }
+            }
+
+            expect(foundTrackOne).to.equal(true);
+            expect(foundTrackTwo).to.equal(true);
             done();
         });
     });

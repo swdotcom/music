@@ -168,20 +168,31 @@ describe("desktop player tests", () => {
                 expect(result.name).to.equal("Trouble");
                 // check if it's disk_number is greater than 1
                 let diskNum = result.disk_number;
+                let previousSong;
                 if (diskNum === 1) {
+                    // we're at disk one, just test using next and previous
                     await CodyMusic.next("Spotify");
                     musicUtil.sleep(1500);
                     await CodyMusic.next("Spotify");
                     musicUtil.sleep(1500);
+
+                    // go to the previous song
+                    await CodyMusic.previous("Spotify");
+                    musicUtil.sleep(3000);
+                    // check
+                    result = await CodyMusic.getState("Spotify");
+                    previousSong = result.name;
+                    expect(previousSong).to.not.equal("Trouble");
+                } else {
+                    // go to the previous song
+                    await CodyMusic.previous("Spotify");
+                    musicUtil.sleep(3000);
+                    // check
+                    result = await CodyMusic.getState("Spotify");
+                    previousSong = result.name;
+                    expect(previousSong).to.equal("Trouble");
                 }
 
-                // go to the previous song
-                await CodyMusic.previous("Spotify");
-                musicUtil.sleep(3000);
-                // check
-                result = await CodyMusic.getState("Spotify");
-                let previousSong = result.name;
-                expect(previousSong).to.not.equal("Trouble");
                 // pause it
                 await CodyMusic.pause("Spotify");
                 musicUtil.sleep(1500);
@@ -196,12 +207,12 @@ describe("desktop player tests", () => {
                 let nextSong = result.name;
                 expect(nextSong).to.not.equal(previousSong);
                 // turn repeat on
-                await CodyMusic.repeatOn("Spotify");
+                await CodyMusic.setRepeat("Spotify", true);
                 // check
                 result = await CodyMusic.isRepeating("Spotify");
                 expect(result).to.equal(true);
                 // turn repeat off
-                await CodyMusic.repeatOff("Spotify");
+                await CodyMusic.setRepeat("Spotify", false);
                 // check
                 result = await CodyMusic.isRepeating("Spotify");
                 expect(result).to.equal(false);
@@ -217,7 +228,7 @@ describe("desktop player tests", () => {
                 result = await CodyMusic.getState("Spotify");
                 expect(result.volume).to.equal(0);
 
-                await CodyMusic.unMute("Spotify");
+                await CodyMusic.unmute("Spotify");
                 result = await CodyMusic.getState("Spotify");
                 expect(result.volume).to.be.within(volume - 1, volume + 1);
 
@@ -276,13 +287,13 @@ describe("desktop player tests", () => {
                 expect(result.name).to.not.equal(songName);
                 songName = result.name;
                 // turn repeat on
-                await CodyMusic.repeatOn("iTunes");
+                await CodyMusic.setRepeat("iTunes", true);
                 result = await CodyMusic.getState("iTunes");
                 // check
                 result = await CodyMusic.isRepeating("iTunes");
                 expect(result).to.equal("one");
                 // turn repeat off
-                await CodyMusic.repeatOff("iTunes");
+                await CodyMusic.setRepeat("iTunes", false);
                 // check
                 result = await CodyMusic.isRepeating("iTunes");
                 expect(result).to.equal("off");
@@ -298,7 +309,7 @@ describe("desktop player tests", () => {
                 result = await CodyMusic.getState("iTunes");
                 expect(result.volume).to.equal(0);
 
-                await CodyMusic.unMute("iTunes");
+                await CodyMusic.unmute("iTunes");
                 result = await CodyMusic.getState("iTunes");
                 expect(result.volume).to.equal(volume);
 
