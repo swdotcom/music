@@ -267,10 +267,10 @@ export class MusicController {
         );
     }
 
-    public async playSpotifyDevice(device_id: string, play: boolean = true) {
+    public async playSpotifyDevice(device_id: string) {
         const payload = {
             device_ids: [device_id],
-            play
+            play: true
         };
         return musicClient.spotifyApiPut("v1/me/player", {}, payload);
     }
@@ -345,5 +345,24 @@ export class MusicController {
         }
 
         return response.data;
+    }
+
+    /**
+     * Kills the Spotify desktop player if it's running
+     */
+    public quitApp(player: PlayerName) {
+        if (player === PlayerName.ItunesDesktop) {
+            return this.stopPlayer(PlayerName.ItunesDesktop);
+        } else {
+            return this.stopPlayer(PlayerName.SpotifyDesktop);
+        }
+    }
+
+    public launchApp(player: PlayerName) {
+        if (player === PlayerName.ItunesDesktop) {
+            return this.startPlayer(PlayerName.ItunesDesktop);
+        } else {
+            return this.startPlayer(PlayerName.SpotifyDesktop);
+        }
     }
 }
