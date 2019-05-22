@@ -19,23 +19,13 @@ export enum TrackStatus {
     NotAssigned = 4
 }
 
-export class TrackState {
-    /**
-     * type of the player
-     */
-    type: PlayerType = PlayerType.NotAssigned;
-    /**
-     * The track data
-     */
-    track: Track = new Track();
-}
-
 // {artist, album, genre, disc_number, duration, played_count, track_number, id, name, state}
 export class Track {
     artist: string = "";
     album: string = "";
     genre: string = "";
     disc_number: number = 0;
+    disk_number: number = 0;
     duration: number = 0;
     duration_ms: number = 0;
     played_count: number = 0;
@@ -50,6 +40,9 @@ export class Track {
     href: string = "";
     // "spotify", "itunes"
     type: string = "";
+    playerType: PlayerType = PlayerType.NotAssigned;
+    loved: boolean = false;
+    volume: number = 0;
     status: TrackStatus = TrackStatus.NotAssigned;
 }
 

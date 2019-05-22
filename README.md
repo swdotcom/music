@@ -19,7 +19,7 @@ $ npm test
 Load the module
 
 ```javascript
-import * as music from "cody-music";
+import * as CodyMusic from "cody-music";
 ```
 
 OR
@@ -38,7 +38,7 @@ Specify either "Spotify" or "iTunes" (case-insensitive).
 
 ```javascript
 // get the track info using get state
-await music.getPlayerState("iTunes").then(state => {
+await CodyMusic.getPlayerState("iTunes").then(state => {
     // - "genre" will be empty from Spotify
     // - duration is in milliseconds
     // {artist, album, genre, disc_number, duration, played_count, track_number, id, name, state}
@@ -53,12 +53,12 @@ await music
     });
 
 // play an iTunes track number
-await music.playTrack("iTunes", 1).then(result => {
+await CodyMusic.playTrack("iTunes", 1).then(result => {
     // track is playing
 });
 
 // handling errors
-await music.playTrack("iTunes", 1000000000).then(result => {
+await CodyMusic.playTrack("iTunes", 1000000000).then(result => {
     // result will contain the "error" attribute with the error message
     if (result.error) {
         console.log(`Unable to play track, error: ${result.error}`);
@@ -108,19 +108,19 @@ isPlayerRunning(player: PlayerName): Promise<boolean>
  * @param player {spotify|spotif-web|itunes}
  * @returns {artist, album, genre, disc_number, duration, played_count, track_number, id, name, state}
  */
-getPlayerState(player: PlayerName): Promise<TrackState>
+getPlayerState(player: PlayerName): Promise<Track>
 
 /**
  * Returns the currently running track info (player and track).
  */
-getRunningPlayerState(): Promise<TrackState>
+getRunningPlayerState(): Promise<Track>
 
 /**
  * Returns the tracks that are found by the given playlist name
  * @param player {spotify|spotify-web|itunes}
  * @param playListName {}
  */
-getTracksByPlaylistName(player: PlayerName,playListName: string)
+getTracksByPlaylistName(player: PlayerName, playListName: string)
 
 /**
  * Plays a specific track on the Spotify or iTunes desktop
@@ -141,7 +141,7 @@ playSpotifyDevice(device_id: string)
  * @param player {spotify|spotify-web|itunes}
  * @param options
  */
-play(player: PlayerName, options: any)
+play(player: PlayerName, options: any = {})
 
 /**
  * Initiate the play command for a given trackId for a specific player
@@ -155,7 +155,7 @@ playTrack(player: PlayerName, trackId: string)
  * @param player {spotify|spotify-web|itunes}
  * @param options
  */
-pause(player: PlayerName, options: any)
+pause(player: PlayerName, options: any = {})
 
 /**
  * Initiate the play/pause command for a given player
@@ -169,14 +169,14 @@ playPause(player: PlayerName)
  * @param player {spotify|spotify-web|itunes}
  * @param options
  */
-next(player: PlayerName, options: any)
+next(player: PlayerName, options: any = {})
 
 /**
  * Initiate the previous command for a given player
  * @param player {spotify|spotify-web|itunes}
  * @param options
  */
-previous(player: PlayerName, options: any)
+previous(player: PlayerName, options: any = {})
 
 /**
  * Turn on/off repeat for a given player
@@ -247,7 +247,7 @@ setItunesLoved(loved: boolean)
  * Get the full list of the playlist names for a given player
  * @param player {spotify|spotify-web|itunes}
  */
-getPlaylistNames(player: PlayerName)
+getPlaylistNames(player: PlayerName):Promise<string[]>
 
 /**
  * Launches a player device
@@ -286,10 +286,10 @@ getSpotifyAudioFeatures(ids: string[]): Promise<SpotifyAudioFeature[]>
 //
 
 // deprecated, please use "getRunningPlayerState()"
-getCurrentlyRunningTrackState(): Promise<TrackState>
+getCurrentlyRunningTrackState(): Promise<Track>
 
 // deprecated, please use "getPlayerState"
-getState(player: PlayerName): Promise<TrackState>
+getState(player: PlayerName): Promise<Track>
 
 // deprecated, please use "launchPlayer('spotify')"
 startSpotifyIfNotRunning()

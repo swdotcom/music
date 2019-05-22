@@ -1,7 +1,6 @@
 const expect = require("chai").expect;
-const CodyMusic = require("../../dist/index.js");
+import * as CodyMusic from "../../index";
 import { MusicUtil } from "../../lib/util";
-import { PlayerName } from "../../lib/models";
 import { MusicController } from "../../lib/controller";
 
 const musicUtil = new MusicUtil();
@@ -18,10 +17,10 @@ const musicCtr = MusicController.getInstance();
 describe("desktop player tests", () => {
     beforeEach(done => {
         musicCtr
-            .quitApp(PlayerName.SpotifyDesktop)
+            .quitApp(CodyMusic.PlayerName.SpotifyDesktop)
             .then((result: any) => {
                 musicCtr
-                    .quitApp(PlayerName.ItunesDesktop)
+                    .quitApp(CodyMusic.PlayerName.ItunesDesktop)
                     .then((result: any) => {
                         done();
                     })
@@ -31,7 +30,7 @@ describe("desktop player tests", () => {
             })
             .catch((err: any) => {
                 musicCtr
-                    .quitApp(PlayerName.ItunesDesktop)
+                    .quitApp(CodyMusic.PlayerName.ItunesDesktop)
                     .then((result: any) => {
                         done();
                     })
@@ -44,7 +43,7 @@ describe("desktop player tests", () => {
     after(done => {
         // make sure both players have been killed
         musicCtr
-            .quitApp(PlayerName.SpotifyDesktop)
+            .quitApp(CodyMusic.PlayerName.SpotifyDesktop)
             .then((result: any) => {
                 done();
             })
@@ -54,48 +53,63 @@ describe("desktop player tests", () => {
     });
 
     it("Should Show The Playlist Names AND Show The Tracks Of A Playlist", done => {
-        CodyMusic.getPlaylistNames("iTunes").then((names: []) => {
-            expect(names).to.not.equal(0);
-            // get the last name in the list and get the tracks
-            CodyMusic.getTracksByPlaylistName(
-                PlayerName.ItunesDesktop,
-                names[names.length - 1]
-            ).then((result: any) => {
-                expect(result.length).to.not.equal(0);
-                done();
-            });
-        });
+        CodyMusic.getPlaylistNames(CodyMusic.PlayerName.ItunesDesktop).then(
+            (names: string[]) => {
+                expect(names.length).to.not.equal(0);
+                // get the last name in the list and get the tracks
+                CodyMusic.getTracksByPlaylistName(
+                    CodyMusic.PlayerName.ItunesDesktop,
+                    names[names.length - 1]
+                ).then((result: any) => {
+                    expect(result.length).to.not.equal(0);
+                    done();
+                });
+            }
+        );
     });
 
     it("Should Set An Itunes Song's Love State", done => {
-        musicCtr.launchApp(PlayerName.ItunesDesktop).then(async () => {
-            musicUtil.sleep(1500);
-            await CodyMusic.setVolume("iTunes", 5);
-            await CodyMusic.play("iTunes");
-            musicUtil.sleep(1500);
-            let result = await CodyMusic.getState("iTunes");
-            let loved = result.loved;
-            CodyMusic.setItunesLoved(!loved).then(async (result: any) => {
-                // get the state again
-                result = await CodyMusic.getState("iTunes");
-                expect(result.loved).to.equal(!loved);
-                done();
+        musicCtr
+            .launchApp(CodyMusic.PlayerName.ItunesDesktop)
+            .then(async () => {
+                musicUtil.sleep(1500);
+                await CodyMusic.setVolume(
+                    CodyMusic.PlayerName.ItunesDesktop,
+                    5
+                );
+                await CodyMusic.play(CodyMusic.PlayerName.ItunesDesktop);
+                musicUtil.sleep(1500);
+                let result = await CodyMusic.getState(
+                    CodyMusic.PlayerName.ItunesDesktop
+                );
+
+                let loved = result.loved;
+                CodyMusic.setItunesLoved(!loved).then(async (result: any) => {
+                    // get the state again
+                    result = await CodyMusic.getState(
+                        CodyMusic.PlayerName.ItunesDesktop
+                    );
+                    expect(result.loved).to.equal(!loved);
+                    done();
+                });
             });
-        });
     });
 
     it("Should Show An Error", done => {
         // play a bad track number
-        CodyMusic.playTrack("iTunes", 1000000000).then((result: any) => {
+        CodyMusic.playTrack(
+            CodyMusic.PlayerName.ItunesDesktop,
+            1000000000
+        ).then((result: any) => {
             expect(result.error).to.not.equal(null);
-            musicCtr.quitApp(PlayerName.ItunesDesktop).then(() => {
+            musicCtr.quitApp(CodyMusic.PlayerName.ItunesDesktop).then(() => {
                 done();
             });
         });
     });
 
     it("Should Show Spotify Is Not Running", done => {
-        musicCtr.quitApp(PlayerName.SpotifyDesktop).then(() => {
+        musicCtr.quitApp(CodyMusic.PlayerName.SpotifyDesktop).then(() => {
             CodyMusic.isSpotifyRunning().then((result: any) => {
                 expect(result).to.equal(false);
                 done();
@@ -104,7 +118,7 @@ describe("desktop player tests", () => {
     });
 
     it("Should Show Itunes Is Not Running", done => {
-        musicCtr.quitApp(PlayerName.ItunesDesktop).then(() => {
+        musicCtr.quitApp(CodyMusic.PlayerName.ItunesDesktop).then(() => {
             CodyMusic.isItunesRunning().then((result: any) => {
                 expect(result).to.equal(false);
                 done();
@@ -117,20 +131,32 @@ describe("desktop player tests", () => {
     // "disc_number": 1,"duration": 273426,"played_count": 0,"track_number": 6,
     // "id": "spotify:track:0R8P9KfGJCDULmlEoBagcO","name": "Trouble","state":"playing"}
     it("Get Spotify Track Info", done => {
-        musicCtr.launchApp(PlayerName.SpotifyDesktop).then(async () => {
-            musicUtil.sleep(2000);
-            await CodyMusic.setVolume("Spotify", 5);
-            // artist: 'Martin Garrix',
-            // album: 'High On Life (feat. Bonn)'
-            // id: spotify:track:4ut5G4rgB1ClpMTMfjoIuy
-            let params = ["spotify:track:4ut5G4rgB1ClpMTMfjoIuy"];
+        musicCtr
+            .launchApp(CodyMusic.PlayerName.SpotifyDesktop)
+            .then(async () => {
+                musicUtil.sleep(2000);
+                await CodyMusic.setVolume(
+                    CodyMusic.PlayerName.SpotifyDesktop,
+                    5
+                );
+                // artist: 'Martin Garrix',
+                // album: 'High On Life (feat. Bonn)'
+                // id: spotify:track:4ut5G4rgB1ClpMTMfjoIuy
+                let params = ["spotify:track:4ut5G4rgB1ClpMTMfjoIuy"];
 
-            await CodyMusic.playTrackInContext("Spotify", params);
-            musicUtil.sleep(1500);
-            let result = await CodyMusic.getState("Spotify");
-            expect(result.id).to.equal("spotify:track:4ut5G4rgB1ClpMTMfjoIuy");
-            done();
-        });
+                await CodyMusic.playTrackInContext(
+                    CodyMusic.PlayerName.SpotifyDesktop,
+                    params
+                );
+                musicUtil.sleep(1500);
+                let result = await CodyMusic.getState(
+                    CodyMusic.PlayerName.SpotifyDesktop
+                );
+                expect(result.id).to.equal(
+                    "spotify:track:4ut5G4rgB1ClpMTMfjoIuy"
+                );
+                done();
+            });
     });
 
     // example result
@@ -138,20 +164,27 @@ describe("desktop player tests", () => {
     // "genre":"Alternative","disc_number": 1,"duration": 212.042007446289,
     // "played_count": 120,"track_number": 1,"id": "5601","name": "Out of Sight","state":"playing"}
     it("Get iTunes Track Info", done => {
-        musicCtr.launchApp(PlayerName.ItunesDesktop).then(async () => {
-            musicUtil.sleep(1500);
-            await CodyMusic.setVolume("iTunes", 5);
-            await CodyMusic.play("iTunes");
-            musicUtil.sleep(1500);
-            let result = await CodyMusic.getState("iTunes");
-            expect(result.artist).to.not.equal(null);
-            done();
-        });
+        musicCtr
+            .launchApp(CodyMusic.PlayerName.ItunesDesktop)
+            .then(async () => {
+                musicUtil.sleep(1500);
+                await CodyMusic.setVolume(
+                    CodyMusic.PlayerName.ItunesDesktop,
+                    5
+                );
+                await CodyMusic.play(CodyMusic.PlayerName.ItunesDesktop);
+                musicUtil.sleep(1500);
+                let result = await CodyMusic.getState(
+                    CodyMusic.PlayerName.ItunesDesktop
+                );
+                expect(result.artist).to.not.equal(null);
+                done();
+            });
     });
 
     it("Tell Spotify To Perform Next, Repeat, Previous, Pause, Shuffle, Volume Change, Mute, Unmute, Shuffle, Check Shuffle", done => {
         musicCtr
-            .launchApp(PlayerName.SpotifyDesktop)
+            .launchApp(CodyMusic.PlayerName.SpotifyDesktop)
             .then(async () => {
                 musicUtil.sleep(1500);
                 let params = [
@@ -159,10 +192,15 @@ describe("desktop player tests", () => {
                     "spotify:album:6ZG5lRT77aJ3btmArcykra"
                 ];
 
-                await CodyMusic.playTrackInContext("Spotify", params);
+                await CodyMusic.playTrackInContext(
+                    CodyMusic.PlayerName.SpotifyDesktop,
+                    params
+                );
                 musicUtil.sleep(1500);
 
-                let result = await CodyMusic.getState("Spotify");
+                let result = await CodyMusic.getState(
+                    CodyMusic.PlayerName.SpotifyDesktop
+                );
                 // make sure it's playing
                 expect(result.state).to.equal("playing");
                 expect(result.name).to.equal("Trouble");
@@ -171,81 +209,118 @@ describe("desktop player tests", () => {
                 let previousSong;
                 if (diskNum === 1) {
                     // we're at disk one, just test using next and previous
-                    await CodyMusic.next("Spotify");
+                    await CodyMusic.next(CodyMusic.PlayerName.SpotifyDesktop);
                     musicUtil.sleep(1500);
-                    await CodyMusic.next("Spotify");
+                    await CodyMusic.next(CodyMusic.PlayerName.SpotifyDesktop);
                     musicUtil.sleep(1500);
 
                     // go to the previous song
-                    await CodyMusic.previous("Spotify");
+                    await CodyMusic.previous(
+                        CodyMusic.PlayerName.SpotifyDesktop
+                    );
                     musicUtil.sleep(3000);
                     // check
-                    result = await CodyMusic.getState("Spotify");
+                    result = await CodyMusic.getState(
+                        CodyMusic.PlayerName.SpotifyDesktop
+                    );
                     previousSong = result.name;
                     expect(previousSong).to.not.equal("Trouble");
                 } else {
                     // go to the previous song
-                    await CodyMusic.previous("Spotify");
+                    await CodyMusic.previous(
+                        CodyMusic.PlayerName.SpotifyDesktop
+                    );
                     musicUtil.sleep(3000);
                     // check
-                    result = await CodyMusic.getState("Spotify");
+                    result = await CodyMusic.getState(
+                        CodyMusic.PlayerName.SpotifyDesktop
+                    );
                     previousSong = result.name;
                     expect(previousSong).to.equal("Trouble");
                 }
 
                 // pause it
-                await CodyMusic.pause("Spotify");
+                await CodyMusic.pause(CodyMusic.PlayerName.SpotifyDesktop);
                 musicUtil.sleep(1500);
                 // check
-                result = await CodyMusic.getState("Spotify");
+                result = await CodyMusic.getState(
+                    CodyMusic.PlayerName.SpotifyDesktop
+                );
                 expect(result.state).to.equal("paused");
                 // go to next
-                await CodyMusic.next("Spotify");
+                await CodyMusic.next(CodyMusic.PlayerName.SpotifyDesktop);
                 musicUtil.sleep(1500);
                 // check
-                result = await CodyMusic.getState("Spotify");
+                result = await CodyMusic.getState(
+                    CodyMusic.PlayerName.SpotifyDesktop
+                );
                 let nextSong = result.name;
                 expect(nextSong).to.not.equal(previousSong);
                 // turn repeat on
-                await CodyMusic.setRepeat("Spotify", true);
+                await CodyMusic.setRepeat(
+                    CodyMusic.PlayerName.SpotifyDesktop,
+                    true
+                );
                 // check
-                result = await CodyMusic.isRepeating("Spotify");
+                result = await CodyMusic.isRepeating(
+                    CodyMusic.PlayerName.SpotifyDesktop
+                );
                 expect(result).to.equal(true);
                 // turn repeat off
-                await CodyMusic.setRepeat("Spotify", false);
+                await CodyMusic.setRepeat(
+                    CodyMusic.PlayerName.SpotifyDesktop,
+                    false
+                );
                 // check
-                result = await CodyMusic.isRepeating("Spotify");
+                result = await CodyMusic.isRepeating(
+                    CodyMusic.PlayerName.SpotifyDesktop
+                );
                 expect(result).to.equal(false);
                 // up the volume
-                await CodyMusic.volumeUp("Spotify");
+                await CodyMusic.volumeUp(CodyMusic.PlayerName.SpotifyDesktop);
                 // check
-                result = await CodyMusic.getState("Spotify");
+                result = await CodyMusic.getState(
+                    CodyMusic.PlayerName.SpotifyDesktop
+                );
                 const volume = result.volume;
                 expect(volume).to.be.greaterThan(5);
 
                 // mute and unmute tests
-                await CodyMusic.mute("Spotify");
-                result = await CodyMusic.getState("Spotify");
+                await CodyMusic.mute(CodyMusic.PlayerName.SpotifyDesktop);
+                result = await CodyMusic.getState(
+                    CodyMusic.PlayerName.SpotifyDesktop
+                );
                 expect(result.volume).to.equal(0);
 
-                await CodyMusic.unmute("Spotify");
-                result = await CodyMusic.getState("Spotify");
+                await CodyMusic.unmute(CodyMusic.PlayerName.SpotifyDesktop);
+                result = await CodyMusic.getState(
+                    CodyMusic.PlayerName.SpotifyDesktop
+                );
                 expect(result.volume).to.be.within(volume - 1, volume + 1);
 
                 // play track
                 await CodyMusic.playTrack(
-                    "Spotify",
+                    CodyMusic.PlayerName.SpotifyDesktop,
                     "spotify:track:4ut5G4rgB1ClpMTMfjoIuy"
                 );
-                result = await CodyMusic.getState("Spotify");
+
+                musicUtil.sleep(1500);
+                result = await CodyMusic.getState(
+                    CodyMusic.PlayerName.SpotifyDesktop
+                );
                 expect(result.artist).to.equal("Martin Garrix");
 
                 // shuffle test
-                await CodyMusic.setShuffle("Spotify", true);
-                result = await CodyMusic.isShuffling("Spotify");
+                await CodyMusic.setShuffle(
+                    CodyMusic.PlayerName.SpotifyDesktop,
+                    true
+                );
+                result = await CodyMusic.isShuffling(
+                    CodyMusic.PlayerName.SpotifyDesktop
+                );
                 expect(result).to.equal(true);
 
-                await musicCtr.quitApp(PlayerName.SpotifyDesktop);
+                await musicCtr.quitApp(CodyMusic.PlayerName.SpotifyDesktop);
 
                 done();
             })
@@ -257,72 +332,108 @@ describe("desktop player tests", () => {
 
     it("Tell Itunes To Perform Next, Repeat, Previous, Pause, Shuffle, Volume Change, Mute, Unmute, Shuffle, Check Shuffle", done => {
         musicCtr
-            .launchApp(PlayerName.ItunesDesktop)
+            .launchApp(CodyMusic.PlayerName.ItunesDesktop)
             .then(async () => {
                 musicUtil.sleep(1500);
-                await CodyMusic.play("iTunes");
+                await CodyMusic.play(CodyMusic.PlayerName.ItunesDesktop);
                 musicUtil.sleep(1500);
 
-                let result = await CodyMusic.getState("iTunes");
+                let result = await CodyMusic.getState(
+                    CodyMusic.PlayerName.ItunesDesktop
+                );
                 // make sure it's playing
                 expect(result.state).to.equal("playing");
                 let songName = result.name;
 
                 // go to the next song
-                await CodyMusic.next("iTunes");
+                await CodyMusic.next(CodyMusic.PlayerName.ItunesDesktop);
 
                 // check
-                result = await CodyMusic.getState("iTunes");
+                result = await CodyMusic.getState(
+                    CodyMusic.PlayerName.ItunesDesktop
+                );
                 expect(result.name).to.not.equal(songName);
                 songName = result.name;
                 // pause it
-                await CodyMusic.pause("iTunes");
+                await CodyMusic.pause(CodyMusic.PlayerName.ItunesDesktop);
                 // check
-                result = await CodyMusic.getState("iTunes");
+                result = await CodyMusic.getState(
+                    CodyMusic.PlayerName.ItunesDesktop
+                );
                 expect(result.state).to.equal("paused");
                 // go to previous
-                await CodyMusic.previous("iTunes");
+                await CodyMusic.previous(CodyMusic.PlayerName.ItunesDesktop);
                 // check
-                result = await CodyMusic.getState("iTunes");
+                result = await CodyMusic.getState(
+                    CodyMusic.PlayerName.ItunesDesktop
+                );
                 expect(result.name).to.not.equal(songName);
                 songName = result.name;
                 // turn repeat on
-                await CodyMusic.setRepeat("iTunes", true);
-                result = await CodyMusic.getState("iTunes");
+                await CodyMusic.setRepeat(
+                    CodyMusic.PlayerName.ItunesDesktop,
+                    true
+                );
+                result = await CodyMusic.getState(
+                    CodyMusic.PlayerName.ItunesDesktop
+                );
                 // check
-                result = await CodyMusic.isRepeating("iTunes");
+                result = await CodyMusic.isRepeating(
+                    CodyMusic.PlayerName.ItunesDesktop
+                );
                 expect(result).to.equal("one");
                 // turn repeat off
-                await CodyMusic.setRepeat("iTunes", false);
+                await CodyMusic.setRepeat(
+                    CodyMusic.PlayerName.ItunesDesktop,
+                    false
+                );
                 // check
-                result = await CodyMusic.isRepeating("iTunes");
+                result = await CodyMusic.isRepeating(
+                    CodyMusic.PlayerName.ItunesDesktop
+                );
                 expect(result).to.equal("off");
                 // up the volume
-                await CodyMusic.volumeUp("iTunes");
+                await CodyMusic.volumeUp(CodyMusic.PlayerName.ItunesDesktop);
                 // check
-                result = await CodyMusic.getState("iTunes");
+                result = await CodyMusic.getState(
+                    CodyMusic.PlayerName.ItunesDesktop
+                );
                 const volume = result.volume;
                 expect(volume).to.be.greaterThan(5);
 
                 // mute and unmute tests
-                await CodyMusic.mute("iTunes");
-                result = await CodyMusic.getState("iTunes");
+                await CodyMusic.mute(CodyMusic.PlayerName.ItunesDesktop);
+                result = await CodyMusic.getState(
+                    CodyMusic.PlayerName.ItunesDesktop
+                );
                 expect(result.volume).to.equal(0);
 
-                await CodyMusic.unmute("iTunes");
-                result = await CodyMusic.getState("iTunes");
+                await CodyMusic.unmute(CodyMusic.PlayerName.ItunesDesktop);
+                result = await CodyMusic.getState(
+                    CodyMusic.PlayerName.ItunesDesktop
+                );
                 expect(result.volume).to.equal(volume);
 
                 // play track
-                await CodyMusic.playTrack("iTunes", 1);
-                result = await CodyMusic.getState("iTunes");
+                await CodyMusic.playTrack(
+                    CodyMusic.PlayerName.ItunesDesktop,
+                    1
+                );
+                result = await CodyMusic.getState(
+                    CodyMusic.PlayerName.ItunesDesktop
+                );
 
                 // shuffle test
-                await CodyMusic.setShuffle("iTunes", true);
-                result = await CodyMusic.isShuffling("iTunes");
+                await CodyMusic.setShuffle(
+                    CodyMusic.PlayerName.ItunesDesktop,
+                    true
+                );
+                result = await CodyMusic.isShuffling(
+                    CodyMusic.PlayerName.ItunesDesktop
+                );
                 expect(result).to.equal(true);
 
-                await musicCtr.quitApp(PlayerName.ItunesDesktop);
+                await musicCtr.quitApp(CodyMusic.PlayerName.ItunesDesktop);
 
                 done();
             })

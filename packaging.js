@@ -8,7 +8,7 @@ async function packageScripts() {
         "creating the dist/lib/scripts directory if it doesn't exist"
     );
     await runCommand(
-        "cp scripts/* dist/lib/scripts/.",
+        "cp lib/scripts/* dist/lib/scripts/.",
         "copy the contents of scripts to dist/sripts"
     );
 }

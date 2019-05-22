@@ -92,7 +92,7 @@ export class MusicController {
         }
         const command = `ps -ef | grep "${appName}" | grep -v grep | awk '{print $2}' | xargs kill`;
         let result = await musicUtil.execCmd(command);
-        if (result === null || result === undefined) {
+        if (result === null || result === undefined || result === "") {
             result = "ok";
         }
         return result;
@@ -102,7 +102,7 @@ export class MusicController {
         player = musicUtil.getPlayerName(player);
         const command = `open -a ${player}`;
         let result = await musicUtil.execCmd(command);
-        if (result === null || result === undefined) {
+        if (result === null || result === undefined || result === "") {
             result = "ok";
         }
         return result;
@@ -151,26 +151,12 @@ export class MusicController {
             script = musicUtil.formatString(script, params);
             command = `osascript -e \'${script}\'`;
         }
+
         let result = await musicUtil.execCmd(command);
-        if (result === null || result === undefined) {
+        if (result === null || result === undefined || result === "") {
             result = "ok";
         }
         return result;
-    }
-
-    playTrack(player: string, trackId: string) {
-        let params = null;
-        if (player === "Spotify") {
-            params = [`"${trackId}"`];
-        } else {
-            params = [`${trackId}`];
-        }
-        return this.execScript(player, "playTrack", params).then(result => {
-            if (result === null || result === undefined) {
-                result = "ok";
-            }
-            return result;
-        });
     }
 
     async run(
@@ -227,7 +213,7 @@ export class MusicController {
         }
         return this.execScript(player, scriptName, params, argv).then(
             result => {
-                if (result === null || result === undefined) {
+                if (result === null || result === undefined || result === "") {
                     result = "ok";
                 }
                 return result;
@@ -238,7 +224,7 @@ export class MusicController {
     setVolume(player: string, volume: number) {
         this.lastVolumeLevel = volume;
         return this.execScript(player, "setVolume", [volume]).then(result => {
-            if (result === null || result === undefined) {
+            if (result === null || result === undefined || result === "") {
                 result = "ok";
             }
             return result;
@@ -248,18 +234,26 @@ export class MusicController {
     setItunesLoved(loved: boolean) {
         return this.execScript(PlayerName.ItunesDesktop, "setItunesLoved", [
             loved
-        ]).then(result => {
-            if (result === null || result === undefined) {
-                result = "ok";
-            }
-            return result;
-        });
+        ])
+            .then(result => {
+                if (result === null || result === undefined || result === "") {
+                    result = "ok";
+                }
+                return result;
+            })
+            .catch(err => {
+                console.log(
+                    "Error updating itunes track loved status, error: ",
+                    err.message
+                );
+                return false;
+            });
     }
 
     playTrackInContext(player: string, params: any[]) {
         return this.execScript(player, "playTrackInContext", params).then(
             result => {
-                if (result === null || result === undefined) {
+                if (result === null || result === undefined || result === "") {
                     result = "ok";
                 }
                 return result;

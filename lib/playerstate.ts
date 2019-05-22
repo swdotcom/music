@@ -3,7 +3,6 @@ import { MusicController } from "./controller";
 import { MusicStore } from "./store";
 import { MusicClient } from "./client";
 import {
-    TrackState,
     PlayerDevice,
     Track,
     PlayerType,
@@ -30,8 +29,8 @@ export class MusicPlayerState {
         return MusicPlayerState.instance;
     }
 
-    async getCurrentlyRunningTrackState(): Promise<TrackState> {
-        let trackState: TrackState = new TrackState();
+    async getCurrentlyRunningTrackState(): Promise<Track> {
+        let trackState: Track = new Track();
         let spotifyDesktopRunning = await this.isSpotifyDesktopRunning();
         let itunesDesktopRunning = await this.isItunesDesktopRunning();
         if (spotifyDesktopRunning || itunesDesktopRunning) {
@@ -176,11 +175,10 @@ export class MusicPlayerState {
         return devices;
     }
 
-    async getDesktopTrackState(): Promise<TrackState> {
-        let trackState: TrackState = new TrackState();
-        let playingTrack: Track = new Track();
-        let pausedTrack: Track = new Track();
-        let pausedType: PlayerType = PlayerType.NotAssigned;
+    async getDesktopTrackState(): Promise<Track> {
+        let outgoingTrack;
+        let spotifyTrack;
+        let itunesTrack;
         if (musicUtil.isMac()) {
             const spotifyRunning = await musicCtr.isMusicPlayerActive(
                 PlayerName.SpotifyDesktop
@@ -192,21 +190,12 @@ export class MusicPlayerState {
                     "state"
                 );
                 if (state) {
-                    playingTrack = JSON.parse(state);
+                    spotifyTrack = JSON.parse(state);
                 }
 
-                if (playingTrack) {
-                    playingTrack.type = PlayerName.SpotifyDesktop;
-                }
-                if (playingTrack && playingTrack.state === "playing") {
-                    trackState = {
-                        type: PlayerType.MacSpotifyDesktop,
-                        track: playingTrack
-                    };
-                } else if (playingTrack) {
-                    // save this one if itunes isn't running
-                    pausedTrack = playingTrack;
-                    pausedType = PlayerType.MacSpotifyDesktop;
+                if (spotifyTrack) {
+                    spotifyTrack.type = PlayerName.SpotifyDesktop;
+                    spotifyTrack.playerType = PlayerType.MacSpotifyDesktop;
                 }
             }
 
@@ -220,67 +209,62 @@ export class MusicPlayerState {
                     "state"
                 );
                 if (state) {
-                    playingTrack = JSON.parse(state);
+                    itunesTrack = JSON.parse(state);
                 }
 
-                if (playingTrack) {
-                    playingTrack.type = PlayerName.ItunesDesktop;
-                }
-                if (playingTrack && playingTrack.state === "playing") {
-                    trackState = {
-                        type: PlayerType.MacItunesDesktop,
-                        track: playingTrack
-                    };
-                } else if (!pausedTrack && playingTrack) {
-                    pausedTrack = playingTrack;
-                    pausedType = PlayerType.MacItunesDesktop;
+                if (itunesTrack) {
+                    itunesTrack.type = PlayerName.ItunesDesktop;
+                    itunesTrack.playerType = PlayerType.MacItunesDesktop;
                 }
             }
 
-            if (pausedTrack) {
-                trackState = { type: pausedType, track: pausedTrack };
+            if (spotifyTrack && itunesTrack) {
+                if (itunesTrack.state !== "playing") {
+                    outgoingTrack = spotifyTrack;
+                }
+            } else if (spotifyTrack) {
+                outgoingTrack = spotifyTrack;
+            } else {
+                outgoingTrack = itunesTrack;
             }
         } else if (musicUtil.isWindows()) {
             // supports only spotify for now
             const winSpotifyRunning = await this.isWindowsSpotifyRunning();
             if (winSpotifyRunning) {
-                playingTrack = await this.getWindowsSpotifyTrackInfo();
-                if (playingTrack) {
-                    playingTrack.type = PlayerName.SpotifyDesktop;
-                    trackState = {
-                        type: PlayerType.MacSpotifyDesktop,
-                        track: playingTrack
-                    };
+                outgoingTrack = await this.getWindowsSpotifyTrackInfo();
+                if (outgoingTrack) {
+                    outgoingTrack.type = PlayerName.SpotifyDesktop;
+                    outgoingTrack.playerType = PlayerType.MacSpotifyDesktop;
                 }
             }
         }
 
         // make sure it's not an advertisement
-        if (trackState && !musicUtil.isEmptyObj(trackState.track)) {
+        if (outgoingTrack && !musicUtil.isEmptyObj(outgoingTrack)) {
             // "artist":"","album":"","id":"spotify:ad:000000012c603a6600000020316a17a1"
             if (
-                trackState.type === PlayerType.MacSpotifyDesktop &&
-                trackState.track.id.includes("spotify:ad:")
+                outgoingTrack.type === PlayerType.MacSpotifyDesktop &&
+                outgoingTrack.id.includes("spotify:ad:")
             ) {
                 // it's a spotify ad
-                trackState.track.status = TrackStatus.Advertisement;
-            } else if (!trackState.track.artist && !trackState.track.album) {
+                outgoingTrack.status = TrackStatus.Advertisement;
+            } else if (!outgoingTrack.artist && !outgoingTrack.album) {
                 // not enough info to send
-                trackState.track.status = TrackStatus.NotAssigned;
+                outgoingTrack.status = TrackStatus.NotAssigned;
             }
         }
 
         // include common attributes
         if (
-            trackState &&
-            !musicUtil.isEmptyObj(trackState.track) &&
-            trackState.track.duration
+            outgoingTrack &&
+            !musicUtil.isEmptyObj(outgoingTrack) &&
+            outgoingTrack.duration
         ) {
             // create the attributes
-            trackState.track["duration_ms"] = trackState.track.duration;
+            outgoingTrack["duration_ms"] = outgoingTrack.duration;
         }
 
-        return trackState;
+        return outgoingTrack;
     }
 
     /**
@@ -347,8 +331,8 @@ export class MusicPlayerState {
         return trackInfo;
     }
 
-    async getSpotifyWebCurrentTrack(): Promise<TrackState> {
-        let trackState: TrackState = new TrackState();
+    async getSpotifyWebCurrentTrack(): Promise<Track> {
+        let trackState: Track = new Track();
 
         let api = "/v1/me/player/currently-playing";
         let response = await musicClient.spotifyApiGet(api);
@@ -370,8 +354,8 @@ export class MusicPlayerState {
             }
             musicUtil.extractAristFromSpotifyTrack(track);
 
-            trackState.track = track;
-            trackState.type = PlayerType.WebSpotify;
+            trackState = track;
+            trackState.playerType = PlayerType.WebSpotify;
 
             return trackState;
         }

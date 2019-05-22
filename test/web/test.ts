@@ -1,7 +1,6 @@
-import { PlayerName, PlayerType } from "../../lib/models";
 import { MusicUtil } from "../../lib/util";
 const expect = require("chai").expect;
-const CodyMusic = require("../../dist/index.js");
+import * as CodyMusic from "../../index";
 
 const musicUtil = new MusicUtil();
 
@@ -24,33 +23,38 @@ describe("web player music tests", () => {
             accessToken: accessToken
         });
 
-        let setAccessToken = CodyMusic.getAccessToken("accessToken");
+        let setAccessToken = CodyMusic.getAccessToken();
 
         expect(setAccessToken).to.equal(accessToken);
 
-        CodyMusic.getSpotifyDevices().then(async (response: []) => {
-            let hasComputerDevice = false;
-            if (response) {
-                for (let i = 0; i < response.length; i++) {
-                    let element: any = response[i];
-                    if (element.type === "Computer") {
-                        hasComputerDevice = true;
-                        break;
+        CodyMusic.getSpotifyDevices().then(
+            async (response: CodyMusic.PlayerDevice[]) => {
+                let hasComputerDevice = false;
+                if (response) {
+                    for (let i = 0; i < response.length; i++) {
+                        let element: any = response[i];
+                        if (element.type === "Computer") {
+                            hasComputerDevice = true;
+                            break;
+                        }
                     }
                 }
-            }
 
-            if (!hasComputerDevice) {
-                // launch the web player
-                // High on Life
-                const albumId = "1GUfof1gHsqYjoHFym3aim";
-                await CodyMusic.launchPlayer(PlayerName.SpotifyWeb, {
-                    album: albumId
-                });
-                musicUtil.sleep(5000);
+                if (!hasComputerDevice) {
+                    // launch the web player
+                    // High on Life
+                    const albumId = "1GUfof1gHsqYjoHFym3aim";
+                    await CodyMusic.launchPlayer(
+                        CodyMusic.PlayerName.SpotifyWeb,
+                        {
+                            album: albumId
+                        }
+                    );
+                    musicUtil.sleep(5000);
+                }
+                done();
             }
-            done();
-        });
+        );
     });
 
     after("web play music test completion", done => {
@@ -60,7 +64,10 @@ describe("web player music tests", () => {
             const options = {
                 device_id
             };
-            response = await CodyMusic.pause(PlayerName.SpotifyWeb, options);
+            response = await CodyMusic.pause(
+                CodyMusic.PlayerName.SpotifyWeb,
+                options
+            );
             done();
         });
     });
@@ -85,10 +92,7 @@ describe("web player music tests", () => {
         CodyMusic.getSpotifyDevices().then(async (response: any) => {
             // get the 1st device id
             const device_id = response[0].id;
-            response = await CodyMusic.playSpotifyDevice(
-                device_id,
-                true /* play */
-            );
+            response = await CodyMusic.playSpotifyDevice(device_id);
             musicUtil.sleep(3000);
             expect(response.status).to.equal(204);
             done();
@@ -102,7 +106,10 @@ describe("web player music tests", () => {
             const options = {
                 device_id
             };
-            response = await CodyMusic.pause(PlayerName.SpotifyWeb, options);
+            response = await CodyMusic.pause(
+                CodyMusic.PlayerName.SpotifyWeb,
+                options
+            );
             musicUtil.sleep(3000);
             expect(response.status).to.equal(204);
             done();
@@ -121,14 +128,19 @@ describe("web player music tests", () => {
                 device_id,
                 track_ids: [track_id]
             };
-            response = await CodyMusic.play(PlayerName.SpotifyWeb, options);
+            response = await CodyMusic.play(
+                CodyMusic.PlayerName.SpotifyWeb,
+                options
+            );
             musicUtil.sleep(3000);
 
             expect(response.status).to.equal(204);
-            CodyMusic.getState(PlayerName.SpotifyWeb).then((response: any) => {
-                expect(response.track.uri).to.equal(track_id);
-                done();
-            });
+            CodyMusic.getState(CodyMusic.PlayerName.SpotifyWeb).then(
+                (response: any) => {
+                    expect(response.uri).to.equal(track_id);
+                    done();
+                }
+            );
         });
     });
 
@@ -144,15 +156,24 @@ describe("web player music tests", () => {
                 ]
             };
 
-            response = await CodyMusic.play(PlayerName.SpotifyWeb, options);
+            response = await CodyMusic.play(
+                CodyMusic.PlayerName.SpotifyWeb,
+                options
+            );
             musicUtil.sleep(3000);
 
             delete options["track_ids"];
 
-            response = await CodyMusic.next(PlayerName.SpotifyWeb, options);
+            response = await CodyMusic.next(
+                CodyMusic.PlayerName.SpotifyWeb,
+                options
+            );
             musicUtil.sleep(1000);
 
-            response = await CodyMusic.next(PlayerName.SpotifyWeb, options);
+            response = await CodyMusic.next(
+                CodyMusic.PlayerName.SpotifyWeb,
+                options
+            );
             musicUtil.sleep(1000);
 
             done();
