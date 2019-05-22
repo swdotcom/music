@@ -112,11 +112,8 @@ getPlayerState(player: PlayerName): Promise<TrackState>
 
 /**
  * Returns the currently running track info (player and track).
- * This only supports returning the state for itunes and spotify desktop
- * on Mac and spotify desktop on windows.
- * Deprecated - use "getState(player:PlayerName)" instead
  */
-getCurrentlyRunningTrackState(): Promise<TrackState>
+getRunningPlayerState(): Promise<TrackState>
 
 /**
  * Returns the tracks that are found by the given playlist name
@@ -287,6 +284,9 @@ getSpotifyAudioFeatures(ids: string[]): Promise<SpotifyAudioFeature[]>
 //
 // Deprecated functions
 //
+
+// deprecated, please use "getRunningPlayerState()"
+getCurrentlyRunningTrackState(): Promise<TrackState>
 
 // deprecated, please use "getPlayerState"
 getState(player: PlayerName): Promise<TrackState>
