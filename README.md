@@ -254,7 +254,7 @@ getPlaylistNames(player: PlayerName):Promise<string[]>
  * @param playerName {spotify|spotify-web|itunes}
  * @param options
  */
-launchPlayer(playerName: PlayerName, options: any)
+launchPlayer(playerName: PlayerName, options: any = {})
 
 /**
  * Returns available Spotify devices

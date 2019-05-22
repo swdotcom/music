@@ -348,7 +348,7 @@ export async function getPlaylistNames(player: PlayerName): Promise<string[]> {
  * @param playerName {spotify|spotify-web|itunes}
  * @param options
  */
-export function launchPlayer(playerName: PlayerName, options: any) {
+export function launchPlayer(playerName: PlayerName, options: any = {}) {
     if (playerName === PlayerName.SpotifyWeb) {
         return musicPlayerCtr.launchWebPlayer(options);
     } else {
