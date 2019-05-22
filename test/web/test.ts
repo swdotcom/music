@@ -27,6 +27,29 @@ describe("web player music tests", () => {
 
         expect(setAccessToken).to.equal(accessToken);
 
+        done();
+    });
+
+    after("web play music test completion", done => {
+        CodyMusic.getSpotifyDevices().then(async (response: any) => {
+            if (response && response.length > 0) {
+                // get the 1st device id
+                const device_id = response[0].id;
+                const options = {
+                    device_id
+                };
+                response = await CodyMusic.pause(
+                    CodyMusic.PlayerName.SpotifyWeb,
+                    options
+                );
+                done();
+            } else {
+                done();
+            }
+        });
+    });
+
+    it("Launch web player", done => {
         CodyMusic.getSpotifyDevices().then(
             async (response: CodyMusic.PlayerDevice[]) => {
                 let hasComputerDevice = false;
@@ -55,21 +78,6 @@ describe("web player music tests", () => {
                 done();
             }
         );
-    });
-
-    after("web play music test completion", done => {
-        CodyMusic.getSpotifyDevices().then(async (response: any) => {
-            // get the 1st device id
-            const device_id = response[0].id;
-            const options = {
-                device_id
-            };
-            response = await CodyMusic.pause(
-                CodyMusic.PlayerName.SpotifyWeb,
-                options
-            );
-            done();
-        });
     });
 
     it("Check the spotify web player devices", done => {

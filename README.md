@@ -111,9 +111,10 @@ isPlayerRunning(player: PlayerName): Promise<boolean>
 getTrack(player: PlayerName): Promise<Track>
 
 /**
- * Returns the currently running track info (player and track).
- */
-getRunningPlayerState(): Promise<Track>
+ * Returns the currently running track.
+ * Spotify web, desktop, or itunes desktop.
+ **/
+getRunningTrack(): Promise<Track>
 
 /**
  * Returns the tracks that are found by the given playlist name
@@ -285,7 +286,7 @@ getSpotifyAudioFeatures(ids: string[]): Promise<SpotifyAudioFeature[]>
 // Deprecated functions
 //
 
-// deprecated, please use "getRunningPlayerState()"
+// deprecated, please use "getRunningTrack()"
 getCurrentlyRunningTrackState(): Promise<Track>
 
 // deprecated, please use "getTrack"

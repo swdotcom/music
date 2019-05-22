@@ -70,17 +70,22 @@ export async function isPlayerRunning(player: PlayerName) {
 }
 
 /**
- * Returns the currently running track info (player and track).
- * This only supports returning the state for itunes and spotify desktop
- * on Mac and spotify desktop on windows.
+ * Returns the currently running track.
+ * Spotify web, desktop, or itunes desktop.
  **/
 export async function getRunningTrack(): Promise<Track> {
-    if (await musicCtr.isMusicPlayerActive(PlayerName.SpotifyDesktop)) {
-        return getTrack(PlayerName.SpotifyDesktop);
-    } else if (await musicCtr.isMusicPlayerActive(PlayerName.ItunesDesktop)) {
-        return getTrack(PlayerName.ItunesDesktop);
+    const spotifyDevices = await getSpotifyDevices();
+    let track: Track = new Track();
+    if (spotifyDevices.length > 0) {
+        track = await getTrack(PlayerName.SpotifyWeb);
+        if (!track || !track.id) {
+            track = await getTrack(PlayerName.SpotifyDesktop);
+        }
     }
-    return getTrack(PlayerName.SpotifyWeb);
+    if (!track || !track.id) {
+        track = await getTrack(PlayerName.ItunesDesktop);
+    }
+    return track;
 }
 
 /**
