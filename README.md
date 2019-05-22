@@ -108,7 +108,7 @@ isPlayerRunning(player: PlayerName): Promise<boolean>
  * @param player {spotify|spotif-web|itunes}
  * @returns {artist, album, genre, disc_number, duration, played_count, track_number, id, name, state}
  */
-getPlayerState(player: PlayerName): Promise<Track>
+getTrack(player: PlayerName): Promise<Track>
 
 /**
  * Returns the currently running track info (player and track).
@@ -288,7 +288,10 @@ getSpotifyAudioFeatures(ids: string[]): Promise<SpotifyAudioFeature[]>
 // deprecated, please use "getRunningPlayerState()"
 getCurrentlyRunningTrackState(): Promise<Track>
 
-// deprecated, please use "getPlayerState"
+// deprecated, please use "getTrack"
+getPlayerState(player: PlayerName): Promise<Track>
+
+// deprecated, please use "getTrack"
 getState(player: PlayerName): Promise<Track>
 
 // deprecated, please use "launchPlayer('spotify')"
@@ -300,13 +303,13 @@ startItunesIfNotRunning()
 // deprecated, please use "isSpotifyRunning" or "isItunesRunning"
 isRunning(player: PlayerName): Promise<boolean>
 
-// deprecated, pluse use "setRepat(player, repeat)"
+// deprecated, please use "setRepat(player, repeat)"
 repeatOn(player: PlayerName)
 
-// deprecated, pluse use "setRepat(player, repeat)"
+// deprecated, please use "setRepat(player, repeat)"
 repeatOff(player: PlayerName)
 
-// deprecated, pluse use "unmute(player)"
+// deprecated, please use "unmute(player)"
 unMute(player: PlayerName)
 ```
 

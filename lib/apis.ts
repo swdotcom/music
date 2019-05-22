@@ -74,23 +74,23 @@ export async function isPlayerRunning(player: PlayerName) {
  * This only supports returning the state for itunes and spotify desktop
  * on Mac and spotify desktop on windows.
  **/
-export async function getRunningPlayerState(): Promise<Track> {
+export async function getRunningTrack(): Promise<Track> {
     if (await musicCtr.isMusicPlayerActive(PlayerName.SpotifyDesktop)) {
-        return getPlayerState(PlayerName.SpotifyDesktop);
+        return getTrack(PlayerName.SpotifyDesktop);
     } else if (await musicCtr.isMusicPlayerActive(PlayerName.ItunesDesktop)) {
-        return getPlayerState(PlayerName.ItunesDesktop);
+        return getTrack(PlayerName.ItunesDesktop);
     }
-    return getPlayerState(PlayerName.SpotifyWeb);
+    return getTrack(PlayerName.SpotifyWeb);
 }
 
 /**
- * Returns the player state and track of a given player {spotify|spotify-web|itunes}
+ * Returns the track of a given player {spotify|spotify-web|itunes}
  * - Spotify does not return a "genre"
  * - duration is in milliseconds
  * @param player {spotify|spotif-web|itunes}
  * @returns {artist, album, genre, disc_number, duration, played_count, track_number, id, name, state}
  */
-export async function getPlayerState(player: PlayerName): Promise<Track> {
+export async function getTrack(player: PlayerName): Promise<Track> {
     let track;
     if (player === PlayerName.SpotifyWeb) {
         track = await musicPlayerCtr.getSpotifyWebCurrentTrack();
@@ -395,56 +395,63 @@ export function getSpotifyAudioFeatures(
 }
 
 /**
- * Deprecated - use "getRunningPlayerState()" instead
+ * Deprecated - use "getTrack(player)"
+ */
+export function getPlayerState(player: PlayerName): Promise<Track> {
+    return getTrack(player);
+}
+
+/**
+ * Deprecated - use "getRunningTrack()" instead
  */
 export function getCurrentlyRunningTrackState(): Promise<Track> {
-    return musicPlayerCtr.getCurrentlyRunningTrackState();
+    return musicPlayerCtr.getCurrentlyRunningTrack();
 }
 
 /**
- * deprecated, please use "getPlayerState"
+ * Deprecated - please use "getPlayerState"
  */
 export function getState(player: PlayerName): Promise<Track> {
-    return getPlayerState(player);
+    return getTrack(player);
 }
 
 /**
- * deprecated, please use "launchPlayer('spotify')"
+ * Deprecated - please use "launchPlayer('spotify')"
  **/
 export function startSpotifyIfNotRunning() {
     return musicCtr.launchApp(PlayerName.SpotifyDesktop);
 }
 
 /**
- * deprecated, please use "launchPlayer('itunes')"
+ * Deprecated - please use "launchPlayer('itunes')"
  */
 export function startItunesIfNotRunning() {
     return musicCtr.launchApp(PlayerName.ItunesDesktop);
 }
 
 /**
- * deprecated, please use "isSpotifyRunning" or "isItunesRunning"
+ * Deprecated - please use "isSpotifyRunning" or "isItunesRunning"
  */
 export function isRunning(player: PlayerName): Promise<boolean> {
     return isPlayerRunning(player);
 }
 
 /**
- * deprecated, pluse use "setRepat(player, repeat)"
+ * Deprecated - please use "setRepat(player, repeat)"
  */
 export function repeatOn(player: PlayerName) {
     return setRepeat(player, true);
 }
 
 /**
- * deprecated, pluse use "setRepat(player, repeat)"
+ * Deprecated - please use "setRepat(player, repeat)"
  */
 export function repeatOff(player: PlayerName) {
     return setRepeat(player, false);
 }
 
 /**
- * deprecated, pluse use "unmute(player)"
+ * Deprecated - please use "unmute(player)"
  */
 export function unMute(player: PlayerName) {
     return unmute(player);

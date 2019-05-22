@@ -29,7 +29,7 @@ export class MusicPlayerState {
         return MusicPlayerState.instance;
     }
 
-    async getCurrentlyRunningTrackState(): Promise<Track> {
+    async getCurrentlyRunningTrack(): Promise<Track> {
         let trackState: Track = new Track();
         let spotifyDesktopRunning = await this.isSpotifyDesktopRunning();
         let itunesDesktopRunning = await this.isItunesDesktopRunning();
