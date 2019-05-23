@@ -19,7 +19,7 @@ export class Playlist {
         return Playlist.instance;
     }
 
-    async createSpotifyPlaylist(name: string, isPublic: boolean) {
+    async createPlaylist(name: string, isPublic: boolean) {
         // get the profile if we don't have it
         if (!musicStore.spotifyUserId) {
             await userProfile.getUserProfile();
@@ -44,6 +44,46 @@ export class Playlist {
         return failedCreate;
     }
 
+    async addTracksToPlaylist(
+        playlist_id: string,
+        track_ids: string[],
+        position: number = 0
+    ) {
+        let codyResp = new CodyResponse();
+        if (!track_ids) {
+            codyResp.status = 500;
+            codyResp.state = CodyResponseType.Failed;
+            codyResp.message = "No track URIs provided to remove from playlist";
+            return codyResp;
+        }
+        let tracks = [];
+        for (let i = 0; i < track_ids.length; i++) {
+            let trackId = track_ids[i];
+            if (!trackId.includes("spotify:track:")) {
+                trackId = `spotify:track:${trackId}`;
+            }
+            tracks.push(trackId);
+        }
+
+        let payload = {
+            uris: tracks,
+            position
+        };
+
+        const api = `/v1/playlists/${playlist_id}/tracks`;
+        codyResp = await musicClient.spotifyApiPost(api, {}, payload);
+
+        // check if the token needs to be refreshed
+        if (codyResp.statusText === "EXPIRED") {
+            // refresh the token
+            await musicClient.refreshSpotifyToken();
+            // try again
+            codyResp = await await musicClient.spotifyApiPost(api, {}, payload);
+        }
+
+        return codyResp;
+    }
+
     /**
      * Track IDs should be the uri (i.e. "spotify:track:4iV5W9uYEdYUVa79Axb7Rh")
      * but if it's only the id (i.e. "4iV5W9uYEdYUVa79Axb7Rh") this will add
@@ -51,12 +91,12 @@ export class Playlist {
      * @param playlist_id
      * @param trackIds
      */
-    async removeTracksFromSpotifyPlaylist(
+    async removeTracksFromPlaylist(
         playlist_id: string,
-        trackIds: string[]
+        track_ids: string[]
     ): Promise<CodyResponse> {
         let codyResp = new CodyResponse();
-        if (!trackIds) {
+        if (!track_ids) {
             codyResp.status = 500;
             codyResp.state = CodyResponseType.Failed;
             codyResp.message = "No track URIs provided to remove from playlist";
@@ -64,8 +104,8 @@ export class Playlist {
         }
         let tracks: any[] = [];
 
-        for (let i = 0; i < trackIds.length; i++) {
-            let trackId = trackIds[i];
+        for (let i = 0; i < track_ids.length; i++) {
+            let trackId = track_ids[i];
             if (!trackId.includes("spotify:track:")) {
                 trackId = `spotify:track:${trackId}`;
             }

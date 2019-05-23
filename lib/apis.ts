@@ -419,24 +419,41 @@ export function getSpotifyAudioFeatures(
 
 /**
  * Create a playlist for a Spotify user. (The playlist will be empty until you add tracks.)
+ * @param name the name of the playlist you want to create
+ * @param isPublic if the playlist will be public or private
  */
-export function createSpotifyPlaylist(name: string, isPublic: boolean) {
-    return playlist.createSpotifyPlaylist(name, isPublic);
+export function createPlaylist(name: string, isPublic: boolean) {
+    return playlist.createPlaylist(name, isPublic);
 }
 
 /**
- * Remove tracks from a given playlise
- * Track IDs should be the uri (i.e. "spotify:track:4iV5W9uYEdYUVa79Axb7Rh")
+ * Add tracks to a given Spotify playlist.
+ * @param playlist_id the Spotify ID for the playlist
+ * @param tracks Tracks should be the uri (i.e. "spotify:track:4iV5W9uYEdYUVa79Axb7Rh")
  * but if it's only the id (i.e. "4iV5W9uYEdYUVa79Axb7Rh") this will add
  * the uri part "spotify:track:"
- * @param playlist_id
- * @param trackIds
+ * @param position The position to insert the tracks, a zero-based index.
  */
-export function removeTracksFromSpotifyPlaylist(
+export function addTracksToPlaylist(
     playlist_id: string,
-    trackIds: string[]
+    tracks: string[],
+    position: number = 0
 ) {
-    return playlist.removeTracksFromSpotifyPlaylist(playlist_id, trackIds);
+    return playlist.addTracksToPlaylist(playlist_id, tracks, position);
+}
+
+/**
+ * Remove tracks from a given Spotify playlist.
+ * @param playlist_id the Spotify ID for the playlist
+ * @param tracks Tracks should be the uri (i.e. "spotify:track:4iV5W9uYEdYUVa79Axb7Rh")
+ * but if it's only the id (i.e. "4iV5W9uYEdYUVa79Axb7Rh") this will add
+ * the uri part "spotify:track:"
+ */
+export function removeTracksFromPlaylist(
+    playlist_id: string,
+    tracks: string[]
+) {
+    return playlist.removeTracksFromPlaylist(playlist_id, tracks);
 }
 
 /**

@@ -289,6 +289,39 @@ getSpotifyGenre(artist: string): Promise<string>
  */
 getSpotifyAudioFeatures(ids: string[]): Promise<SpotifyAudioFeature[]>
 
+/**
+ * Create a playlist for a Spotify user. (The playlist will be empty until you add tracks.)
+ * @param name the name of the playlist you want to create
+ * @param isPublic if the playlist will be public or private
+ */
+createPlaylist(name: string, isPublic: boolean)
+
+/**
+ * Add tracks to a given Spotify playlist.
+ * @param playlist_id the Spotify ID for the playlist
+ * @param tracks Tracks should be the uri (i.e. "spotify:track:4iV5W9uYEdYUVa79Axb7Rh")
+ * but if it's only the id (i.e. "4iV5W9uYEdYUVa79Axb7Rh") this will add
+ * the uri part "spotify:track:"
+ * @param position The position to insert the tracks, a zero-based index.
+ */
+addTracksToPlaylist(
+    playlist_id: string,
+    tracks: string[],
+    position: number = 0
+)
+
+/**
+ * Remove tracks from a given Spotify playlist.
+ * @param playlist_id the Spotify ID for the playlist
+ * @param tracks Tracks should be the uri (i.e. "spotify:track:4iV5W9uYEdYUVa79Axb7Rh")
+ * but if it's only the id (i.e. "4iV5W9uYEdYUVa79Axb7Rh") this will add
+ * the uri part "spotify:track:"
+ */
+removeTracksFromPlaylist(
+    playlist_id: string,
+    tracks: string[]
+)
+
 //
 // Deprecated functions
 //
