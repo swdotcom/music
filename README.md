@@ -102,6 +102,13 @@ isItunesRunning(): Promise<boolean>
 isPlayerRunning(player: PlayerName): Promise<boolean>
 
 /**
+ * Returns whether there's an active track,
+ * (spotify web, spotify desktop, or itunes desktop)
+ * @returns {Promise<boolean>}
+ */
+hasActiveTrack(): Promise<boolean>
+
+/**
  * Returns the player state and track of a given player {spotify|spotify-web|itunes}
  * - Spotify does not return a "genre"
  * - duration is in milliseconds

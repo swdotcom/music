@@ -84,4 +84,11 @@ describe("music track tests", () => {
             }
         );
     });
+
+    it("checks if it has an active track", done => {
+        CodyMusic.hasActiveTrack().then((result: any) => {
+            expect(result).to.equal(true);
+            done();
+        });
+    });
 });

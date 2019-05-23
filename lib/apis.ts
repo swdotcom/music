@@ -9,14 +9,18 @@ import {
     PlayerType
 } from "./models";
 import { MusicPlayerState } from "./playerstate";
+import { AudioStat } from "./audiostat";
 import { MusicStore } from "./store";
 import { MusicUtil } from "./util";
+import { Playlist } from "./playlist";
 
 // get the instances
 const musicCtr = MusicController.getInstance();
 const musicPlayerCtr = MusicPlayerState.getInstance();
 const musicStore = MusicStore.getInstance();
 const musicUtil = new MusicUtil();
+const audioStat = AudioStat.getInstance();
+const playlist = Playlist.getInstance();
 
 /**
  * Set Credentials (currently only supports Spotify)
@@ -70,8 +74,22 @@ export async function isPlayerRunning(player: PlayerName) {
 }
 
 /**
+ * Returns whether there's an active track,
+ * (spotify web, spotify desktop, or itunes desktop)
+ * @returns {Promise<boolean>}
+ */
+export async function hasActiveTrack(): Promise<boolean> {
+    const track: Track = await getRunningTrack();
+    if (track && track.id) {
+        return true;
+    }
+    return false;
+}
+
+/**
  * Returns the currently running track.
  * Spotify web, desktop, or itunes desktop.
+ * @returns {Promise<Track>}
  **/
 export async function getRunningTrack(): Promise<Track> {
     const spotifyDevices = await getSpotifyDevices();
@@ -396,7 +414,29 @@ export function getSpotifyGenre(artist: string): Promise<string> {
 export function getSpotifyAudioFeatures(
     ids: string[]
 ): Promise<SpotifyAudioFeature[]> {
-    return musicPlayerCtr.getSpotifyAudioFeatures(ids);
+    return audioStat.getSpotifyAudioFeatures(ids);
+}
+
+/**
+ * Create a playlist for a Spotify user. (The playlist will be empty until you add tracks.)
+ */
+export function createSpotifyPlaylist(name: string, isPublic: boolean) {
+    return playlist.createSpotifyPlaylist(name, isPublic);
+}
+
+/**
+ * Remove tracks from a given playlise
+ * Track IDs should be the uri (i.e. "spotify:track:4iV5W9uYEdYUVa79Axb7Rh")
+ * but if it's only the id (i.e. "4iV5W9uYEdYUVa79Axb7Rh") this will add
+ * the uri part "spotify:track:"
+ * @param playlist_id
+ * @param trackIds
+ */
+export function removeTracksFromSpotifyPlaylist(
+    playlist_id: string,
+    trackIds: string[]
+) {
+    return playlist.removeTracksFromSpotifyPlaylist(playlist_id, trackIds);
 }
 
 /**

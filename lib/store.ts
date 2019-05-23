@@ -5,6 +5,7 @@ export class MusicStore {
     private _connectServerAuth: string = "";
     private _spotifyClientSecret: string = "";
     private _spotifyClientId: string = "";
+    private _spotifyUserId: string = "";
 
     private static instance: MusicStore;
     private constructor() {
@@ -90,5 +91,13 @@ export class MusicStore {
 
     set apiHeaders(newApiHeaders) {
         this._apiHeaders = newApiHeaders;
+    }
+
+    get spotifyUserId(): any {
+        return this._spotifyUserId;
+    }
+
+    set spotifyUserId(newSpotifyUserId) {
+        this._spotifyUserId = newSpotifyUserId;
     }
 }

@@ -1,9 +1,9 @@
 export enum PlayerType {
-    MacItunesDesktop = 1,
-    MacSpotifyDesktop = 2,
-    WindowsSpotifyDesktop = 3,
-    WebSpotify = 4,
-    NotAssigned = 5
+    MacItunesDesktop = "MacItunesDesktop",
+    MacSpotifyDesktop = "MacSpotifyDesktop",
+    WindowsSpotifyDesktop = "WidowsSpotifyDesktop",
+    WebSpotify = "WebSpotify",
+    NotAssigned = "NotAssigned"
 }
 
 export enum PlayerName {
@@ -19,13 +19,26 @@ export enum TrackStatus {
     NotAssigned = 4
 }
 
+export enum CodyResponseType {
+    Success = "success",
+    Failed = "failed"
+}
+
+export class CodyResponse {
+    status: number = 200;
+    state: CodyResponseType = CodyResponseType.Success;
+    statusText: string = "";
+    message: string = "";
+    data: any = {};
+    error: any = {};
+}
+
 // {artist, album, genre, disc_number, duration, played_count, track_number, id, name, state}
 export class Track {
     artist: string = "";
     album: string = "";
     genre: string = "";
     disc_number: number = 0;
-    disk_number: number = 0;
     duration: number = 0;
     duration_ms: number = 0;
     played_count: number = 0;

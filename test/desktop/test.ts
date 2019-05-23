@@ -8,7 +8,7 @@ const musicCtr = MusicController.getInstance();
 
 /**
  * Don't add "async" into the it condition.
- * i.e. xit("description text", async (done) => {
+ * i.e. it("description text", async (done) => {
  *     // do stuff
  * });
  * It will return the following error if you do.
@@ -52,7 +52,7 @@ describe("desktop player tests", () => {
             });
     });
 
-    xit("Should Show The Playlist Names AND Show The Tracks Of A Playlist", done => {
+    it("Should Show The Playlist Names AND Show The Tracks Of A Playlist", done => {
         CodyMusic.getPlaylistNames(CodyMusic.PlayerName.ItunesDesktop).then(
             (names: string[]) => {
                 expect(names.length).to.not.equal(0);
@@ -68,7 +68,7 @@ describe("desktop player tests", () => {
         );
     });
 
-    xit("Should Set An Itunes Song's Love State", done => {
+    it("Should Set An Itunes Song's Love State", done => {
         musicCtr
             .launchApp(CodyMusic.PlayerName.ItunesDesktop)
             .then(async () => {
@@ -95,7 +95,7 @@ describe("desktop player tests", () => {
             });
     });
 
-    xit("Should Show An Error", done => {
+    it("Should Show An Error", done => {
         // play a bad track number
         CodyMusic.playTrack(
             CodyMusic.PlayerName.ItunesDesktop,
@@ -108,7 +108,7 @@ describe("desktop player tests", () => {
         });
     });
 
-    xit("Should Show Spotify Is Not Running", done => {
+    it("Should Show Spotify Is Not Running", done => {
         musicCtr.quitApp(CodyMusic.PlayerName.SpotifyDesktop).then(() => {
             CodyMusic.isSpotifyRunning().then((result: any) => {
                 expect(result).to.equal(false);
@@ -117,7 +117,7 @@ describe("desktop player tests", () => {
         });
     });
 
-    xit("Should Show Itunes Is Not Running", done => {
+    it("Should Show Itunes Is Not Running", done => {
         musicCtr.quitApp(CodyMusic.PlayerName.ItunesDesktop).then(() => {
             CodyMusic.isItunesRunning().then((result: any) => {
                 expect(result).to.equal(false);
@@ -130,7 +130,7 @@ describe("desktop player tests", () => {
     // {"artist": "Coldplay","album": "Parachutes","genre": "",
     // "disc_number": 1,"duration": 273426,"played_count": 0,"track_number": 6,
     // "id": "spotify:track:0R8P9KfGJCDULmlEoBagcO","name": "Trouble","state":"playing"}
-    xit("Get Spotify Track Info", done => {
+    it("Get Spotify Track Info", done => {
         musicCtr
             .launchApp(CodyMusic.PlayerName.SpotifyDesktop)
             .then(async () => {
@@ -152,6 +152,7 @@ describe("desktop player tests", () => {
                 let result = await CodyMusic.getState(
                     CodyMusic.PlayerName.SpotifyDesktop
                 );
+
                 expect(result.id).to.equal(
                     "spotify:track:4ut5G4rgB1ClpMTMfjoIuy"
                 );
@@ -163,7 +164,7 @@ describe("desktop player tests", () => {
     // {"artist": "Loud Forest","album": "Out of Sight - Single",
     // "genre":"Alternative","disc_number": 1,"duration": 212.042007446289,
     // "played_count": 120,"track_number": 1,"id": "5601","name": "Out of Sight","state":"playing"}
-    xit("Get iTunes Track Info", done => {
+    it("Get iTunes Track Info", done => {
         musicCtr
             .launchApp(CodyMusic.PlayerName.ItunesDesktop)
             .then(async () => {
@@ -182,7 +183,7 @@ describe("desktop player tests", () => {
             });
     });
 
-    xit("Tell Spotify To Perform Next, Repeat, Previous, Pause, Shuffle, Volume Change, Mute, Unmute, Shuffle, Check Shuffle", done => {
+    it("Tell Spotify To Perform Next, Repeat, Previous, Pause, Shuffle, Volume Change, Mute, Unmute, Shuffle, Check Shuffle", done => {
         musicCtr
             .launchApp(CodyMusic.PlayerName.SpotifyDesktop)
             .then(async () => {
@@ -204,8 +205,9 @@ describe("desktop player tests", () => {
                 // make sure it's playing
                 expect(result.state).to.equal("playing");
                 expect(result.name).to.equal("Trouble");
-                // check if it's disk_number is greater than 1
-                let diskNum = result.disk_number;
+
+                // check if it's disc_number is greater than 1
+                let diskNum = result.disc_number;
                 let previousSong;
                 if (diskNum === 1) {
                     // we're at disk one, just test using next and previous
@@ -330,7 +332,7 @@ describe("desktop player tests", () => {
             });
     });
 
-    xit("Tell Itunes To Perform Next, Repeat, Previous, Pause, Shuffle, Volume Change, Mute, Unmute, Shuffle, Check Shuffle", done => {
+    it("Tell Itunes To Perform Next, Repeat, Previous, Pause, Shuffle, Volume Change, Mute, Unmute, Shuffle, Check Shuffle", done => {
         musicCtr
             .launchApp(CodyMusic.PlayerName.ItunesDesktop)
             .then(async () => {
