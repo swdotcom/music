@@ -19,13 +19,18 @@ export class Playlist {
         return Playlist.instance;
     }
 
+    /**
+     * Create a new playlist
+     * @param name
+     * @param isPublic
+     */
     async createPlaylist(name: string, isPublic: boolean) {
         // get the profile if we don't have it
         if (!musicStore.spotifyUserId) {
             await userProfile.getUserProfile();
         }
 
-        if (!musicStore.spotifyUserId) {
+        if (musicStore.spotifyUserId) {
             /**
              * --data "{\"name\":\"A New Playlist\", \"public\":false}
              */
@@ -44,6 +49,27 @@ export class Playlist {
         return failedCreate;
     }
 
+    async deletePlaylist(playlist_id: string) {
+        const api = `/v1/playlists/${playlist_id}/followers`;
+        let codyResp = await musicClient.spotifyApiDelete(api, {}, {});
+
+        // check if the token needs to be refreshed
+        if (codyResp.statusText === "EXPIRED") {
+            // refresh the token
+            await musicClient.refreshSpotifyToken();
+            // try again
+            codyResp = await musicClient.spotifyApiDelete(api, {}, {});
+        }
+
+        return codyResp;
+    }
+
+    /**
+     * Add tracks to a given playlist
+     * @param playlist_id
+     * @param track_ids
+     * @param position
+     */
     async addTracksToPlaylist(
         playlist_id: string,
         track_ids: string[],
@@ -56,14 +82,7 @@ export class Playlist {
             codyResp.message = "No track URIs provided to remove from playlist";
             return codyResp;
         }
-        let tracks = [];
-        for (let i = 0; i < track_ids.length; i++) {
-            let trackId = track_ids[i];
-            if (!trackId.includes("spotify:track:")) {
-                trackId = `spotify:track:${trackId}`;
-            }
-            tracks.push(trackId);
-        }
+        const tracks = this.normalizeTrackIds(track_ids);
 
         let payload = {
             uris: tracks,
@@ -78,7 +97,41 @@ export class Playlist {
             // refresh the token
             await musicClient.refreshSpotifyToken();
             // try again
-            codyResp = await await musicClient.spotifyApiPost(api, {}, payload);
+            codyResp = await musicClient.spotifyApiPost(api, {}, payload);
+        }
+
+        return codyResp;
+    }
+
+    /**
+     * Replace tracks of a given playlist. This will wipe out
+     * the current set of tracks.
+     * @param playlist_id
+     * @param track_ids
+     */
+    async replacePlaylistTracks(playlist_id: string, track_ids: string[]) {
+        let codyResp = new CodyResponse();
+        if (!track_ids) {
+            codyResp.status = 500;
+            codyResp.state = CodyResponseType.Failed;
+            codyResp.message = "No track URIs provided to remove from playlist";
+            return codyResp;
+        }
+        const tracks = this.normalizeTrackIds(track_ids);
+
+        let payload = {
+            uris: tracks
+        };
+
+        const api = `/v1/playlists/${playlist_id}/tracks`;
+        codyResp = await musicClient.spotifyApiPut(api, {}, payload);
+
+        // check if the token needs to be refreshed
+        if (codyResp.statusText === "EXPIRED") {
+            // refresh the token
+            await musicClient.refreshSpotifyToken();
+            // try again
+            codyResp = await musicClient.spotifyApiPut(api, {}, payload);
         }
 
         return codyResp;
@@ -102,18 +155,7 @@ export class Playlist {
             codyResp.message = "No track URIs provided to remove from playlist";
             return codyResp;
         }
-        let tracks: any[] = [];
-
-        for (let i = 0; i < track_ids.length; i++) {
-            let trackId = track_ids[i];
-            if (!trackId.includes("spotify:track:")) {
-                trackId = `spotify:track:${trackId}`;
-            }
-            const urlObj = {
-                uri: trackId
-            };
-            tracks.push(urlObj);
-        }
+        const tracks = this.normalizeTrackIds(track_ids);
 
         codyResp = await musicClient.spotifyApiDelete(
             `/v1/playlists/${playlist_id}/tracks`,
@@ -126,7 +168,7 @@ export class Playlist {
             // refresh the token
             await musicClient.refreshSpotifyToken();
             // try again
-            codyResp = await await musicClient.spotifyApiDelete(
+            codyResp = await musicClient.spotifyApiDelete(
                 `/v1/playlists/${playlist_id}/tracks`,
                 {},
                 { tracks }
@@ -134,5 +176,22 @@ export class Playlist {
         }
 
         return codyResp;
+    }
+
+    normalizeTrackIds(track_ids: string[]) {
+        let tracks = [];
+
+        for (let i = 0; i < track_ids.length; i++) {
+            let trackId = track_ids[i];
+            if (!trackId.includes("spotify:track:")) {
+                trackId = `spotify:track:${trackId}`;
+            }
+            const urlObj = {
+                uri: trackId
+            };
+            tracks.push(urlObj);
+        }
+
+        return tracks;
     }
 }

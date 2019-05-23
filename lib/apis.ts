@@ -427,6 +427,27 @@ export function createPlaylist(name: string, isPublic: boolean) {
 }
 
 /**
+ * Deletes a playlist of a given playlist ID.
+ * @param playlist_id
+ */
+export function deletePlaylist(playlist_id: string) {
+    return playlist.deletePlaylist(playlist_id);
+}
+
+/**
+ * Replace tracks of a given playlist. This will wipe out
+ * the current set of tracks and add the tracks specified.
+ * @param playlist_id
+ * @param track_ids
+ */
+export function replacePlaylistTracks(
+    playlist_id: string,
+    track_ids: string[]
+) {
+    return playlist.replacePlaylistTracks(playlist_id, track_ids);
+}
+
+/**
  * Add tracks to a given Spotify playlist.
  * @param playlist_id the Spotify ID for the playlist
  * @param tracks Tracks should be the uri (i.e. "spotify:track:4iV5W9uYEdYUVa79Axb7Rh")

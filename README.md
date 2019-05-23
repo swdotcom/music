@@ -1,8 +1,21 @@
 # cody-music
 
-Control Mac desktop Spotify and iTunes, or Spotify devices via your access and refresh token.
+## Player control support
 
-Also provides various Spotify and iTunes search, audio features, and playlist APIs. More coming soon.
+-   Mac Spotify and iTunes desktop
+-   Spotify Web
+
+## Spotify web API support
+
+-   Audio features
+-   Playlists
+-   Genre search
+
+## iTunes API support
+
+-   Genre search
+
+More coming soon
 
 ## Installation
 
@@ -295,6 +308,23 @@ getSpotifyAudioFeatures(ids: string[]): Promise<SpotifyAudioFeature[]>
  * @param isPublic if the playlist will be public or private
  */
 createPlaylist(name: string, isPublic: boolean)
+
+/**
+ * Deletes a playlist given a specified playlist ID.
+ * @param playlist_id
+ **/
+deletePlaylist(playlist_id: string)
+
+/**
+ * Replace tracks of a given playlist. This will wipe out
+ * the current set of tracks and add the tracks specified.
+ * @param playlist_id
+ * @param track_ids
+ */
+replacePlaylistTracks(
+    playlist_id: string,
+    track_ids: string[]
+)
 
 /**
  * Add tracks to a given Spotify playlist.
