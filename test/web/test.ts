@@ -1,6 +1,7 @@
 import { MusicUtil } from "../../lib/util";
 const expect = require("chai").expect;
 import * as CodyMusic from "../../index";
+import { TrackStatus } from "../../lib/models";
 
 const musicUtil = new MusicUtil();
 
@@ -101,7 +102,6 @@ describe("web player music tests", () => {
             // get the 1st device id
             const device_id = response[0].id;
             response = await CodyMusic.playSpotifyDevice(device_id);
-            musicUtil.sleep(3000);
             expect(response.status).to.equal(204);
             done();
         });
@@ -118,7 +118,6 @@ describe("web player music tests", () => {
                 CodyMusic.PlayerName.SpotifyWeb,
                 options
             );
-            musicUtil.sleep(3000);
             expect(response.status).to.equal(204);
             done();
         });
@@ -145,6 +144,7 @@ describe("web player music tests", () => {
             expect(response.status).to.equal(204);
             CodyMusic.getState(CodyMusic.PlayerName.SpotifyWeb).then(
                 (response: any) => {
+                    expect(response.state).to.equal(TrackStatus.Playing);
                     expect(response.uri).to.equal(track_id);
                     done();
                 }

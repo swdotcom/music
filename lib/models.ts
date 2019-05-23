@@ -13,10 +13,10 @@ export enum PlayerName {
 }
 
 export enum TrackStatus {
-    Playing = 1,
-    Paused = 2,
-    Advertisement = 3,
-    NotAssigned = 4
+    Playing = "playing",
+    Paused = "paused",
+    Advertisement = "advertisement",
+    NotAssigned = "notassigned"
 }
 
 export enum CodyResponseType {
@@ -47,7 +47,6 @@ export class Track {
     id: string = "";
     uri: string = "";
     name: string = "";
-    state: string = "";
     explicit: boolean = false;
     // href:"https://api.spotify.com/v1/playlists/0mwG8hCL4scWi8Nkt7jyoV/tracks"
     href: string = "";
@@ -56,7 +55,7 @@ export class Track {
     playerType: PlayerType = PlayerType.NotAssigned;
     loved: boolean = false;
     volume: number = 0;
-    status: TrackStatus = TrackStatus.NotAssigned;
+    state: TrackStatus = TrackStatus.NotAssigned;
 }
 
 export class PlayerDevice {

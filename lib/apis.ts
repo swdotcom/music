@@ -6,7 +6,8 @@ import {
     Track,
     PlayerDevice,
     SpotifyAudioFeature,
-    PlayerType
+    PlayerType,
+    TrackStatus
 } from "./models";
 import { MusicPlayerState } from "./playerstate";
 import { AudioStat } from "./audiostat";
@@ -120,17 +121,26 @@ export async function getTrack(player: PlayerName): Promise<Track> {
         if (track) {
             track.playerType = PlayerType.WebSpotify;
         }
-        return track;
     }
 
-    track = await musicCtr.run(player, "state");
-    if (track) {
-        track = JSON.parse(track);
-        if (player === PlayerName.SpotifyDesktop) {
-            track.playerType = PlayerType.MacSpotifyDesktop;
-        } else {
-            track.playerType = PlayerType.MacItunesDesktop;
+    if (!track || !track.id) {
+        track = await musicCtr.run(player, "state");
+        if (track) {
+            track = JSON.parse(track);
+            if (player === PlayerName.SpotifyDesktop) {
+                track.playerType = PlayerType.MacSpotifyDesktop;
+                // applescript "id" returns the web equivelant of the "uri" value
+                // check if it's an advertisement
+                if (track.id.includes("spotify:ad:")) {
+                    track.state = TrackStatus.Advertisement;
+                }
+            } else {
+                track.playerType = PlayerType.MacItunesDesktop;
+            }
         }
+    }
+
+    if (track && track.id) {
         return track;
     }
     return new Track();
@@ -488,7 +498,7 @@ export function getPlayerState(player: PlayerName): Promise<Track> {
  * Deprecated - use "getRunningTrack()" instead
  */
 export function getCurrentlyRunningTrackState(): Promise<Track> {
-    return musicPlayerCtr.getCurrentlyRunningTrack();
+    return getRunningTrack();
 }
 
 /**
