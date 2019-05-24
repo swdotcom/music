@@ -100,11 +100,25 @@ export async function getRunningTrack(): Promise<Track> {
     if (spotifyDevices.length > 0) {
         track = await getTrack(PlayerName.SpotifyWeb);
         if (!track || !track.id) {
-            track = await getTrack(PlayerName.SpotifyDesktop);
+            const spotifyDesktopRunning = await isPlayerRunning(
+                PlayerName.SpotifyDesktop
+            );
+            if (spotifyDesktopRunning) {
+                track = await getTrack(PlayerName.SpotifyDesktop);
+            }
         }
     }
     if (!track || !track.id) {
-        track = await getTrack(PlayerName.ItunesDesktop);
+        const itunesDesktopRunning = await isPlayerRunning(
+            PlayerName.SpotifyDesktop
+        );
+        if (itunesDesktopRunning) {
+            track = await getTrack(PlayerName.ItunesDesktop);
+        }
+    }
+
+    if (!track) {
+        track = new Track();
     }
 
     return track;

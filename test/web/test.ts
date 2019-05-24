@@ -78,7 +78,8 @@ describe("web player music tests", () => {
             volume_percent: 100 } ]
          */
         CodyMusic.getSpotifyDevices().then((response: any) => {
-            console.log("spotify devices: ", response);
+            // it shouldn't have any playing devices yet
+            expect(response.length).to.equal(0);
             done();
         });
     });
