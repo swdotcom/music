@@ -150,6 +150,14 @@ export async function getTrack(player: PlayerName): Promise<Track> {
 
     if (!track || musicUtil.isEmptyObj(track)) {
         track = new Track();
+    } else if (track && !track["playerType"]) {
+        if (player === PlayerName.SpotifyWeb) {
+            track["playerType"] = PlayerType.WebSpotify;
+        } else if (player === PlayerName.SpotifyDesktop) {
+            track["playerType"] = PlayerType.MacSpotifyDesktop;
+        } else {
+            track["playerType"] = PlayerType.MacItunesDesktop;
+        }
     }
 
     return track;

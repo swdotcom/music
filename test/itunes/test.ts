@@ -40,7 +40,7 @@ describe("itunes player tests", () => {
             });
     });
 
-    xit("Launch and test itunes track state", done => {
+    it("Launch and test itunes track state", done => {
         CodyMusic.launchPlayer(CodyMusic.PlayerName.ItunesDesktop, {}).then(
             result => {
                 CodyMusic.getRunningTrack().then((track: Track) => {
