@@ -1,7 +1,7 @@
 import { MusicUtil } from "../../lib/util";
 const expect = require("chai").expect;
 import * as CodyMusic from "../../index";
-import { TrackStatus, Track } from "../../lib/models";
+import { Track } from "../../lib/models";
 import { MusicController } from "../../lib/controller";
 
 const musicUtil = new MusicUtil();

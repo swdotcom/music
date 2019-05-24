@@ -10,7 +10,8 @@
         "playlist-test": "npm run build && mocha -r ts-node/register test/playlists/test.ts --reporter spec --timeout 20000 --exit",
         "web-test": "npm run build && mocha -r ts-node/register test/web/test.ts --reporter spec --timeout 20000 --exit",
         "controls-test": "npm run build && mocha -r ts-node/register test/controls/test.ts --reporter spec --timeout 20000 --exit",
-        "itunes-test": "npm run build && mocha -r ts-node/register test/itunes/test.ts --reporter spec --timeout 20000 --exit"
+        "itunes-test": "npm run build && mocha -r ts-node/register test/itunes/test.ts --reporter spec --timeout 20000 --exit",
+        "features-test": "npm run build && mocha -r ts-node/register test/features/test.ts --reporter spec --timeout 20000 --exit"
     },
     "repository": {
         "type": "git",

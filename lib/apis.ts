@@ -6,8 +6,7 @@ import {
     Track,
     PlayerDevice,
     SpotifyAudioFeature,
-    PlayerType,
-    TrackStatus
+    PlayerType
 } from "./models";
 import { MusicPlayerState } from "./playerstate";
 import { AudioStat } from "./audiostat";

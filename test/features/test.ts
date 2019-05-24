@@ -1,15 +1,19 @@
+import { TestUtil } from "../util";
 const expect = require("chai").expect;
 const CodyMusic = require("../../dist/index.js");
 
+const testUtil = new TestUtil();
+
 describe("feature api tests", () => {
     before(done => {
-        const accessToken = "123abc";
+        let configFile = __dirname + "/../config.json";
+        let data = testUtil.getJsonFromFile(configFile);
+        console.log("data: ", data);
         CodyMusic.setCredentials({
-            refreshToken:
-                "AQCSjp8_taBNv46KFtHsRpU9IcppjCDyGBWN4pATLLXqBPa4Wjk38CY703-WnG4xk7zVbU7niLKQrsYi_zkGnFIy2HuZv-RyiU9fwkE-uw3HUI-vqWBxZoEbdZEIcM1zIqPs3w",
-            clientSecret: "2b40b4975b2743189c87f4712c0cd59e",
-            clientId: "eb67e22ba1c6474aad8ec8067480d9dc",
-            accessToken: accessToken
+            refreshToken: data.refreshToken,
+            clientSecret: data.clientSecret,
+            clientId: data.clientId,
+            accessToken: data.accessToken
         });
 
         done();
