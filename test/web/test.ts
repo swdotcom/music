@@ -24,7 +24,6 @@ describe("web player music tests", () => {
             .then((result: any) => {
                 let configFile = __dirname + "/../config.json";
                 let data = testUtil.getJsonFromFile(configFile);
-                console.log("data: ", data);
                 CodyMusic.setCredentials({
                     refreshToken: data.refreshToken,
                     clientSecret: data.clientSecret,
@@ -34,7 +33,7 @@ describe("web player music tests", () => {
 
                 let setAccessToken = CodyMusic.getAccessToken();
 
-                expect(setAccessToken).to.equal(accessToken);
+                expect(setAccessToken).to.equal(data.accessToken);
 
                 done();
             });

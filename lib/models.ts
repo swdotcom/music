@@ -99,3 +99,11 @@ export class SpotifyAudioFeature {
     duration_ms: number = 0;
     time_signature: number = 0;
 }
+
+export class PlaylistItem {
+    name: string = "";
+    id: string = "";
+    tracks: Track[] = [];
+    collaborative: boolean = false;
+    public: boolean = true;
+}

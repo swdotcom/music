@@ -18,7 +18,6 @@ describe("spotify profile tests", () => {
     before(done => {
         let configFile = __dirname + "/../config.json";
         let data = testUtil.getJsonFromFile(configFile);
-        console.log("data: ", data);
         CodyMusic.setCredentials({
             refreshToken: data.refreshToken,
             clientSecret: data.clientSecret,

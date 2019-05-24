@@ -1,5 +1,5 @@
 import { MusicClient } from "./client";
-import { CodyResponse, CodyResponseType } from "./models";
+import { CodyResponse, CodyResponseType, PlaylistItem } from "./models";
 import { MusicStore } from "./store";
 import { UserProfile } from "./profile";
 
@@ -17,6 +17,40 @@ export class Playlist {
             Playlist.instance = new Playlist();
         }
         return Playlist.instance;
+    }
+
+    async getPlaylists(): Promise<PlaylistItem[]> {
+        let playlists: PlaylistItem[] = [];
+        if (!musicStore.spotifyUserId) {
+            await userProfile.getUserProfile();
+        }
+
+        if (musicStore.spotifyUserId) {
+            const api = `/v1/users/${
+                musicStore.spotifyUserId
+            }/playlists?limit=50`;
+            let spotifyPlaylists = await musicClient.spotifyApiGet(api, {});
+            if (
+                spotifyPlaylists &&
+                spotifyPlaylists.data &&
+                spotifyPlaylists.data.items
+            ) {
+                playlists = spotifyPlaylists.data.items;
+            }
+        }
+
+        return playlists;
+    }
+
+    async getPlaylistNames(): Promise<string[]> {
+        let names: string[] = [];
+        let playlists = await this.getPlaylists();
+        if (playlists) {
+            names = playlists.map((playlistItem: PlaylistItem) => {
+                return playlistItem.name;
+            });
+        }
+        return names;
     }
 
     /**

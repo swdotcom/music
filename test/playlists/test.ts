@@ -1,6 +1,7 @@
 const expect = require("chai").expect;
 import * as CodyMusic from "../../index";
 import { TestUtil } from "../util";
+import { PlayerName } from "../../lib/models";
 
 const testUtil = new TestUtil();
 
@@ -16,7 +17,6 @@ describe("spotify playlist tests", () => {
     before(done => {
         let configFile = __dirname + "/../config.json";
         let data = testUtil.getJsonFromFile(configFile);
-        console.log("data: ", data);
         CodyMusic.setCredentials({
             refreshToken: data.refreshToken,
             clientSecret: data.clientSecret,
@@ -42,5 +42,19 @@ describe("spotify playlist tests", () => {
                 });
             }
         );
+    });
+
+    it("return spotify playlists", done => {
+        CodyMusic.getPlaylists(PlayerName.SpotifyWeb).then(result => {
+            expect(result.length).to.not.equal(0);
+            done();
+        });
+    });
+
+    it("return spotify playlist names", done => {
+        CodyMusic.getPlaylistNames(PlayerName.SpotifyWeb).then(result => {
+            expect(result.length).to.not.equal(0);
+            done();
+        });
     });
 });

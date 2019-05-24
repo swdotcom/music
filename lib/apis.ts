@@ -6,7 +6,8 @@ import {
     Track,
     PlayerDevice,
     SpotifyAudioFeature,
-    PlayerType
+    PlayerType,
+    PlaylistItem
 } from "./models";
 import { MusicPlayerState } from "./playerstate";
 import { AudioStat } from "./audiostat";
@@ -374,10 +375,28 @@ export function setItunesLoved(loved: boolean) {
 }
 
 /**
+ * Returns the playlists for a given player
+ * @param player {spotify|spotify-web|itunes}
+ */
+export async function getPlaylists(
+    player: PlayerName
+): Promise<PlaylistItem[]> {
+    let playlists: PlaylistItem[] = [];
+    if (player === PlayerName.SpotifyWeb) {
+        playlists = await playlist.getPlaylists();
+    }
+
+    return playlists;
+}
+
+/**
  * Get the full list of the playlist names for a given player
  * @param player {spotify|spotify-web|itunes}
  */
 export async function getPlaylistNames(player: PlayerName): Promise<string[]> {
+    if (player === PlayerName.SpotifyWeb) {
+        return playlist.getPlaylistNames();
+    }
     // result will string of playlist names separated by a comma
     let result = await musicCtr.run(player, "playlistNames");
     // trim the names just in case
