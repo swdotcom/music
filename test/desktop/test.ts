@@ -45,10 +45,24 @@ describe("desktop player tests", () => {
         musicCtr
             .quitApp(CodyMusic.PlayerName.SpotifyDesktop)
             .then((result: any) => {
-                done();
+                musicCtr
+                    .quitApp(CodyMusic.PlayerName.ItunesDesktop)
+                    .then((result: any) => {
+                        done();
+                    })
+                    .catch((err: any) => {
+                        done();
+                    });
             })
             .catch((err: any) => {
-                done();
+                musicCtr
+                    .quitApp(CodyMusic.PlayerName.ItunesDesktop)
+                    .then((result: any) => {
+                        done();
+                    })
+                    .catch((err: any) => {
+                        done();
+                    });
             });
     });
 

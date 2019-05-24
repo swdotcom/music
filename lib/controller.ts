@@ -144,9 +144,24 @@ export class MusicController {
             // script = fs.readFileSync(file).toString();
         } else {
             if (scriptName === "play" && player.toLowerCase() === "itunes") {
-                script = this.scripts.playFromLibrary;
-                params.push("Library");
+                // if itunes is not currently running, default to play from the
+                // user's default playlist
+                let itunesTrack = await this.run(
+                    PlayerName.ItunesDesktop,
+                    "state"
+                );
+
+                if (itunesTrack) {
+                    // make it an object
+                    itunesTrack = JSON.parse(itunesTrack);
+                    if (!itunesTrack || !itunesTrack.id) {
+                        // play from the user's default playlist
+                        script = this.scripts.playFromLibrary;
+                        params.push("Library");
+                    }
+                }
             }
+
             // apply the params to the one line script
             script = musicUtil.formatString(script, params);
             command = `osascript -e \'${script}\'`;
@@ -211,6 +226,7 @@ export class MusicController {
                 await this.execScript(player, "state", ["song repeat", "off"]);
             }
         }
+
         return this.execScript(player, scriptName, params, argv).then(
             result => {
                 if (result === null || result === undefined || result === "") {
