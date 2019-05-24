@@ -38,7 +38,7 @@ import * as CodyMusic from "cody-music";
 OR
 
 ```javascript
-const music = require("cody-music");
+const CodyMusic = require("cody-music");
 ```
 
 ## API
@@ -51,19 +51,19 @@ Specify either "Spotify" or "iTunes" (case-insensitive).
 
 ```javascript
 // get the track info using get state
-await CodyMusic.getPlayerState("iTunes").then(state => {
+await CodyMusic.getRunningTrack().then((track: Track) => {
     // - "genre" will be empty from Spotify
     // - duration is in milliseconds
-    // {artist, album, genre, disc_number, duration, played_count, track_number, id, name, state}
-    console.log(state);
+    // {artist, album, genre, disc_number, duration, played_count, track_number, id, loved, name, state, volume}
 });
 
 // play a specific spotify track
-await music
-    .playTrack("Spotify", "spotify:track:2YarjDYjBJuH63dUIh9OWv")
-    .then(result => {
-        // track is playing
-    });
+await CodyMusic.playTrack(
+    "Spotify",
+    "spotify:track:2YarjDYjBJuH63dUIh9OWv"
+).then(result => {
+    // track is playing
+});
 
 // play an iTunes track number
 await CodyMusic.playTrack("iTunes", 1).then(result => {
