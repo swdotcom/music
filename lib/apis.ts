@@ -90,11 +90,13 @@ export async function hasActiveTrack(): Promise<boolean> {
 /**
  * Returns the currently running track.
  * Spotify web, desktop, or itunes desktop.
+ * It will return an empty Track object if it's unable to
+ * find a running track.
  * @returns {Promise<Track>}
  **/
 export async function getRunningTrack(): Promise<Track> {
     const spotifyDevices = await getSpotifyDevices();
-    let track: Track = new Track();
+    let track = null;
     if (spotifyDevices.length > 0) {
         track = await getTrack(PlayerName.SpotifyWeb);
         if (!track || !track.id) {
@@ -104,6 +106,7 @@ export async function getRunningTrack(): Promise<Track> {
     if (!track || !track.id) {
         track = await getTrack(PlayerName.ItunesDesktop);
     }
+
     return track;
 }
 
@@ -118,32 +121,20 @@ export async function getTrack(player: PlayerName): Promise<Track> {
     let track;
     if (player === PlayerName.SpotifyWeb) {
         track = await musicPlayerCtr.getSpotifyWebCurrentTrack();
-        if (track) {
-            track.playerType = PlayerType.WebSpotify;
-        }
-    }
-
-    if (!track || !track.id) {
+    } else {
         track = await musicCtr.run(player, "state");
         if (track) {
-            track = JSON.parse(track);
-            if (player === PlayerName.SpotifyDesktop) {
-                track.playerType = PlayerType.MacSpotifyDesktop;
-                // applescript "id" returns the web equivelant of the "uri" value
-                // check if it's an advertisement
-                if (track.id.includes("spotify:ad:")) {
-                    track.state = TrackStatus.Advertisement;
-                }
-            } else {
-                track.playerType = PlayerType.MacItunesDesktop;
-            }
+            try {
+                track = JSON.parse(track);
+            } catch (e) {}
         }
     }
 
-    if (track && track.id) {
-        return track;
+    if (!track || musicUtil.isEmptyObj(track)) {
+        track = new Track();
     }
-    return new Track();
+
+    return track;
 }
 
 /**
