@@ -97,6 +97,7 @@ export async function hasActiveTrack(): Promise<boolean> {
 export async function getRunningTrack(): Promise<Track> {
     const spotifyDevices = await getSpotifyDevices();
     let track = null;
+
     if (spotifyDevices.length > 0) {
         track = await getTrack(PlayerName.SpotifyWeb);
         if (!track || !track.id) {
@@ -110,8 +111,9 @@ export async function getRunningTrack(): Promise<Track> {
     }
     if (!track || !track.id) {
         const itunesDesktopRunning = await isPlayerRunning(
-            PlayerName.SpotifyDesktop
+            PlayerName.ItunesDesktop
         );
+
         if (itunesDesktopRunning) {
             track = await getTrack(PlayerName.ItunesDesktop);
         }
@@ -134,8 +136,10 @@ export async function getRunningTrack(): Promise<Track> {
 export async function getTrack(player: PlayerName): Promise<Track> {
     let track;
     if (player === PlayerName.SpotifyWeb) {
+        // fetch the web track
         track = await musicPlayerCtr.getSpotifyWebCurrentTrack();
     } else {
+        // fetch the track from the specified player name
         track = await musicCtr.run(player, "state");
         if (track) {
             try {

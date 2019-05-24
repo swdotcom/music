@@ -72,7 +72,13 @@ export class MusicController {
 
     async isMusicPlayerActive(player: PlayerName) {
         player = musicUtil.getPlayerName(player);
-        const command = `pgrep -x ${player}`;
+
+        let appName = "Spotify.app";
+        if (player === PlayerName.ItunesDesktop) {
+            appName = "iTunes.app";
+        }
+        const command = `ps -ef | grep "${appName}" | grep -v grep | awk '{print $2}'`;
+
         // this returns the PID of the requested player
         const result = await musicUtil.execCmd(command);
         if (result && !result.error) {
@@ -153,8 +159,14 @@ export class MusicController {
 
                 if (itunesTrack) {
                     // make it an object
-                    itunesTrack = JSON.parse(itunesTrack);
-                    if (!itunesTrack || !itunesTrack.id) {
+                    try {
+                        itunesTrack = JSON.parse(itunesTrack);
+                        if (!itunesTrack || !itunesTrack.id) {
+                            // play from the user's default playlist
+                            script = this.scripts.playFromLibrary;
+                            params.push("Library");
+                        }
+                    } catch (err) {
                         // play from the user's default playlist
                         script = this.scripts.playFromLibrary;
                         params.push("Library");
