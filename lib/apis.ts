@@ -384,6 +384,16 @@ export async function getPlaylists(
     let playlists: PlaylistItem[] = [];
     if (player === PlayerName.SpotifyWeb) {
         playlists = await playlist.getPlaylists();
+    } else {
+        let playlistNames: string[] = await getPlaylistNames(player);
+        if (playlistNames) {
+            playlists = playlistNames.map(name => {
+                let playlistItem: PlaylistItem = new PlaylistItem();
+                playlistItem.public = false;
+                playlistItem.name = name;
+                return playlistItem;
+            });
+        }
     }
 
     return playlists;

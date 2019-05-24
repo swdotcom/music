@@ -103,7 +103,6 @@ export class SpotifyAudioFeature {
 export class PlaylistItem {
     name: string = "";
     id: string = "";
-    tracks: Track[] = [];
     collaborative: boolean = false;
     public: boolean = true;
 }
