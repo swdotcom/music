@@ -29,13 +29,19 @@ export class Playlist {
             const api = `/v1/users/${
                 musicStore.spotifyUserId
             }/playlists?limit=50`;
-            let spotifyPlaylists = await musicClient.spotifyApiGet(api, {});
-            if (
-                spotifyPlaylists &&
-                spotifyPlaylists.data &&
-                spotifyPlaylists.data.items
-            ) {
-                playlists = spotifyPlaylists.data.items;
+            let codyResp: CodyResponse = await musicClient.spotifyApiGet(
+                api,
+                {}
+            );
+            // check if the token needs to be refreshed
+            if (codyResp.statusText === "EXPIRED") {
+                // refresh the token
+                await musicClient.refreshSpotifyToken();
+                // try again
+                codyResp = await musicClient.spotifyApiGet(api, {});
+            }
+            if (codyResp && codyResp.data && codyResp.data.items) {
+                playlists = codyResp.data.items;
             }
         }
 

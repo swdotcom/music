@@ -59,23 +59,27 @@ await CodyMusic.getRunningTrack().then((track: Track) => {
 
 // play a specific spotify track
 await CodyMusic.playTrack(
-    "Spotify",
+    "spotify",
     "spotify:track:2YarjDYjBJuH63dUIh9OWv"
 ).then(result => {
     // track is playing
 });
 
 // play an iTunes track number
-await CodyMusic.playTrack("iTunes", 1).then(result => {
+await CodyMusic.playTrack("itunes", 1).then(result => {
     // track is playing
 });
 
 // handling errors
-await CodyMusic.playTrack("iTunes", 1000000000).then(result => {
+await CodyMusic.playTrack("spotify", 1000000000).then(result => {
     // result will contain the "error" attribute with the error message
     if (result.error) {
         console.log(`Unable to play track, error: ${result.error}`);
     }
+});
+await CodyMusic.getRunningTrack().then(result => {
+    // result will be the best effort track that is playing.
+    // i.e. if you have your itunes app running, it would show you that track
 });
 ```
 
@@ -263,6 +267,12 @@ unmute(player: PlayerName)
  * @param player {spotify|spotify-web|itunes}
  */
 setItunesLoved(loved: boolean)
+
+/**
+ * Returns the playlists for a given player
+ * @param player {spotify|spotify-web|itunes}
+ */
+getPlaylists(player: PlayerName): Promise<PlaylistItem[]>
 
 /**
  * Get the full list of the playlist names for a given player
