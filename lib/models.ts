@@ -105,4 +105,5 @@ export class PlaylistItem {
     id: string = "";
     collaborative: boolean = false;
     public: boolean = true;
+    tracks: Track[] = [];
 }
