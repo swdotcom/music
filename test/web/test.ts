@@ -103,11 +103,11 @@ describe("web player music tests", () => {
                 if (!hasComputerDevice) {
                     // launch the web player
                     // High on Life
-                    const albumId = "1GUfof1gHsqYjoHFym3aim";
+                    const album_id = "1GUfof1gHsqYjoHFym3aim";
                     await CodyMusic.launchPlayer(
                         CodyMusic.PlayerName.SpotifyWeb,
                         {
-                            album: albumId
+                            album_id
                         }
                     );
                     musicUtil.sleep(5000);

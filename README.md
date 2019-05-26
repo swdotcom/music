@@ -283,7 +283,7 @@ getPlaylistNames(player: PlayerName):Promise<string[]>
 /**
  * Launches a player device
  * @param playerName {spotify|spotify-web|itunes}
- * @param options
+ * @param options (spotify-web only) {playlist_id | album_id | track_id }
  */
 launchPlayer(playerName: PlayerName, options: any = {})
 

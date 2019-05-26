@@ -224,13 +224,17 @@ export class MusicPlayerState {
     }
 
     launchWebPlayer(options: any) {
-        if (options.album) {
+        if (options.album_id) {
             return musicUtil.launchWebUrl(
-                `https://open.spotify.com/album/${options.album}`
+                `https://open.spotify.com/album/${options.album_id}`
             );
-        } else if (options.track) {
+        } else if (options.track_id) {
             return musicUtil.launchWebUrl(
-                `https://open.spotify.com/track/${options.track}`
+                `https://open.spotify.com/track/${options.track_id}`
+            );
+        } else if (options.playlist_id) {
+            return musicUtil.launchWebUrl(
+                `https://open.spotify.com/playlist/${options.playlist_id}`
             );
         }
         return musicUtil.launchWebUrl("https://open.spotify.com/browse");
