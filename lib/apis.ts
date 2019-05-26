@@ -476,9 +476,14 @@ export function getSpotifyAudioFeatures(
  * Create a playlist for a Spotify user. (The playlist will be empty until you add tracks.)
  * @param name the name of the playlist you want to create
  * @param isPublic if the playlist will be public or private
+ * @param description (Optioal) displayed in Spotify Clients and in the Web API
  */
-export function createPlaylist(name: string, isPublic: boolean) {
-    return playlist.createPlaylist(name, isPublic);
+export function createPlaylist(
+    name: string,
+    isPublic: boolean,
+    description: string = ""
+) {
+    return playlist.createPlaylist(name, isPublic, description);
 }
 
 /**

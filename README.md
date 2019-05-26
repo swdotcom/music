@@ -316,8 +316,9 @@ getSpotifyAudioFeatures(ids: string[]): Promise<SpotifyAudioFeature[]>
  * Create a playlist for a Spotify user. (The playlist will be empty until you add tracks.)
  * @param name the name of the playlist you want to create
  * @param isPublic if the playlist will be public or private
+ * @param description (Optioal) displayed in Spotify Clients and in the Web API
  */
-createPlaylist(name: string, isPublic: boolean)
+createPlaylist(name: string, isPublic: boolean, description: string = "")
 
 /**
  * Deletes a playlist given a specified playlist ID.

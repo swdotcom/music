@@ -64,7 +64,11 @@ export class Playlist {
      * @param name
      * @param isPublic
      */
-    async createPlaylist(name: string, isPublic: boolean) {
+    async createPlaylist(
+        name: string,
+        isPublic: boolean,
+        description: string = ""
+    ) {
         // get the profile if we don't have it
         if (!musicStore.spotifyUserId) {
             await userProfile.getUserProfile();
@@ -76,10 +80,15 @@ export class Playlist {
              */
             const payload = {
                 name,
-                public: isPublic
+                public: isPublic,
+                description
             };
             const api = `/v1/users/${musicStore.spotifyUserId}/playlists`;
-            return await musicClient.spotifyApiPost(api, {}, payload);
+            return await musicClient.spotifyApiPost(
+                api,
+                {},
+                JSON.stringify(payload)
+            );
         }
 
         const failedCreate: CodyResponse = new CodyResponse();
