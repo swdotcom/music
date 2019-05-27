@@ -204,7 +204,7 @@ export class Playlist {
             codyResp.message = "No track URIs provided to remove from playlist";
             return codyResp;
         }
-        const tracks = this.normalizeTrackIds(track_ids);
+        const tracks = this.normalizeTrackIds(track_ids, true /*addUriObj*/);
 
         codyResp = await musicClient.spotifyApiDelete(
             `/v1/playlists/${playlist_id}/tracks`,
@@ -227,18 +227,22 @@ export class Playlist {
         return codyResp;
     }
 
-    normalizeTrackIds(track_ids: string[]) {
+    normalizeTrackIds(track_ids: string[], useUriObj: boolean = false) {
         let tracks = [];
 
         for (let i = 0; i < track_ids.length; i++) {
-            let trackId = track_ids[i];
-            if (!trackId.includes("spotify:track:")) {
-                trackId = `spotify:track:${trackId}`;
+            let uri = track_ids[i];
+            if (!uri.includes("spotify:track:")) {
+                uri = `spotify:track:${uri}`;
             }
-            const urlObj = {
-                uri: trackId
-            };
-            tracks.push(urlObj);
+            if (useUriObj) {
+                const urlObj = {
+                    uri
+                };
+                tracks.push(urlObj);
+            } else {
+                tracks.push(uri);
+            }
         }
 
         return tracks;
