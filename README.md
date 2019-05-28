@@ -12,6 +12,7 @@
     (create, delete, fetch playlist tracks, replace playlist tracks)
 -   Genre search
 -   Spotify devices
+-   Access token refresh retry
 
 ## iTunes API support
 
@@ -34,9 +35,22 @@ $ npm test
 Load the module
 
 ```javascript
-import { getRunningTrack, Track, PlayerType, TrackStatus } from "cody-music";
+import {
+    getRunningTrack,
+    Track,
+    PlayerType,
+    TrackStatus,
+    setCredentials } from "cody-music";
 
 ...
+
+// update the CodyMusic spotify credentials
+setCredentials({
+    refreshToken: <refresh_token>,
+    clientSecret: <clientSecret>,
+    clientId: <clientId>,
+    accessToken: <access_token>
+});
 
 const track:Track = await getRunningTrack();
 
