@@ -167,10 +167,14 @@ export async function getTrack(player: PlayerName): Promise<Track> {
  * Returns the tracks that are found by the given playlist name
  * @param player {spotify|spotify-web|itunes}
  * @param playListName
+ * @param playlist_id (optional)
+ * @param qsOptions (optional) {offset, limit}
  */
 export async function getTracksByPlaylistName(
     player: PlayerName,
-    playListName: string
+    playListName: string,
+    playlist_id: string = "",
+    qsOptions: any = {}
 ) {
     const params = null;
     const argv = [playListName];
@@ -192,6 +196,21 @@ export async function getTracksByPlaylistName(
         }
     }
     return jsonResult;
+}
+
+/**
+ * Returns the tracks that are found by the given playlist name
+ * - currently spofity-web support only
+ * @param player {spotify-web}
+ * @param playlist_id (optional)
+ * @param qsOptions (optional) {offset, limit}
+ */
+export async function getPlaylistTracks(
+    player: PlayerName,
+    playlist_id: string,
+    qsOptions: any = {}
+) {
+    return playlist.getPlaylistTracks(playlist_id, qsOptions);
 }
 
 /**
@@ -377,13 +396,15 @@ export function setItunesLoved(loved: boolean) {
 /**
  * Returns the playlists for a given player
  * @param player {spotify|spotify-web|itunes}
+ * @param (optional) {limit, offset}
  */
 export async function getPlaylists(
-    player: PlayerName
+    player: PlayerName,
+    qsOptions: any = {}
 ): Promise<PlaylistItem[]> {
     let playlists: PlaylistItem[] = [];
     if (player === PlayerName.SpotifyWeb) {
-        playlists = await playlist.getPlaylists();
+        playlists = await playlist.getPlaylists(qsOptions);
     } else {
         let playlistNames: string[] = await getPlaylistNames(player);
         if (playlistNames) {
@@ -402,10 +423,14 @@ export async function getPlaylists(
 /**
  * Get the full list of the playlist names for a given player
  * @param player {spotify|spotify-web|itunes}
+ * @param qsOptions (optional) {limit, offset}
  */
-export async function getPlaylistNames(player: PlayerName): Promise<string[]> {
+export async function getPlaylistNames(
+    player: PlayerName,
+    qsOptions: any = {}
+): Promise<string[]> {
     if (player === PlayerName.SpotifyWeb) {
-        return playlist.getPlaylistNames();
+        return playlist.getPlaylistNames(qsOptions);
     }
     // result will string of playlist names separated by a comma
     let result = await musicCtr.run(player, "playlistNames");

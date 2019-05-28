@@ -143,9 +143,24 @@ getRunningTrack(): Promise<Track>
 /**
  * Returns the tracks that are found by the given playlist name
  * @param player {spotify|spotify-web|itunes}
- * @param playListName {}
+ * @param playListName
+ * @param playlist_id (optional)
+ * @param qsOptions (optional) {offset, limit}
  */
-getTracksByPlaylistName(player: PlayerName, playListName: string)
+getTracksByPlaylistName(player: PlayerName,
+    playListName: string,
+    playlist_id: string = "",
+    qsOptions: any = {})
+
+/**
+ * Returns the tracks that are found by the given playlist name
+ * @param player {spotify|spotify-web|itunes}
+ * @param playlist_id
+ * @param qsOptions (optional) {offset, limit}
+ */
+getPlaylistTracks(player: PlayerName,
+    playlist_id: string,
+    qsOptions: any = {})
 
 /**
  * Plays a specific track on the Spotify or iTunes desktop
@@ -271,14 +286,19 @@ setItunesLoved(loved: boolean)
 /**
  * Returns the playlists for a given player
  * @param player {spotify|spotify-web|itunes}
+ * @param (optional) {limit, offset}
  */
-getPlaylists(player: PlayerName): Promise<PlaylistItem[]>
+getPlaylists(
+    player: PlayerName,
+    qsOptions: any = {}
+): Promise<PlaylistItem[]>
 
 /**
  * Get the full list of the playlist names for a given player
  * @param player {spotify|spotify-web|itunes}
+ * @param (optional) {limit, offset}
  */
-getPlaylistNames(player: PlayerName):Promise<string[]>
+getPlaylistNames(player: PlayerName, qsOptions: any = {}):Promise<string[]>
 
 /**
  * Launches a player device

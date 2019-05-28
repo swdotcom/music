@@ -163,7 +163,7 @@ export class MusicClient {
     }
 
     spotifyApiGet(api: string, qsOptions: any = {}): Promise<CodyResponse> {
-        this.addQueryStringToApi(api, qsOptions);
+        api = this.addQueryStringToApi(api, qsOptions);
 
         spotifyClient.defaults.headers.common["Authorization"] = `Bearer ${
             musicStore.spotifyAccessToken
@@ -185,7 +185,7 @@ export class MusicClient {
         qsOptions: any = {},
         payload: any = {}
     ): Promise<CodyResponse> {
-        this.addQueryStringToApi(api, qsOptions);
+        api = this.addQueryStringToApi(api, qsOptions);
 
         spotifyClient.defaults.headers.common["Authorization"] = `Bearer ${
             musicStore.spotifyAccessToken
@@ -206,7 +206,7 @@ export class MusicClient {
         qsOptions: any = {},
         payload: any = {}
     ): Promise<CodyResponse> {
-        this.addQueryStringToApi(api, qsOptions);
+        api = this.addQueryStringToApi(api, qsOptions);
 
         spotifyClient.defaults.headers.common["Authorization"] = `Bearer ${
             musicStore.spotifyAccessToken
@@ -227,7 +227,7 @@ export class MusicClient {
         qsOptions: any = {},
         payload: any = {}
     ): Promise<CodyResponse> {
-        this.addQueryStringToApi(api, qsOptions);
+        api = this.addQueryStringToApi(api, qsOptions);
 
         spotifyClient.defaults.headers.common["Authorization"] = `Bearer ${
             musicStore.spotifyAccessToken
@@ -248,6 +248,7 @@ export class MusicClient {
         if (qs) {
             api += `?${qs}`;
         }
+        return api;
     }
 
     buildSuccessResponse(resp: any): CodyResponse {

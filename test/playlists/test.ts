@@ -57,4 +57,17 @@ describe("spotify playlist tests", () => {
             done();
         });
     });
+
+    it("return the tracks of a playlist", done => {
+        CodyMusic.getPlaylists(PlayerName.SpotifyWeb).then(result => {
+            let playlist_id = result[0].id;
+            CodyMusic.getPlaylistTracks(
+                PlayerName.SpotifyWeb,
+                playlist_id
+            ).then(result => {
+                expect(result.data.items[0].track).to.not.equal(null);
+                done();
+            });
+        });
+    });
 });

@@ -1,5 +1,5 @@
 import { MusicClient } from "./client";
-import { CodyResponse, CodyResponseType, PlaylistItem } from "./models";
+import { CodyResponse, CodyResponseType, PlaylistItem, Track } from "./models";
 import { MusicStore } from "./store";
 import { UserProfile } from "./profile";
 
@@ -19,19 +19,26 @@ export class Playlist {
         return Playlist.instance;
     }
 
-    async getPlaylists(): Promise<PlaylistItem[]> {
+    async getPlaylists(qsOptions: any = {}): Promise<PlaylistItem[]> {
         let playlists: PlaylistItem[] = [];
         if (!musicStore.spotifyUserId) {
             await userProfile.getUserProfile();
         }
 
         if (musicStore.spotifyUserId) {
-            const api = `/v1/users/${
-                musicStore.spotifyUserId
-            }/playlists?limit=50`;
+            if (!qsOptions.limit) {
+                qsOptions["limit"] = 50;
+            } else if (qsOptions.limit < 1) {
+                qsOptions.limit = 1;
+            }
+            if (!qsOptions.offset) {
+                qsOptions["offset"] = 0;
+            }
+
+            const api = `/v1/users/${musicStore.spotifyUserId}/playlists`;
             let codyResp: CodyResponse = await musicClient.spotifyApiGet(
                 api,
-                {}
+                qsOptions
             );
             // check if the token needs to be refreshed
             if (codyResp.statusText === "EXPIRED") {
@@ -48,9 +55,59 @@ export class Playlist {
         return playlists;
     }
 
-    async getPlaylistNames(): Promise<string[]> {
+    async getPlaylistTracks(playlist_id: string, qsOptions: any = {}) {
+        if (!qsOptions.limit) {
+            qsOptions["limit"] = 100;
+        } else if (qsOptions.limit < 1) {
+            qsOptions.limit = 1;
+        }
+        if (!qsOptions.offset) {
+            qsOptions["offset"] = 0;
+        }
+
+        // fields to return for the present moment
+        // TODO: allow options to update this
+        qsOptions["fields"] = "items(track(name,id,album(id,name),artists))";
+
+        const api = `/v1/playlists/${playlist_id}/tracks`;
+        let codyResp = await musicClient.spotifyApiGet(api, qsOptions);
+
+        // check if the token needs to be refreshed
+        if (codyResp.statusText === "EXPIRED") {
+            // refresh the token
+            await musicClient.refreshSpotifyToken();
+            // try again
+            codyResp = await musicClient.spotifyApiPost(api, qsOptions);
+        }
+
+        // get the artists
+        if (
+            codyResp.state === CodyResponseType.Success &&
+            codyResp.data.items &&
+            codyResp.data.items.length > 0
+        ) {
+            codyResp.data.items.forEach((item: any) => {
+                let artists: any[] = [];
+                if (
+                    item.track &&
+                    item.track.artists &&
+                    item.track.artists.length > 0
+                ) {
+                    item.track.artists.forEach((artist: any) => {
+                        artists.push(artist.name);
+                    });
+                    delete item.track.artists;
+                    item.track["artists"] = artists;
+                }
+            });
+        }
+
+        return codyResp;
+    }
+
+    async getPlaylistNames(qsOptions: any = {}): Promise<string[]> {
         let names: string[] = [];
-        let playlists = await this.getPlaylists();
+        let playlists = await this.getPlaylists(qsOptions);
         if (playlists) {
             names = playlists.map((playlistItem: PlaylistItem) => {
                 return playlistItem.name;
