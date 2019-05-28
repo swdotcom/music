@@ -65,7 +65,7 @@ describe("spotify playlist tests", () => {
                 PlayerName.SpotifyWeb,
                 playlist_id
             ).then(result => {
-                expect(result.data.items[0].track).to.not.equal(null);
+                expect(result.data.items[0]).to.not.equal(null);
                 done();
             });
         });

@@ -52,10 +52,36 @@ export class Track {
     href: string = "";
     // "spotify", "itunes"
     type: string = "";
+    artists: string[] = [];
     playerType: PlayerType = PlayerType.NotAssigned;
     loved: boolean = false;
     volume: number = 0;
     state: TrackStatus = TrackStatus.NotAssigned;
+    albumData: Album = new Album();
+}
+
+export class Album {
+    album_type: string = "";
+    artists: any[] = [];
+    href: string = "";
+    id: string = "";
+    name: string = "";
+    uri: string = "";
+    images: any[] = [];
+}
+
+export class PaginationItem {
+    items: any[] = [];
+    limit: number = 0;
+    // url to the next page
+    next: string = "";
+    // url to the previous page
+    previous: string = "";
+    total: number = 0;
+    offset: number = 0;
+    constructor() {
+        //
+    }
 }
 
 export class PlayerDevice {
@@ -106,4 +132,5 @@ export class PlaylistItem {
     collaborative: boolean = false;
     public: boolean = true;
     tracks: Track[] = [];
+    type: string = "playlist";
 }

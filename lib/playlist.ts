@@ -1,5 +1,13 @@
 import { MusicClient } from "./client";
-import { CodyResponse, CodyResponseType, PlaylistItem, Track } from "./models";
+import {
+    CodyResponse,
+    CodyResponseType,
+    PlaylistItem,
+    Track,
+    PaginationItem,
+    PlayerType,
+    Album
+} from "./models";
 import { MusicStore } from "./store";
 import { UserProfile } from "./profile";
 
@@ -67,7 +75,8 @@ export class Playlist {
 
         // fields to return for the present moment
         // TODO: allow options to update this
-        qsOptions["fields"] = "items(track(name,id,album(id,name),artists))";
+        qsOptions["fields"] =
+            "href,limit,next,offset,previous,total,items(track(name,id,album(id,name),artists))";
 
         const api = `/v1/playlists/${playlist_id}/tracks`;
         let codyResp = await musicClient.spotifyApiGet(api, qsOptions);
@@ -83,23 +92,46 @@ export class Playlist {
         // get the artists
         if (
             codyResp.state === CodyResponseType.Success &&
-            codyResp.data.items &&
-            codyResp.data.items.length > 0
+            codyResp.data.items
         ) {
+            const paginationItem: PaginationItem = new PaginationItem();
+            paginationItem.offset = codyResp.data.offset;
+            paginationItem.next = codyResp.data.next;
+            paginationItem.previous = codyResp.data.previous;
+            paginationItem.limit = codyResp.data.limit;
+            paginationItem.total = codyResp.data.total;
+
+            let tracks: Track[] = [];
+
             codyResp.data.items.forEach((item: any) => {
-                let artists: any[] = [];
-                if (
-                    item.track &&
-                    item.track.artists &&
-                    item.track.artists.length > 0
-                ) {
-                    item.track.artists.forEach((artist: any) => {
-                        artists.push(artist.name);
+                if (item.track) {
+                    // create a Track
+                    let track: Track = new Track();
+                    track.artists = item.track.artists.map((artist: any) => {
+                        return artist.name;
                     });
-                    delete item.track.artists;
-                    item.track["artists"] = artists;
+                    track.id = item.track.id;
+                    track.name = item.track.name;
+                    track.uri = item.track.uri;
+                    track.href = item.track.href;
+                    track.playerType = PlayerType.WebSpotify;
+
+                    // get the album info
+                    let albumData: Album = new Album();
+                    albumData.id = item.track.album.id;
+                    albumData.name = item.track.album.name;
+                    track.albumData = albumData;
+                    track.album = albumData.name;
+
+                    tracks.push(track);
                 }
             });
+
+            paginationItem.items = tracks;
+            // delete the old type of data
+            delete codyResp.data;
+            // update with the pagination item info
+            codyResp["data"] = paginationItem;
         }
 
         return codyResp;
