@@ -8,7 +8,8 @@ import {
     SpotifyAudioFeature,
     PlayerType,
     PlaylistItem,
-    CodyResponse
+    CodyResponse,
+    PlaylistTrackInfo
 } from "./models";
 import { MusicPlayerState } from "./playerstate";
 import { AudioStat } from "./audiostat";
@@ -409,12 +410,30 @@ export async function getPlaylists(
     } else {
         let playlistNames: string[] = await getPlaylistNames(player);
         if (playlistNames) {
-            playlists = playlistNames.map(name => {
-                let playlistItem: PlaylistItem = new PlaylistItem();
-                playlistItem.public = false;
-                playlistItem.name = name;
-                return playlistItem;
-            });
+            if (player === PlayerName.ItunesDesktop) {
+                for (let i = 0; i < playlistNames.length; i++) {
+                    let name = playlistNames[i];
+                    let playlistItem: PlaylistItem = new PlaylistItem();
+                    playlistItem.public = false;
+                    playlistItem.name = name;
+                    playlistItem.tracks = new PlaylistTrackInfo();
+                    let result = await getTracksByPlaylistName(player, name);
+                    if (result) {
+                        let jsonList = result.split("[TRACK_END],");
+                        playlistItem.tracks.total = jsonList
+                            ? jsonList.length
+                            : 0;
+                    }
+                    playlists.push(playlistItem);
+                }
+            } else {
+                playlists = playlistNames.map(name => {
+                    let playlistItem: PlaylistItem = new PlaylistItem();
+                    playlistItem.public = false;
+                    playlistItem.name = name;
+                    return playlistItem;
+                });
+            }
         }
     }
 

@@ -13,5 +13,6 @@ export {
     PlayerContext,
     PlaylistItem,
     SpotifyAudioFeature,
-    PlayerType
+    PlayerType,
+    PlaylistTrackInfo
 } from "./lib/models";

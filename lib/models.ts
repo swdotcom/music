@@ -126,11 +126,17 @@ export class SpotifyAudioFeature {
     time_signature: number = 0;
 }
 
+export class PlaylistTrackInfo {
+    href: string = "";
+    total: number = 0;
+}
+
 export class PlaylistItem {
     name: string = "";
     id: string = "";
     collaborative: boolean = false;
     public: boolean = true;
-    tracks: Track[] = [];
+    tracks: PlaylistTrackInfo = new PlaylistTrackInfo();
     type: string = "playlist";
+    total: number = 0;
 }

@@ -1,7 +1,7 @@
 const expect = require("chai").expect;
 import * as CodyMusic from "../../index";
 import { TestUtil } from "../util";
-import { PlayerName } from "../../lib/models";
+import { PlayerName, PlaylistItem } from "../../lib/models";
 
 const testUtil = new TestUtil();
 
@@ -45,10 +45,14 @@ describe("spotify playlist tests", () => {
     });
 
     it("return spotify playlists", done => {
-        CodyMusic.getPlaylists(PlayerName.SpotifyWeb).then(result => {
-            expect(result.length).to.not.equal(0);
-            done();
-        });
+        CodyMusic.getPlaylists(PlayerName.SpotifyWeb).then(
+            (result: PlaylistItem[]) => {
+                expect(result.length).to.not.equal(0);
+                const playlistItem: PlaylistItem = result[0];
+                expect(playlistItem.tracks.total).to.not.equal(0);
+                done();
+            }
+        );
     });
 
     it("return spotify playlist names", done => {
