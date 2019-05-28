@@ -193,7 +193,11 @@ export async function getTracksByPlaylistName(
         if (jsonList && jsonList.length > 0) {
             for (let i = 0; i < jsonList.length; i++) {
                 let jsonStr = jsonList[i].trim();
-                jsonResult[i] = JSON.parse(jsonStr);
+                try {
+                    jsonResult[i] = JSON.parse(jsonStr);
+                } catch (err) {
+                    // it might be the success response "ok"
+                }
             }
         }
     }
@@ -417,12 +421,14 @@ export async function getPlaylists(
                     playlistItem.public = false;
                     playlistItem.name = name;
                     playlistItem.tracks = new PlaylistTrackInfo();
-                    let result = await getTracksByPlaylistName(player, name);
-                    if (result) {
-                        let jsonList = result.split("[TRACK_END],");
-                        playlistItem.tracks.total = jsonList
-                            ? jsonList.length
-                            : 0;
+                    let tracksResult = await getTracksByPlaylistName(
+                        player,
+                        name
+                    );
+                    if (tracksResult) {
+                        playlistItem.tracks.total = Object.keys(
+                            tracksResult
+                        ).length;
                     }
                     playlists.push(playlistItem);
                 }

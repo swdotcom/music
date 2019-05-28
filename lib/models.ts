@@ -138,5 +138,4 @@ export class PlaylistItem {
     public: boolean = true;
     tracks: PlaylistTrackInfo = new PlaylistTrackInfo();
     type: string = "playlist";
-    total: number = 0;
 }

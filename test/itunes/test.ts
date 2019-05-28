@@ -1,7 +1,7 @@
 import { MusicUtil } from "../../lib/util";
 const expect = require("chai").expect;
 import * as CodyMusic from "../../index";
-import { Track } from "../../lib/models";
+import { Track, PlayerName, PlaylistItem } from "../../lib/models";
 import { MusicController } from "../../lib/controller";
 
 const musicUtil = new MusicUtil();
@@ -59,5 +59,16 @@ describe("itunes player tests", () => {
                 done();
             });
         });
+    });
+
+    it("Get itunes playlists", done => {
+        CodyMusic.getPlaylists(PlayerName.ItunesDesktop).then(
+            (result: PlaylistItem[]) => {
+                expect(result.length).to.not.equal(0);
+                const playlistItem: PlaylistItem = result[0];
+                expect(playlistItem.tracks.total).to.not.equal(0);
+                done();
+            }
+        );
     });
 });
