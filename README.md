@@ -9,7 +9,9 @@
 
 -   Audio features
 -   Playlists
+    (create, delete, fetch playlist tracks, replace playlist tracks)
 -   Genre search
+-   Spotify devices
 
 ## iTunes API support
 
@@ -30,6 +32,25 @@ $ npm test
 ```
 
 Load the module
+
+```javascript
+import { getRunningTrack, Track, PlayerType, TrackStatus } from "cody-music";
+
+...
+
+const track:Track = await getRunningTrack();
+
+if (track.state === TrackStatus.Playing) {
+    // track is playing
+}
+
+if (track.playerType === PlayerType.WebSpotify) {
+    // track running has been identified as your spotify web player
+}
+
+```
+
+OR
 
 ```javascript
 import * as CodyMusic from "cody-music";
@@ -154,6 +175,9 @@ getTracksByPlaylistName(player: PlayerName,
 
 /**
  * Returns the tracks that are found by the given playlist name
+ * CodyResponse.data will contain <PaginationItem>
+ *  - PaginationItem contains
+ *    {tracks:Track[], offset, next, previous, limit, total}
  * @param player {spotify|spotify-web|itunes}
  * @param playlist_id
  * @param qsOptions (optional) {offset, limit}
@@ -382,11 +406,11 @@ removeTracksFromPlaylist(
     playlist_id: string,
     tracks: string[]
 )
+```
 
-//
-// Deprecated functions
-//
+Deprecated APIs
 
+```js
 // deprecated, please use "getRunningTrack()"
 getCurrentlyRunningTrackState(): Promise<Track>
 

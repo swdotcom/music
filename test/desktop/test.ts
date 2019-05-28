@@ -68,7 +68,11 @@ describe("desktop player tests", () => {
 
     it("Should Show The Playlist Names AND Show The Tracks Of A Playlist", done => {
         CodyMusic.getPlaylistNames(CodyMusic.PlayerName.ItunesDesktop).then(
-            (names: string[]) => {
+            async (names: string[]) => {
+                await CodyMusic.setRepeat(
+                    CodyMusic.PlayerName.ItunesDesktop,
+                    false
+                );
                 expect(names.length).to.not.equal(0);
                 // get the last name in the list and get the tracks
                 CodyMusic.getTracksByPlaylistName(

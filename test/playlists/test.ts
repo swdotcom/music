@@ -66,6 +66,7 @@ describe("spotify playlist tests", () => {
                 playlist_id
             ).then(result => {
                 expect(result.data.items[0]).to.not.equal(null);
+                expect(result.data.items[0].id).to.not.equal("");
                 done();
             });
         });

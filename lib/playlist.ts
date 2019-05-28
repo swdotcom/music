@@ -110,10 +110,15 @@ export class Playlist {
                     track.artists = item.track.artists.map((artist: any) => {
                         return artist.name;
                     });
+                    if (track.artist) {
+                        track.artist = track.artists.join(", ");
+                    }
                     track.id = item.track.id;
                     track.name = item.track.name;
                     track.uri = item.track.uri;
                     track.href = item.track.href;
+                    track.explicit = item.track.explicit;
+                    track.type = "track";
                     track.playerType = PlayerType.WebSpotify;
 
                     // get the album info

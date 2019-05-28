@@ -7,7 +7,8 @@ import {
     PlayerDevice,
     SpotifyAudioFeature,
     PlayerType,
-    PlaylistItem
+    PlaylistItem,
+    CodyResponse
 } from "./models";
 import { MusicPlayerState } from "./playerstate";
 import { AudioStat } from "./audiostat";
@@ -209,7 +210,7 @@ export async function getPlaylistTracks(
     player: PlayerName,
     playlist_id: string,
     qsOptions: any = {}
-) {
+): Promise<CodyResponse> {
     return playlist.getPlaylistTracks(playlist_id, qsOptions);
 }
 
