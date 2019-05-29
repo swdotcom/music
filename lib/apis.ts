@@ -417,9 +417,13 @@ export async function getPlaylists(
             if (player === PlayerName.ItunesDesktop) {
                 for (let i = 0; i < playlistNames.length; i++) {
                     let name = playlistNames[i];
+                    if (name === "Library") {
+                        continue;
+                    }
                     let playlistItem: PlaylistItem = new PlaylistItem();
                     playlistItem.public = false;
                     playlistItem.name = name;
+                    playlistItem.id = name;
                     playlistItem.tracks = new PlaylistTrackInfo();
                     let tracksResult = await getTracksByPlaylistName(
                         player,
