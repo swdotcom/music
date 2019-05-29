@@ -1,6 +1,6 @@
 {
     "name": "cody-music",
-    "version": "2.2.8",
+    "version": "2.2.9",
     "description": "mac osx spotify and itunes music player controller, spotify audio features, itunes and spotify genre, and playlist control",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -11,7 +11,8 @@
         "web-test": "npm run build && mocha -r ts-node/register test/web/test.ts --reporter spec --timeout 20000 --exit",
         "controls-test": "npm run build && mocha -r ts-node/register test/controls/test.ts --reporter spec --timeout 20000 --exit",
         "itunes-test": "npm run build && mocha -r ts-node/register test/itunes/test.ts --reporter spec --timeout 20000 --exit",
-        "features-test": "npm run build && mocha -r ts-node/register test/features/test.ts --reporter spec --timeout 20000 --exit"
+        "features-test": "npm run build && mocha -r ts-node/register test/features/test.ts --reporter spec --timeout 20000 --exit",
+        "desktop-test": "npm run build && mocha -r ts-node/register test/desktop/test.ts --reporter spec --timeout 20000 --exit"
     },
     "repository": {
         "type": "git",

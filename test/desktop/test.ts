@@ -162,11 +162,11 @@ describe("desktop player tests", () => {
                 // id: spotify:track:4ut5G4rgB1ClpMTMfjoIuy
                 let params = ["spotify:track:4ut5G4rgB1ClpMTMfjoIuy"];
 
-                await CodyMusic.playTrackInContext(
+                let playTrackResp = await CodyMusic.playTrackInContext(
                     CodyMusic.PlayerName.SpotifyDesktop,
                     params
                 );
-                musicUtil.sleep(1500);
+                musicUtil.sleep(4000);
                 let result = await CodyMusic.getState(
                     CodyMusic.PlayerName.SpotifyDesktop
                 );
@@ -215,7 +215,7 @@ describe("desktop player tests", () => {
                     CodyMusic.PlayerName.SpotifyDesktop,
                     params
                 );
-                musicUtil.sleep(1500);
+                musicUtil.sleep(4000);
 
                 let result = await CodyMusic.getState(
                     CodyMusic.PlayerName.SpotifyDesktop

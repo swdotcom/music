@@ -38,7 +38,10 @@ export class MusicClient {
         return MusicClient.instance;
     }
 
-    getGenreFromSpotify(artist: string): Promise<any> {
+    async getGenreFromSpotify(artist: string): Promise<any> {
+        if (!musicStore.spotifyAccessToken) {
+            return this.throwNoSpotifyTokenInfoError();
+        }
         const qParam = encodeURIComponent(`artist:${artist}`);
         const qryStr = `q=${qParam}&type=artist&limit=1`;
         const api = `/v1/search?${qryStr}`;
@@ -162,7 +165,13 @@ export class MusicClient {
         return response;
     }
 
-    spotifyApiGet(api: string, qsOptions: any = {}): Promise<CodyResponse> {
+    async spotifyApiGet(
+        api: string,
+        qsOptions: any = {}
+    ): Promise<CodyResponse> {
+        if (!musicStore.spotifyAccessToken) {
+            return this.throwNoSpotifyTokenInfoError();
+        }
         api = this.addQueryStringToApi(api, qsOptions);
 
         spotifyClient.defaults.headers.common["Authorization"] = `Bearer ${
@@ -175,16 +184,18 @@ export class MusicClient {
                 return this.buildSuccessResponse(resp);
             })
             .catch(async err => {
-                // console.log(`${api} error: ${err.message}`);
                 return this.buildErrorResponse(err);
             });
     }
 
-    spotifyApiPut(
+    async spotifyApiPut(
         api: string,
         qsOptions: any = {},
         payload: any = {}
     ): Promise<CodyResponse> {
+        if (!musicStore.spotifyAccessToken) {
+            return this.throwNoSpotifyTokenInfoError();
+        }
         api = this.addQueryStringToApi(api, qsOptions);
 
         spotifyClient.defaults.headers.common["Authorization"] = `Bearer ${
@@ -196,16 +207,18 @@ export class MusicClient {
                 return this.buildSuccessResponse(resp);
             })
             .catch(err => {
-                // console.log(`${api} error: ${err.message}`);
                 return this.buildErrorResponse(err);
             });
     }
 
-    spotifyApiPost(
+    async spotifyApiPost(
         api: string,
         qsOptions: any = {},
         payload: any = {}
     ): Promise<CodyResponse> {
+        if (!musicStore.spotifyAccessToken) {
+            return this.throwNoSpotifyTokenInfoError();
+        }
         api = this.addQueryStringToApi(api, qsOptions);
 
         spotifyClient.defaults.headers.common["Authorization"] = `Bearer ${
@@ -217,16 +230,18 @@ export class MusicClient {
                 return this.buildSuccessResponse(resp);
             })
             .catch(err => {
-                // console.log(`${api} error: ${err.message}`);
                 return this.buildErrorResponse(err);
             });
     }
 
-    spotifyApiDelete(
+    async spotifyApiDelete(
         api: string,
         qsOptions: any = {},
         payload: any = {}
     ): Promise<CodyResponse> {
+        if (!musicStore.spotifyAccessToken) {
+            return this.throwNoSpotifyTokenInfoError();
+        }
         api = this.addQueryStringToApi(api, qsOptions);
 
         spotifyClient.defaults.headers.common["Authorization"] = `Bearer ${
@@ -238,7 +253,6 @@ export class MusicClient {
                 return this.buildSuccessResponse(resp);
             })
             .catch(err => {
-                // console.log(`${api} error: ${err.message}`);
                 return this.buildErrorResponse(err);
             });
     }
@@ -279,6 +293,15 @@ export class MusicClient {
         } else {
             codyResp.statusText = "ERROR";
         }
+        return codyResp;
+    }
+
+    throwNoSpotifyTokenInfoError(): CodyResponse {
+        const codyResp = new CodyResponse();
+        codyResp.status = 400;
+        codyResp.state = CodyResponseType.Failed;
+        codyResp.message = "Missing Spotify access token information.";
+        codyResp.statusText = "ERROR";
         return codyResp;
     }
 }
