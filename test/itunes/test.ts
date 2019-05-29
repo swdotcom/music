@@ -5,7 +5,8 @@ import {
     Track,
     PlayerName,
     PlaylistItem,
-    CodyResponse
+    CodyResponse,
+    PaginationItem
 } from "../../lib/models";
 import { MusicController } from "../../lib/controller";
 
@@ -86,7 +87,8 @@ describe("itunes player tests", () => {
                     PlayerName.ItunesDesktop,
                     playlistItem.id
                 ).then((result: CodyResponse) => {
-                    expect(result.data.length).to.not.equal(0);
+                    let pageItem: PaginationItem = result.data;
+                    expect(pageItem.items.length).to.not.equal(0);
                     done();
                 });
             }

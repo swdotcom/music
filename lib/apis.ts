@@ -9,7 +9,8 @@ import {
     PlayerType,
     PlaylistItem,
     CodyResponse,
-    PlaylistTrackInfo
+    PlaylistTrackInfo,
+    PaginationItem
 } from "./models";
 import { MusicPlayerState } from "./playerstate";
 import { AudioStat } from "./audiostat";
@@ -166,15 +167,15 @@ export async function getTrack(player: PlayerName): Promise<Track> {
 }
 
 /**
- * Returns the tracks that are found by the given playlist name
- * @param player {spotify|spotify-web|itunes}
+ * Returns the tracks that are found for itunes
+ * @param player {itunes}
  * @param playListName
  */
 export async function getTracksByPlaylistName(
     player: PlayerName,
     playListName: string
-): Promise<PlaylistItem[]> {
-    let playlistItems: PlaylistItem[] = [];
+): Promise<Track[]> {
+    let playlistItems: Track[] = [];
     const params = null;
     const argv = [playListName];
     const result = await musicCtr.run(
@@ -186,18 +187,22 @@ export async function getTracksByPlaylistName(
 
     let jsonResult: any = {};
     if (result) {
-        let jsonList = result.split("[TRACK_END],");
-        if (jsonList && jsonList.length > 0) {
-            for (let i = 0; i < jsonList.length; i++) {
-                let jsonStr = jsonList[i].trim();
-                if (jsonStr.toLowerCase() !== "ok") {
-                    try {
-                        jsonResult[i] = JSON.parse(jsonStr);
-                    } catch (err) {
-                        // it might be the success response "ok"
+        try {
+            let jsonList = result.split("[TRACK_END]");
+            if (jsonList && jsonList.length > 0) {
+                for (let i = 0; i < jsonList.length; i++) {
+                    let jsonStr = jsonList[i].trim();
+                    if (jsonStr.toLowerCase() !== "ok") {
+                        try {
+                            jsonResult[i] = JSON.parse(jsonStr);
+                        } catch (err) {
+                            // it might be the success response "ok"
+                        }
                     }
                 }
             }
+        } catch (err) {
+            //
         }
     }
     if (jsonResult) {
@@ -205,13 +210,16 @@ export async function getTracksByPlaylistName(
         // of PlaylistItem
         playlistItems = Object.keys(jsonResult).map((key: string) => {
             let trackItem = jsonResult[key];
-            let playlistItem: PlaylistItem = new PlaylistItem();
-            playlistItem.name = trackItem.name;
-            playlistItem.type = "track";
-            playlistItem.public = true;
-            playlistItem.collaborative = false;
-            playlistItem.id = trackItem.id;
-            return playlistItem;
+            let track: Track = new Track();
+            track.name = trackItem.name;
+            track.type = "track";
+            track.id = trackItem.id;
+            track.artist = trackItem.artist;
+            track.album = trackItem.album;
+            track.played_count = trackItem.played_count;
+            track.duration = trackItem.duration;
+            track.playerType = PlayerType.MacItunesDesktop;
+            return track;
         });
     }
     return playlistItems;
@@ -234,12 +242,16 @@ export async function getPlaylistTracks(
     }
 
     // itunes or spotify desktop
-    const playlistItems: PlaylistItem[] = await getTracksByPlaylistName(
-        player,
-        playlist_id
-    );
+    const tracks: Track[] = await getTracksByPlaylistName(player, playlist_id);
     let codyResp: CodyResponse = new CodyResponse();
-    codyResp.data = playlistItems;
+    let pageItem: PaginationItem = new PaginationItem();
+    pageItem.offset = 0;
+    pageItem.next = "";
+    pageItem.previous = "";
+    pageItem.limit = -1;
+    pageItem.total = tracks.length;
+    pageItem.items = tracks;
+    codyResp.data = pageItem;
     return codyResp;
 }
 
@@ -438,25 +450,26 @@ export async function getPlaylists(
     } else {
         let result = await musicCtr.run(player, "playlistTrackCounts");
         if (result) {
-            result = result.split("[TRACK_END]");
-            if (result && result.length > 0) {
-                playlists = result.map((resultItem: string) => {
-                    // if (!resultItem.includes("}")) {
-                    //     resultItem = `${resultItem}}`;
-                    // }
-                    try {
-                        // {name, count}
-                        let item = JSON.parse(resultItem);
-                        let playlistItem: PlaylistItem = new PlaylistItem();
-                        playlistItem.public = true;
-                        playlistItem.name = item.name;
-                        playlistItem.id = item.name;
-                        playlistItem.tracks.total = item.count;
-                        return playlistItem;
-                    } catch (err) {
-                        //
-                    }
-                });
+            try {
+                result = result.split("[TRACK_END]");
+                if (result && result.length > 0) {
+                    playlists = result.map((resultItem: string) => {
+                        try {
+                            // {name, count}
+                            let item = JSON.parse(resultItem);
+                            let playlistItem: PlaylistItem = new PlaylistItem();
+                            playlistItem.public = true;
+                            playlistItem.name = item.name;
+                            playlistItem.id = item.name;
+                            playlistItem.tracks.total = item.count;
+                            return playlistItem;
+                        } catch (err) {
+                            //
+                        }
+                    });
+                }
+            } catch (err) {
+                //
             }
         }
     }
