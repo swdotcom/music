@@ -22,7 +22,7 @@ tell application "iTunes"
 			set counter to counter + 1
 		end repeat
 		set t_info to t_info & ", \"count\": " & counter
-        set t_info to t_info & "}"
+        set t_info to t_info & "}[TRACK_END]"
 		copy t_info to end of myList
 		set playlistCounter to playlistCounter + 1
 	end repeat

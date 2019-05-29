@@ -11,7 +11,6 @@ on run argv
 	set playlistName to (item 1 of argv)
 	set myList to {}
 	tell application "iTunes"
-		activate
 		set results to (every file track of playlist playlistName)
 		set counter to 0
 		set len to count of results
@@ -22,6 +21,7 @@ on run argv
 			set t_info to t_info & ",\"duration\": " & (((duration of aTrack) * 1000) as integer)
 			set t_info to t_info & ",\"played_count\": " & played count of aTrack
 			set t_info to t_info & ",\"name\": \"" & my escape_quotes(name of aTrack) & "\""
+			set t_info to t_info & ",\"id\": \"" & id of aTrack & "\""
 			set testCount to counter + 1
 			if testCount is greater than or equal to len then
 				set t_info to t_info & "}"

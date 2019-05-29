@@ -169,15 +169,12 @@ export async function getTrack(player: PlayerName): Promise<Track> {
  * Returns the tracks that are found by the given playlist name
  * @param player {spotify|spotify-web|itunes}
  * @param playListName
- * @param playlist_id (optional)
- * @param qsOptions (optional) {offset, limit}
  */
 export async function getTracksByPlaylistName(
     player: PlayerName,
-    playListName: string,
-    playlist_id: string = "",
-    qsOptions: any = {}
-) {
+    playListName: string
+): Promise<PlaylistItem[]> {
+    let playlistItems: PlaylistItem[] = [];
     const params = null;
     const argv = [playListName];
     const result = await musicCtr.run(
@@ -193,15 +190,31 @@ export async function getTracksByPlaylistName(
         if (jsonList && jsonList.length > 0) {
             for (let i = 0; i < jsonList.length; i++) {
                 let jsonStr = jsonList[i].trim();
-                try {
-                    jsonResult[i] = JSON.parse(jsonStr);
-                } catch (err) {
-                    // it might be the success response "ok"
+                if (jsonStr.toLowerCase() !== "ok") {
+                    try {
+                        jsonResult[i] = JSON.parse(jsonStr);
+                    } catch (err) {
+                        // it might be the success response "ok"
+                    }
                 }
             }
         }
     }
-    return jsonResult;
+    if (jsonResult) {
+        // go through the keys and create an array
+        // of PlaylistItem
+        playlistItems = Object.keys(jsonResult).map((key: string) => {
+            let trackItem = jsonResult[key];
+            let playlistItem: PlaylistItem = new PlaylistItem();
+            playlistItem.name = trackItem.name;
+            playlistItem.type = "track";
+            playlistItem.public = true;
+            playlistItem.collaborative = false;
+            playlistItem.id = trackItem.id;
+            return playlistItem;
+        });
+    }
+    return playlistItems;
 }
 
 /**
@@ -216,7 +229,18 @@ export async function getPlaylistTracks(
     playlist_id: string,
     qsOptions: any = {}
 ): Promise<CodyResponse> {
-    return playlist.getPlaylistTracks(playlist_id, qsOptions);
+    if (player === PlayerName.SpotifyWeb) {
+        return playlist.getPlaylistTracks(playlist_id, qsOptions);
+    }
+
+    // itunes or spotify desktop
+    const playlistItems: PlaylistItem[] = await getTracksByPlaylistName(
+        player,
+        playlist_id
+    );
+    let codyResp: CodyResponse = new CodyResponse();
+    codyResp.data = playlistItems;
+    return codyResp;
 }
 
 /**
@@ -414,12 +438,12 @@ export async function getPlaylists(
     } else {
         let result = await musicCtr.run(player, "playlistTrackCounts");
         if (result) {
-            result = result.split("},");
+            result = result.split("[TRACK_END]");
             if (result && result.length > 0) {
                 playlists = result.map((resultItem: string) => {
-                    if (!resultItem.includes("}")) {
-                        resultItem = `${resultItem}}`;
-                    }
+                    // if (!resultItem.includes("}")) {
+                    //     resultItem = `${resultItem}}`;
+                    // }
                     try {
                         // {name, count}
                         let item = JSON.parse(resultItem);
