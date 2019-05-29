@@ -56,7 +56,11 @@ export class MusicController {
             requiresArgv: true
         },
         setItunesLoved:
-            'tell application "{0}" to set loved of current track to {1}'
+            'tell application "{0}" to set loved of current track to {1}',
+        playlistTrackCounts: {
+            file: "get_playlist_count.{0}.applescript",
+            requiresArgv: false
+        }
     };
 
     private static instance: MusicController;

@@ -412,36 +412,26 @@ export async function getPlaylists(
     if (player === PlayerName.SpotifyWeb) {
         playlists = await playlist.getPlaylists(qsOptions);
     } else {
-        let playlistNames: string[] = await getPlaylistNames(player);
-        if (playlistNames) {
-            if (player === PlayerName.ItunesDesktop) {
-                for (let i = 0; i < playlistNames.length; i++) {
-                    let name = playlistNames[i];
-                    if (name === "Library") {
-                        continue;
+        let result = await musicCtr.run(player, "playlistTrackCounts");
+        if (result) {
+            result = result.split("},");
+            if (result && result.length > 0) {
+                playlists = result.map((resultItem: string) => {
+                    if (!resultItem.includes("}")) {
+                        resultItem = `${resultItem}}`;
                     }
-                    let playlistItem: PlaylistItem = new PlaylistItem();
-                    playlistItem.public = false;
-                    playlistItem.name = name;
-                    playlistItem.id = name;
-                    playlistItem.tracks = new PlaylistTrackInfo();
-                    let tracksResult = await getTracksByPlaylistName(
-                        player,
-                        name
-                    );
-                    if (tracksResult) {
-                        playlistItem.tracks.total = Object.keys(
-                            tracksResult
-                        ).length;
+                    try {
+                        // {name, count}
+                        let item = JSON.parse(resultItem);
+                        let playlistItem: PlaylistItem = new PlaylistItem();
+                        playlistItem.public = true;
+                        playlistItem.name = item.name;
+                        playlistItem.id = item.name;
+                        playlistItem.tracks.total = item.count;
+                        return playlistItem;
+                    } catch (err) {
+                        //
                     }
-                    playlists.push(playlistItem);
-                }
-            } else {
-                playlists = playlistNames.map(name => {
-                    let playlistItem: PlaylistItem = new PlaylistItem();
-                    playlistItem.public = false;
-                    playlistItem.name = name;
-                    return playlistItem;
                 });
             }
         }
