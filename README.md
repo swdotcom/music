@@ -179,13 +179,9 @@ getRunningTrack(): Promise<Track>
  * Returns the tracks that are found by the given playlist name
  * @param player {spotify|spotify-web|itunes}
  * @param playListName
- * @param playlist_id (optional)
- * @param qsOptions (optional) {offset, limit}
  */
 getTracksByPlaylistName(player: PlayerName,
-    playListName: string,
-    playlist_id: string = "",
-    qsOptions: any = {})
+    playListName: string): Promise<PlaylistItem[]>
 
 /**
  * Returns the tracks that are found by the given playlist name
@@ -198,7 +194,7 @@ getTracksByPlaylistName(player: PlayerName,
  */
 getPlaylistTracks(player: PlayerName,
     playlist_id: string,
-    qsOptions: any = {})
+    qsOptions: any = {}): Promise<CodyResponse>
 
 /**
  * Plays a specific track on the Spotify or iTunes desktop
