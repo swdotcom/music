@@ -34,10 +34,10 @@ export class MusicPlayerState {
         let result = await musicUtil
             .execCmd(MusicController.WINDOWS_SPOTIFY_TRACK_FIND)
             .catch(e => {
-                console.log(
-                    "Error trying to identify if spotify is running on windows: ",
-                    e.message
-                );
+                // console.log(
+                //     "Error trying to identify if spotify is running on windows: ",
+                //     e.message
+                // );
                 return null;
             });
         if (result && result.toLowerCase().includes("title")) {
@@ -114,10 +114,10 @@ export class MusicPlayerState {
         let songInfo = await musicUtil
             .execCmd(MusicController.WINDOWS_SPOTIFY_TRACK_FIND)
             .catch(e => {
-                console.log(
-                    "Error trying to identify if spotify is running on windows: ",
-                    e.message
-                );
+                // console.log(
+                //     "Error trying to identify if spotify is running on windows: ",
+                //     e.message
+                // );
                 return null;
             });
         if (!songInfo || !songInfo.includes(windowTitleStr)) {

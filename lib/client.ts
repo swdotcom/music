@@ -175,7 +175,7 @@ export class MusicClient {
                 return this.buildSuccessResponse(resp);
             })
             .catch(async err => {
-                console.log(`${api} error: ${err.message}`);
+                // console.log(`${api} error: ${err.message}`);
                 return this.buildErrorResponse(err);
             });
     }
@@ -196,7 +196,7 @@ export class MusicClient {
                 return this.buildSuccessResponse(resp);
             })
             .catch(err => {
-                console.log(`${api} error: ${err.message}`);
+                // console.log(`${api} error: ${err.message}`);
                 return this.buildErrorResponse(err);
             });
     }
@@ -217,7 +217,7 @@ export class MusicClient {
                 return this.buildSuccessResponse(resp);
             })
             .catch(err => {
-                console.log(`${api} error: ${err.message}`);
+                // console.log(`${api} error: ${err.message}`);
                 return this.buildErrorResponse(err);
             });
     }
@@ -238,7 +238,7 @@ export class MusicClient {
                 return this.buildSuccessResponse(resp);
             })
             .catch(err => {
-                console.log(`${api} error: ${err.message}`);
+                // console.log(`${api} error: ${err.message}`);
                 return this.buildErrorResponse(err);
             });
     }

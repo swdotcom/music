@@ -188,7 +188,12 @@ export async function getTracksByPlaylistName(
     let jsonResult: any = {};
     if (result) {
         try {
-            let jsonList = result.split("[TRACK_END]");
+            let jsonList;
+            if (result.indexOf("[TRACK_END],") !== -1) {
+                jsonList = result.split("[TRACK_END],");
+            } else {
+                jsonList = result.split("[TRACK_END]");
+            }
             if (jsonList && jsonList.length > 0) {
                 for (let i = 0; i < jsonList.length; i++) {
                     let jsonStr = jsonList[i].trim();
@@ -451,12 +456,16 @@ export async function getPlaylists(
         let result = await musicCtr.run(player, "playlistTrackCounts");
         if (result) {
             try {
-                result = result.split("[TRACK_END]");
+                if (result.indexOf("[TRACK_END],") !== -1) {
+                    result = result.split("[TRACK_END],");
+                } else {
+                    result = result.split("[TRACK_END]");
+                }
                 if (result && result.length > 0) {
                     playlists = result.map((resultItem: string) => {
                         try {
                             // {name, count}
-                            let item = JSON.parse(resultItem);
+                            let item = JSON.parse(resultItem.trim());
                             let playlistItem: PlaylistItem = new PlaylistItem();
                             playlistItem.public = true;
                             playlistItem.name = item.name;

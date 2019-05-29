@@ -274,10 +274,10 @@ export class MusicController {
                 return result;
             })
             .catch(err => {
-                console.log(
-                    "Error updating itunes track loved status, error: ",
-                    err.message
-                );
+                // console.log(
+                //     "Error updating itunes track loved status, error: ",
+                //     err.message
+                // );
                 return false;
             });
     }
