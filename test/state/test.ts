@@ -21,7 +21,7 @@ const musicCtr = MusicController.getInstance();
  * It will return the following error if you do.
  * "Error: Resolution method is overspecified. Specify a callback *or* return a Promise; not both."
  */
-describe("itunes player tests", () => {
+describe("itunes state tests", () => {
     before(done => {
         musicCtr
             .quitApp(CodyMusic.PlayerName.SpotifyDesktop)
@@ -55,6 +55,7 @@ describe("itunes player tests", () => {
                     );
                     expect(playerRunning).to.equal(true);
                     expect(track.id).to.not.equal("");
+                    expect(track.playerType).to.not.equal(undefined);
                     done();
                 });
             }
