@@ -128,6 +128,9 @@ export async function getRunningTrack(): Promise<Track> {
                 if (track) {
                     try {
                         track = JSON.parse(track);
+                        if (track) {
+                            track["playerType"] = PlayerType.MacItunesDesktop;
+                        }
                     } catch (e) {}
                 }
             }
