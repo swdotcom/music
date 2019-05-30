@@ -50,7 +50,7 @@ describe("itunes player tests", () => {
         CodyMusic.launchPlayer(CodyMusic.PlayerName.ItunesDesktop, {}).then(
             result => {
                 CodyMusic.getRunningTrack().then((track: Track) => {
-                    expect(track.id).to.equal("");
+                    expect(track.id).to.not.equal("");
                     done();
                 });
             }
@@ -90,6 +90,32 @@ describe("itunes player tests", () => {
                     let pageItem: PaginationItem = result.data;
                     expect(pageItem.items.length).to.not.equal(0);
                     done();
+                });
+            }
+        );
+    });
+
+    it("Play track in context", done => {
+        CodyMusic.getPlaylists(PlayerName.ItunesDesktop).then(
+            (result: PlaylistItem[]) => {
+                const playlistItem: PlaylistItem = result[0];
+                const playlistName = playlistItem.name;
+                CodyMusic.getPlaylistTracks(
+                    PlayerName.ItunesDesktop,
+                    playlistItem.id
+                ).then((result: CodyResponse) => {
+                    let pageItem: PaginationItem = result.data;
+                    let track: Track = pageItem.items[0];
+                    const trackName = track.name;
+                    CodyMusic.playTrackInContext(PlayerName.ItunesDesktop, [
+                        trackName,
+                        playlistName
+                    ]).then(result => {
+                        CodyMusic.getRunningTrack().then((result: Track) => {
+                            expect(result.name).to.equal(trackName);
+                            done();
+                        });
+                    });
                 });
             }
         );

@@ -119,6 +119,18 @@ export async function getRunningTrack(): Promise<Track> {
 
         if (itunesDesktopRunning) {
             track = await getTrack(PlayerName.ItunesDesktop);
+            if (track && !track.id) {
+                // get the 1st track
+                track = await musicCtr.run(
+                    PlayerName.ItunesDesktop,
+                    "firstTrackState"
+                );
+                if (track) {
+                    try {
+                        track = JSON.parse(track);
+                    } catch (e) {}
+                }
+            }
         }
     }
 
@@ -263,7 +275,11 @@ export async function getPlaylistTracks(
 /**
  * Plays a specific track on the Spotify or iTunes desktop
  * @param player
- * @param params (e.g. ["spotify:track:0R8P9KfGJCDULmlEoBagcO", "spotify:album:6ZG5lRT77aJ3btmArcykra"]
+ * @param params
+ * spotify example  ["spotify:track:0R8P9KfGJCDULmlEoBagcO", "spotify:album:6ZG5lRT77aJ3btmArcykra"]
+ *   -- provice the trackID then the album or playlist ID
+ * itunes example   ["Let Me Down Slowly", "MostRecents"]
+ *   -- provide the track name then the playlist name
  */
 export function playTrackInContext(player: PlayerName, params: any[]) {
     return musicCtr.playTrackInContext(player, params);
@@ -462,20 +478,23 @@ export async function getPlaylists(
                     result = result.split("[TRACK_END]");
                 }
                 if (result && result.length > 0) {
-                    playlists = result.map((resultItem: string) => {
-                        try {
-                            // {name, count}
-                            let item = JSON.parse(resultItem.trim());
-                            let playlistItem: PlaylistItem = new PlaylistItem();
-                            playlistItem.public = true;
-                            playlistItem.name = item.name;
-                            playlistItem.id = item.name;
-                            playlistItem.tracks.total = item.count;
-                            return playlistItem;
-                        } catch (err) {
-                            //
+                    for (let i = 0; i < result.length; i++) {
+                        let resultItem = result[i];
+                        if (resultItem && resultItem.trim().length > 0) {
+                            try {
+                                // {name, count}
+                                let item = JSON.parse(resultItem.trim());
+                                let playlistItem: PlaylistItem = new PlaylistItem();
+                                playlistItem.public = true;
+                                playlistItem.name = item.name;
+                                playlistItem.id = item.name;
+                                playlistItem.tracks.total = item.count;
+                                playlists.push(playlistItem);
+                            } catch (err) {
+                                //
+                            }
                         }
-                    });
+                    }
                 }
             } catch (err) {
                 //

@@ -199,7 +199,11 @@ getPlaylistTracks(player: PlayerName,
 /**
  * Plays a specific track on the Spotify or iTunes desktop
  * @param player
- * @param params (e.g. ["spotify:track:0R8P9KfGJCDULmlEoBagcO", "spotify:album:6ZG5lRT77aJ3btmArcykra"]
+ * @param params
+ *    * spotify example  ["spotify:track:0R8P9KfGJCDULmlEoBagcO", "spotify:album:6ZG5lRT77aJ3btmArcykra"]
+ *      -- provice the trackID then the album or playlist ID
+ *    * itunes example   ["Let Me Down Slowly", "MostRecents"]
+ *      -- provide the track name then the playlist name
  */
 playTrackInContext(player: PlayerName, params: any[])
 

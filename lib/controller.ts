@@ -18,6 +18,10 @@ export class MusicController {
             file: "get_state.{0}.applescript",
             requiresArgv: false
         },
+        firstTrackState: {
+            file: "get_first_track_state.{0}.applescript",
+            requiresArgv: false
+        },
         volumeUp: {
             file: "volume_up.{0}.applescript",
             requiresArgv: false
@@ -27,7 +31,7 @@ export class MusicController {
             requiresArgv: false
         },
         playTrackInContext:
-            'tell application "{0}" to play track "{1}" in context "{2}"',
+            'tell application "{0}" to play track "{1}" {2} "{3}"',
         play: 'tell application "{0}" to play',
         playFromLibrary: 'tell application "{0}" to play of playlist "{1}"',
         playSongFromLibrary:
@@ -175,6 +179,12 @@ export class MusicController {
                         script = this.scripts.playFromLibrary;
                         params.push("Library");
                     }
+                }
+            } else if (scriptName === "playTrackInContext") {
+                if (player === PlayerName.ItunesDesktop) {
+                    params.splice(2, 0, "of playlist");
+                } else {
+                    params.splice(2, 0, "in context");
                 }
             }
 
