@@ -57,6 +57,10 @@ export class Playlist {
             }
             if (codyResp && codyResp.data && codyResp.data.items) {
                 playlists = codyResp.data.items;
+                // ensure the playerType is set
+                playlists.map((playlist: PlaylistItem) => {
+                    playlist.playerType = PlayerType.WebSpotify;
+                });
             }
         }
 

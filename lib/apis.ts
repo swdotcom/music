@@ -494,6 +494,13 @@ export async function getPlaylists(
                                 playlistItem.name = item.name;
                                 playlistItem.id = item.name;
                                 playlistItem.tracks.total = item.count;
+                                if (player === PlayerName.ItunesDesktop) {
+                                    playlistItem.playerType =
+                                        PlayerType.MacItunesDesktop;
+                                } else {
+                                    playlistItem.playerType =
+                                        PlayerType.MacSpotifyDesktop;
+                                }
                                 playlists.push(playlistItem);
                             } catch (err) {
                                 //

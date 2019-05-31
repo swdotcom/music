@@ -138,4 +138,5 @@ export class PlaylistItem {
     public: boolean = true;
     tracks: PlaylistTrackInfo = new PlaylistTrackInfo();
     type: string = "playlist";
+    playerType: PlayerType = PlayerType.NotAssigned;
 }
