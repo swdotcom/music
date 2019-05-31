@@ -1,3 +1,5 @@
+import { CodyConfig } from "./models";
+
 export class MusicStore {
     private _spotifyAccessToken: string = "";
     private _spotifyRefreshToken: string = "";
@@ -6,6 +8,9 @@ export class MusicStore {
     private _spotifyClientSecret: string = "";
     private _spotifyClientId: string = "";
     private _spotifyUserId: string = "";
+    private _ItunesDesktopEnabled: boolean = true;
+    private _SpotifyDesktopEnabled: boolean = true;
+    private _SpotifyApiEnabled: boolean = true;
 
     private static instance: MusicStore;
     private constructor() {
@@ -16,6 +21,16 @@ export class MusicStore {
             MusicStore.instance = new MusicStore();
         }
         return MusicStore.instance;
+    }
+
+    setConfig(config: CodyConfig) {
+        this.spotifyAccessToken = config.spotifyAccessToken;
+        this.spotifyClientId = config.spotifyClientId;
+        this.spotifyClientSecret = config.spotifyClientSecret;
+        this.spotifyRefreshToken = config.spotifyRefreshToken;
+        this.ItunesDesktopEnabled = config.enableItunesDesktop;
+        this.SpotifyDesktopEnabled = config.enableSpotifyDesktop;
+        this.SpotifyApiEnabled = config.enableSpotifyApi;
     }
 
     setCredentials(creds: any) {
@@ -33,16 +48,22 @@ export class MusicStore {
     }
 
     credentialByKey(key: string): any {
-        if (key === "clientId") {
+        if (key === "spotifyClientId") {
             return this.spotifyClientId;
-        } else if (key === "clientSecret") {
+        } else if (key === "spotifyClientSecret") {
             return this.spotifyClientSecret;
-        } else if (key === "refreshToken") {
+        } else if (key === "spotifyRefreshToken") {
             return this.spotifyRefreshToken;
-        } else if (key === "accessToken") {
+        } else if (key === "spotifyAccessToken") {
             return this.spotifyAccessToken;
         }
         return null;
+    }
+
+    hasSpotifyAccessToken(): boolean {
+        return this._spotifyAccessToken && this._spotifyAccessToken !== ""
+            ? true
+            : false;
     }
 
     get spotifyAccessToken(): string {
@@ -99,5 +120,29 @@ export class MusicStore {
 
     set spotifyUserId(newSpotifyUserId) {
         this._spotifyUserId = newSpotifyUserId;
+    }
+
+    get ItunesDesktopEnabled(): any {
+        return this._ItunesDesktopEnabled;
+    }
+
+    set ItunesDesktopEnabled(newItunesDesktopEnabled) {
+        this._ItunesDesktopEnabled = newItunesDesktopEnabled;
+    }
+
+    get SpotifyDesktopEnabled(): any {
+        return this._SpotifyDesktopEnabled;
+    }
+
+    set SpotifyDesktopEnabled(newSpotifyDesktopEnabled) {
+        this._SpotifyDesktopEnabled = newSpotifyDesktopEnabled;
+    }
+
+    get SpotifyApiEnabled(): any {
+        return this._SpotifyApiEnabled;
+    }
+
+    set SpotifyApiEnabled(newSpotifyApiEnabled) {
+        this._SpotifyApiEnabled = newSpotifyApiEnabled;
     }
 }

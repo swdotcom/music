@@ -9,7 +9,7 @@ import {
     PlayerType,
     PlaylistItem,
     CodyResponse,
-    PlaylistTrackInfo,
+    CodyConfig,
     PaginationItem
 } from "./models";
 import { MusicPlayerState } from "./playerstate";
@@ -27,20 +27,19 @@ const audioStat = AudioStat.getInstance();
 const playlist = Playlist.getInstance();
 
 /**
- * Set Credentials (currently only supports Spotify)
- * Accepted credentials: clientId, clientSecret, refreshToken, accessToken
- * @param credentials
+ * Initialize/set music credentials and settings
+ * @param config <CodyConfig>
  */
-export function setCredentials(credentials: any) {
-    musicStore.setCredentials(credentials);
+export function setConfig(config: CodyConfig) {
+    musicStore.setConfig(config);
 }
 
 /**
- * Get the accessToken provided via through the setCredentials api
- * @returns {string} the access token string
+ * Get the Spotify accessToken provided via through the setConfig api
+ * @returns {string} the spotify access token string
  */
-export function getAccessToken() {
-    return musicStore.credentialByKey("accessToken");
+export function getSpotifyAccessToken() {
+    return musicStore.credentialByKey("spotifyAccessToken");
 }
 
 /**
@@ -102,37 +101,47 @@ export async function getRunningTrack(): Promise<Track> {
     let track = null;
 
     if (spotifyDevices.length > 0) {
-        track = await getTrack(PlayerName.SpotifyWeb);
+        // 1st try spotify web
+        if (musicStore.SpotifyApiEnabled) {
+            track = await getTrack(PlayerName.SpotifyWeb);
+        }
         if (!track || !track.id) {
-            const spotifyDesktopRunning = await isPlayerRunning(
-                PlayerName.SpotifyDesktop
-            );
-            if (spotifyDesktopRunning) {
-                track = await getTrack(PlayerName.SpotifyDesktop);
+            if (musicStore.SpotifyDesktopEnabled) {
+                // next try spotify desktop
+                const spotifyDesktopRunning = await isPlayerRunning(
+                    PlayerName.SpotifyDesktop
+                );
+                if (spotifyDesktopRunning) {
+                    track = await getTrack(PlayerName.SpotifyDesktop);
+                }
             }
         }
     }
     if (!track || !track.id) {
-        const itunesDesktopRunning = await isPlayerRunning(
-            PlayerName.ItunesDesktop
-        );
+        if (musicStore.ItunesDesktopEnabled) {
+            // still no track, try itunes desktop
+            const itunesDesktopRunning = await isPlayerRunning(
+                PlayerName.ItunesDesktop
+            );
 
-        if (itunesDesktopRunning) {
-            track = await getTrack(PlayerName.ItunesDesktop);
-            if (track && !track.id) {
-                // get the 1st track
-                track = await musicCtr.run(
-                    PlayerName.ItunesDesktop,
-                    "firstTrackState"
-                );
-                if (track) {
-                    try {
-                        track = JSON.parse(track);
-                        if (track) {
-                            track["playerType"] = PlayerType.MacItunesDesktop;
+            if (itunesDesktopRunning) {
+                track = await getTrack(PlayerName.ItunesDesktop);
+                if (track && !track.id) {
+                    // get the 1st track
+                    track = await musicCtr.run(
+                        PlayerName.ItunesDesktop,
+                        "firstTrackState"
+                    );
+                    if (track) {
+                        try {
+                            track = JSON.parse(track);
+                            if (track) {
+                                track["playerType"] =
+                                    PlayerType.MacItunesDesktop;
+                            }
+                        } catch (e) {
+                            //
                         }
-                    } catch (e) {
-                        //
                     }
                 }
             }
@@ -164,6 +173,13 @@ export async function getTrack(player: PlayerName): Promise<Track> {
         if (track) {
             try {
                 track = JSON.parse(track);
+                if (track) {
+                    if (player === PlayerName.ItunesDesktop) {
+                        track.playerType = PlayerType.MacItunesDesktop;
+                    } else {
+                        track.playerType = PlayerType.MacSpotifyDesktop;
+                    }
+                }
             } catch (e) {}
         }
     }
@@ -227,6 +243,16 @@ export async function getTracksByPlaylistName(
             //
         }
     }
+    /**
+     * result will have ...
+     * '38':
+        { artist: 'ZAYN',
+            album: 'Dusk Till Dawn (feat. Sia) [Radio Edit] - Single',
+            duration: 239000,
+            played_count: 260,
+            name: 'Dusk Till Dawn (feat. Sia) [Radio Edit]',
+            id: '6680' },
+     */
     if (jsonResult) {
         // go through the keys and create an array
         // of PlaylistItem
@@ -660,6 +686,14 @@ export function removeTracksFromPlaylist(
 }
 
 /**
+ * Returns whether or not the spotify access token has been provided.
+ * @returns <boolean>
+ */
+export function requiresSpotifyAccessInfo(): boolean {
+    return !musicStore.hasSpotifyAccessToken() ? true : false;
+}
+
+/**
  * Deprecated - use "getTrack(player)"
  */
 export function getPlayerState(player: PlayerName): Promise<Track> {
@@ -720,4 +754,23 @@ export function repeatOff(player: PlayerName) {
  */
 export function unMute(player: PlayerName) {
     return unmute(player);
+}
+
+/**
+ * Deprecated - please use "setConfig(config: CodyConfig)"
+ * Set Credentials (currently only supports Spotify)
+ * Accepted credentials: clientId, clientSecret, refreshToken, accessToken
+ * @param credentials
+ */
+export function setCredentials(credentials: any) {
+    musicStore.setCredentials(credentials);
+}
+
+/**
+ * Deprecated - please use "getSpotifyAccessToken()"
+ * Get the accessToken provided via through the setCredentials api
+ * @returns {string} the access token string
+ */
+export function getAccessToken() {
+    return musicStore.credentialByKey("spotifyAccessToken");
 }

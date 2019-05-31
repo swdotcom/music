@@ -14,5 +14,6 @@ export {
     PlaylistItem,
     SpotifyAudioFeature,
     PlayerType,
-    PlaylistTrackInfo
+    PlaylistTrackInfo,
+    CodyConfig
 } from "./lib/models";

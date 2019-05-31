@@ -140,3 +140,13 @@ export class PlaylistItem {
     type: string = "playlist";
     playerType: PlayerType = PlayerType.NotAssigned;
 }
+
+export class CodyConfig {
+    spotifyAccessToken: string = "";
+    spotifyRefreshToken: string = "";
+    spotifyClientSecret: string = "";
+    spotifyClientId: string = "";
+    enableItunesDesktop: boolean = true;
+    enableSpotifyDesktop: boolean = true;
+    enableSpotifyApi: boolean = true;
+}

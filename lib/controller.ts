@@ -81,6 +81,10 @@ export class MusicController {
     async isMusicPlayerActive(player: PlayerName) {
         player = musicUtil.getPlayerName(player);
 
+        if (!musicUtil.isMac()) {
+            return false;
+        }
+
         let appName = "Spotify.app";
         if (player === PlayerName.ItunesDesktop) {
             appName = "iTunes.app";
@@ -96,6 +100,10 @@ export class MusicController {
     }
 
     async stopPlayer(player: PlayerName) {
+        if (!musicUtil.isMac()) {
+            return "";
+        }
+
         /**
          * ps -ef | grep "Spotify.app" | grep -v grep | awk '{print $2}' | xargs kill
          * ps -ef | grep "iTunes.app" | grep -v grep | awk '{print $2}' | xargs kill
@@ -113,6 +121,10 @@ export class MusicController {
     }
 
     async startPlayer(player: string) {
+        if (!musicUtil.isMac()) {
+            return "";
+        }
+
         player = musicUtil.getPlayerName(player);
         const command = `open -a ${player}`;
         let result = await musicUtil.execCmd(command);

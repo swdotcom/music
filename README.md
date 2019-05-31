@@ -122,11 +122,10 @@ Full set of APIs
 
 ```js
 /**
- * Set Credentials (currently only supports Spotify)
- * Accepted credentials: clientId, clientSecret, refreshToken, accessToken
- * @param credentials
+ * Initialize/set music credentials and settings
+ * @param config <CodyConfig>
  */
-setCredentials(credentials: any)
+setConfig(config: CodyConfig)
 
 /**
  * Get the accessToken provided via through the setCredentials api
@@ -420,6 +419,12 @@ removeTracksFromPlaylist(
     playlist_id: string,
     tracks: string[]
 )
+
+/**
+ * Returns whether or not the spotify access token has been provided.
+ * @returns <boolean>
+ */
+requiresSpotifyAccessInfo(): boolean
 ```
 
 Deprecated APIs
@@ -451,6 +456,9 @@ repeatOff(player: PlayerName)
 
 // deprecated, please use "unmute(player)"
 unMute(player: PlayerName)
+
+// Deprecated, please use "setConfig(config: CodyConfig)"
+setCredentials(credentials: any)
 ```
 
 ## Contributors
