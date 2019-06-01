@@ -105,19 +105,21 @@ export async function getRunningTrack(): Promise<Track> {
         if (musicStore.SpotifyApiEnabled) {
             track = await getTrack(PlayerName.SpotifyWeb);
         }
-        if (!track || !track.id) {
-            if (musicStore.SpotifyDesktopEnabled) {
-                // next try spotify desktop
-                const spotifyDesktopRunning = await isPlayerRunning(
-                    PlayerName.SpotifyDesktop
-                );
-                if (spotifyDesktopRunning) {
-                    track = await getTrack(PlayerName.SpotifyDesktop);
-                }
+    }
+    if (!track || !track.id) {
+        // spotify desktop try
+        if (musicStore.SpotifyDesktopEnabled) {
+            // next try spotify desktop
+            const spotifyDesktopRunning = await isPlayerRunning(
+                PlayerName.SpotifyDesktop
+            );
+            if (spotifyDesktopRunning) {
+                track = await getTrack(PlayerName.SpotifyDesktop);
             }
         }
     }
     if (!track || !track.id) {
+        // itunes desktop try
         if (musicStore.ItunesDesktopEnabled) {
             // still no track, try itunes desktop
             const itunesDesktopRunning = await isPlayerRunning(
