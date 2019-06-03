@@ -3,14 +3,21 @@
 New updates include:
 
 -   Interally setting "itunesAccessGranted"
-    to true if the user has granted access to iTunes
-    This is accessible via the api:
+    to true if the user has granted access to iTunes.
+
+-   This is accessible via the api:
 
     -   isItunesAccessGranted()
 
 -   Support to specify which players are enabled for lookup
 
 -   Improved playlist model definition to provide a tree view structure
+
+-   Set or update Spotify access or other settings using the CodyConfig with the following api:
+
+    -   setConfig(codyConfig)
+
+-   You can send all or partial settings updates
 
 ## Player control support
 
