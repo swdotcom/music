@@ -89,11 +89,13 @@ export class MusicController {
         if (player === PlayerName.ItunesDesktop) {
             appName = "iTunes.app";
         }
-        let command = `ps -ef | grep "${appName}" | grep -v grep | awk '{print $2}'`;
+        let command = `ps -ef | grep "${appName}" | grep -v grep`;
         if (player === PlayerName.ItunesDesktop) {
             // make sure it's not the cache extension process
             command = `${command} | grep -i "visualizer"`;
         }
+
+        command = `${command} | awk '{print $2}'`;
 
         // this returns the PID of the requested player
         const result = await musicUtil.execCmd(command);

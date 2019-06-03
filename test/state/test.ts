@@ -49,6 +49,7 @@ describe("itunes state tests", () => {
     it("Return itunes current track when itunes is the only app running", done => {
         CodyMusic.launchPlayer(CodyMusic.PlayerName.ItunesDesktop, {}).then(
             result => {
+                musicUtil.sleep(2500);
                 CodyMusic.getRunningTrack().then(async (track: Track) => {
                     let playerRunning = await CodyMusic.isPlayerRunning(
                         PlayerName.ItunesDesktop

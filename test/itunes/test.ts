@@ -46,15 +46,20 @@ describe("itunes player tests", () => {
             });
     });
 
-    it("Launch and test itunes track state", done => {
+    it("Launch test", done => {
         CodyMusic.launchPlayer(CodyMusic.PlayerName.ItunesDesktop, {}).then(
             result => {
-                CodyMusic.getRunningTrack().then((track: Track) => {
-                    expect(track.id).to.not.equal("");
-                    done();
-                });
+                musicUtil.sleep(2500);
+                done();
             }
         );
+    });
+
+    it("Get running track state", done => {
+        CodyMusic.getRunningTrack().then((track: Track) => {
+            expect(track.id).to.not.equal("");
+            done();
+        });
     });
 
     it("Get running track with only iTunes running", done => {

@@ -76,6 +76,7 @@ describe("music track tests", () => {
     it("get best currently running track", done => {
         CodyMusic.launchPlayer(CodyMusic.PlayerName.ItunesDesktop).then(
             async () => {
+                musicUtil.sleep(2500);
                 // play any song
                 await CodyMusic.play(CodyMusic.PlayerName.ItunesDesktop);
                 musicUtil.sleep(1500);

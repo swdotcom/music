@@ -126,6 +126,8 @@ export async function getRunningTrack(): Promise<Track> {
                 PlayerName.ItunesDesktop
             );
 
+            console.log("itunes running: ", itunesDesktopRunning);
+
             if (itunesDesktopRunning) {
                 track = await getTrack(PlayerName.ItunesDesktop);
                 if (track && !track.id) {

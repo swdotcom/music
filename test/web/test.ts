@@ -61,6 +61,7 @@ describe("web player music tests", () => {
     it("Launch and test track state", done => {
         CodyMusic.launchPlayer(CodyMusic.PlayerName.SpotifyWeb, {}).then(
             result => {
+                musicUtil.sleep(2500);
                 CodyMusic.getRunningTrack().then((track: Track) => {
                     expect(track.id).to.equal("");
                     done();
