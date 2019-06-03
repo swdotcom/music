@@ -266,7 +266,19 @@ export class MusicController {
         }
 
         return this.execScript(player, scriptName, params, argv).then(
-            result => {
+            async result => {
+                if (result && result.error) {
+                    if (result.error.includes("Not authorized")) {
+                        // reset the apple events to show the request access again
+                        await musicUtil.execCmd("tccutil reset AppleEvents");
+                        result = await this.execScript(
+                            player,
+                            scriptName,
+                            params,
+                            argv
+                        );
+                    }
+                }
                 if (result === null || result === undefined || result === "") {
                     result = "ok";
                 }

@@ -310,7 +310,7 @@ export async function getPlaylistTracks(
  * @param player
  * @param params
  * spotify example  ["spotify:track:0R8P9KfGJCDULmlEoBagcO", "spotify:album:6ZG5lRT77aJ3btmArcykra"]
- *   -- provice the trackID then the album or playlist ID
+ *   -- provide the trackID then the album or playlist ID
  * itunes example   ["Let Me Down Slowly", "MostRecents"]
  *   -- provide the track name then the playlist name
  */
@@ -330,7 +330,9 @@ export function playSpotifyDevice(device_id: string) {
 /**
  * Initiate the play command for a specific player
  * @param player {spotify|spotify-web|itunes}
- * @param options
+ * @param options { uris, device_id }
+ * example
+ * {device_id: <spotify_device_id>, uris: ["spotify:track:4iV5W9uYEdYUVa79Axb7Rh", "spotify:track:1301WleyT98MSxVHPZCA6M"]}
  */
 export function play(player: PlayerName, options: any = {}) {
     if (player === PlayerName.SpotifyWeb) {

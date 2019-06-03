@@ -44,12 +44,15 @@ import {
 
 ...
 
-// update the CodyMusic spotify credentials
-setCredentials({
-    refreshToken: <refresh_token>,
-    clientSecret: <clientSecret>,
-    clientId: <clientId>,
-    accessToken: <access_token>
+// update the CodyMusic spotify credentials and other settings
+setConfig({
+    spotifyAccessToken: <spotify_access_token>,
+    spotifyRefreshToken: <spotify_refresh_token>;
+    spotifyClientSecret: <spotify_client_secret>;
+    spotifyClientId: <spotify_client_id>;
+    enableItunesDesktop: <enable_itunes_desktop_track_lookup>;
+    enableSpotifyDesktop: <enable_spotify_desktop_track_lookup>;
+    enableSpotifyApi: <enable_spotify_api>;
 });
 
 const track:Track = await getRunningTrack();

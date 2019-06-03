@@ -11,7 +11,6 @@ on run argv
 	set playlistName to (item 1 of argv)
 	set myList to {}
 	tell application "iTunes"
-		activate
 		set results to (every file track of playlist playlistName)
 		set counter to 0
 		set len to count of results

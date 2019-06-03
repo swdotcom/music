@@ -139,6 +139,8 @@ export class PlaylistItem {
     tracks: PlaylistTrackInfo = new PlaylistTrackInfo();
     type: string = "playlist";
     playerType: PlayerType = PlayerType.NotAssigned;
+    tag: string = "";
+    tooltip: string = "";
 }
 
 export class CodyConfig {
