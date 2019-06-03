@@ -34,6 +34,10 @@ export function setConfig(config: CodyConfig) {
     musicStore.setConfig(config);
 }
 
+export function isItunesAccessGranted() {
+    return musicStore.itunesAccessGranted;
+}
+
 /**
  * Get the Spotify accessToken provided via through the setConfig api
  * @returns {string} the spotify access token string
@@ -102,13 +106,13 @@ export async function getRunningTrack(): Promise<Track> {
 
     if (spotifyDevices.length > 0) {
         // 1st try spotify web
-        if (musicStore.SpotifyApiEnabled) {
+        if (musicStore.spotifyApiEnabled) {
             track = await getTrack(PlayerName.SpotifyWeb);
         }
     }
     if (!track || !track.id) {
         // spotify desktop try
-        if (musicStore.SpotifyDesktopEnabled) {
+        if (musicStore.spotifyDesktopEnabled) {
             // next try spotify desktop
             const spotifyDesktopRunning = await isPlayerRunning(
                 PlayerName.SpotifyDesktop
@@ -120,13 +124,11 @@ export async function getRunningTrack(): Promise<Track> {
     }
     if (!track || !track.id) {
         // itunes desktop try
-        if (musicStore.ItunesDesktopEnabled) {
+        if (musicStore.itunesDesktopEnabled && musicStore.itunesAccessGranted) {
             // still no track, try itunes desktop
             const itunesDesktopRunning = await isPlayerRunning(
                 PlayerName.ItunesDesktop
             );
-
-            console.log("itunes running: ", itunesDesktopRunning);
 
             if (itunesDesktopRunning) {
                 track = await getTrack(PlayerName.ItunesDesktop);

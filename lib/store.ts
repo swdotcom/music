@@ -8,9 +8,10 @@ export class MusicStore {
     private _spotifyClientSecret: string = "";
     private _spotifyClientId: string = "";
     private _spotifyUserId: string = "";
-    private _ItunesDesktopEnabled: boolean = true;
-    private _SpotifyDesktopEnabled: boolean = true;
-    private _SpotifyApiEnabled: boolean = true;
+    private _itunesDesktopEnabled: boolean = true;
+    private _spotifyDesktopEnabled: boolean = true;
+    private _spotifyApiEnabled: boolean = true;
+    private _itunesAccessGranted: boolean = true;
 
     private static instance: MusicStore;
     private constructor() {
@@ -28,9 +29,9 @@ export class MusicStore {
         this.spotifyClientId = config.spotifyClientId;
         this.spotifyClientSecret = config.spotifyClientSecret;
         this.spotifyRefreshToken = config.spotifyRefreshToken;
-        this.ItunesDesktopEnabled = config.enableItunesDesktop;
-        this.SpotifyDesktopEnabled = config.enableSpotifyDesktop;
-        this.SpotifyApiEnabled = config.enableSpotifyApi;
+        this.itunesDesktopEnabled = config.enableItunesDesktop;
+        this.spotifyDesktopEnabled = config.enableSpotifyDesktop;
+        this.spotifyApiEnabled = config.enableSpotifyApi;
     }
 
     setCredentials(creds: any) {
@@ -72,6 +73,14 @@ export class MusicStore {
 
     set spotifyAccessToken(newAccessToken: string) {
         this._spotifyAccessToken = newAccessToken;
+    }
+
+    get itunesAccessGranted(): boolean {
+        return this._itunesAccessGranted;
+    }
+
+    set itunesAccessGranted(granted: boolean) {
+        this._itunesAccessGranted = granted;
     }
 
     get spotifyClientSecret(): string {
@@ -122,27 +131,27 @@ export class MusicStore {
         this._spotifyUserId = newSpotifyUserId;
     }
 
-    get ItunesDesktopEnabled(): any {
-        return this._ItunesDesktopEnabled;
+    get itunesDesktopEnabled(): any {
+        return this._itunesDesktopEnabled;
     }
 
-    set ItunesDesktopEnabled(newItunesDesktopEnabled) {
-        this._ItunesDesktopEnabled = newItunesDesktopEnabled;
+    set itunesDesktopEnabled(newitunesDesktopEnabled) {
+        this._itunesDesktopEnabled = newitunesDesktopEnabled;
     }
 
-    get SpotifyDesktopEnabled(): any {
-        return this._SpotifyDesktopEnabled;
+    get spotifyDesktopEnabled(): any {
+        return this._spotifyDesktopEnabled;
     }
 
-    set SpotifyDesktopEnabled(newSpotifyDesktopEnabled) {
-        this._SpotifyDesktopEnabled = newSpotifyDesktopEnabled;
+    set spotifyDesktopEnabled(newspotifyDesktopEnabled) {
+        this._spotifyDesktopEnabled = newspotifyDesktopEnabled;
     }
 
-    get SpotifyApiEnabled(): any {
-        return this._SpotifyApiEnabled;
+    get spotifyApiEnabled(): any {
+        return this._spotifyApiEnabled;
     }
 
-    set SpotifyApiEnabled(newSpotifyApiEnabled) {
-        this._SpotifyApiEnabled = newSpotifyApiEnabled;
+    set spotifyApiEnabled(newspotifyApiEnabled) {
+        this._spotifyApiEnabled = newspotifyApiEnabled;
     }
 }

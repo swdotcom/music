@@ -49,7 +49,7 @@ describe("itunes player tests", () => {
     it("Launch test", done => {
         CodyMusic.launchPlayer(CodyMusic.PlayerName.ItunesDesktop, {}).then(
             result => {
-                musicUtil.sleep(2500);
+                musicUtil.sleep(3000);
                 done();
             }
         );

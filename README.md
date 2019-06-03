@@ -1,5 +1,17 @@
 # cody-music
 
+New updates include:
+
+-   Interally setting "itunesAccessGranted"
+    to true if the user has granted access to iTunes
+    This is accessible via the api:
+
+    -   isItunesAccessGranted()
+
+-   Support to specify which players are enabled for lookup
+
+-   Improved playlist model definition to provide a tree view structure
+
 ## Player control support
 
 -   Mac Spotify and iTunes desktop

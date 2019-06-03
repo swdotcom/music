@@ -1,6 +1,7 @@
 import { MusicUtil } from "./util";
 import { MusicClient } from "./client";
 import { PlayerName } from "./models";
+import { MusicStore } from "./store";
 
 const musicClient = MusicClient.getInstance();
 const musicUtil = new MusicUtil();
@@ -273,19 +274,25 @@ export class MusicController {
 
         return this.execScript(player, scriptName, params, argv).then(
             async result => {
-                if (result && result.error) {
-                    if (result.error.includes("Not authorized")) {
-                        // reset the apple events to show the request access again
-                        await musicUtil.execCmd("tccutil reset AppleEvents");
-                        result = await this.execScript(
-                            player,
-                            scriptName,
-                            params,
-                            argv
-                        );
-                    }
+                if (
+                    result &&
+                    result.error &&
+                    result.error.includes("Not authorized")
+                ) {
+                    // reset the apple events to show the request access again
+                    // await musicUtil.execCmd("tccutil reset AppleEvents");
+                    // result = await this.execScript(
+                    //     player,
+                    //     scriptName,
+                    //     params,
+                    //     argv
+                    // );
+                    return "Desktop Player Access Not Authorized";
                 }
                 if (result === null || result === undefined || result === "") {
+                    if (player === PlayerName.ItunesDesktop) {
+                        MusicStore.getInstance().itunesAccessGranted = true;
+                    }
                     result = "ok";
                 }
                 return result;
