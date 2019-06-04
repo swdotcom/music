@@ -59,7 +59,7 @@ import {
     Track,
     PlayerType,
     TrackStatus,
-    setCredentials } from "cody-music";
+    setConfig } from "cody-music";
 
 ...
 
@@ -150,10 +150,10 @@ Full set of APIs
 setConfig(config: CodyConfig)
 
 /**
- * Get the accessToken provided via through the setCredentials api
- * @returns {string} the access token string
+ * Get the Spotify accessToken provided via through the setConfig api
+ * @returns {string} the spotify access token string
  */
-getAccessToken()
+getSpotifyAccessToken()
 
 /**
  * Checks if the Spotify desktop or web player is running or not
@@ -452,6 +452,10 @@ requiresSpotifyAccessInfo(): boolean
 Deprecated APIs
 
 ```js
+
+// deprecate, please use "getSpotifyAccessToken()"
+getAccessToken()
+
 // deprecated, please use "getRunningTrack()"
 getCurrentlyRunningTrackState(): Promise<Track>
 
