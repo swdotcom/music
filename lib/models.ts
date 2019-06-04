@@ -141,6 +141,8 @@ export class PlaylistItem {
     playerType: PlayerType = PlayerType.NotAssigned;
     tag: string = "";
     tooltip: string = "";
+    state: TrackStatus = TrackStatus.NotAssigned;
+    artists: string = "";
 }
 
 export class CodyConfig {
