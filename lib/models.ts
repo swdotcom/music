@@ -143,6 +143,7 @@ export class PlaylistItem {
     tooltip: string = "";
     state: TrackStatus = TrackStatus.NotAssigned;
     artists: string = "";
+    command: string = "";
 }
 
 export class CodyConfig {
