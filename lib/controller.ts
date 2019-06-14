@@ -340,10 +340,10 @@ export class MusicController {
         );
     }
 
-    public async playSpotifyDevice(device_id: string) {
+    public async playPauseSpotifyDevice(device_id: string, play: boolean) {
         const payload = {
             device_ids: [device_id],
-            play: true
+            play
         };
         return musicClient.spotifyApiPut("v1/me/player", {}, payload);
     }

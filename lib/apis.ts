@@ -325,10 +325,18 @@ export function playTrackInContext(player: PlayerName, params: any[]) {
 /**
  * Initiate and play the specified Spotify device
  * @param device_id {string}
- * @param play {boolean}
  */
 export function playSpotifyDevice(device_id: string) {
-    return musicCtr.playSpotifyDevice(device_id);
+    return musicCtr.playPauseSpotifyDevice(device_id, true);
+}
+
+/**
+ * Initiate and play the specified Spotify device
+ * @param device_id {string}
+ * @param play {boolean} true to play and false to keep current play state
+ */
+export function transferSpotifyDevice(device_id: string, play: boolean) {
+    return musicCtr.playPauseSpotifyDevice(device_id, play);
 }
 
 /**
