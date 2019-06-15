@@ -352,7 +352,13 @@ export class MusicController {
         const qsOptions = options.device_id
             ? { device_id: options.device_id }
             : {};
-        const payload = options.track_ids ? { uris: options.track_ids } : {};
+        let payload: any = {};
+        if (options.uris) {
+            payload["uris"] = options.uris;
+        } else if (options.track_ids) {
+            payload["uris"] = options.track_ids;
+        }
+
         return musicClient.spotifyApiPut(
             "/v1/me/player/play",
             qsOptions,

@@ -201,6 +201,31 @@ export class MusicPlayerState {
         return track;
     }
 
+    async getSpotifyRecentlyPlayedTracks(limit: number): Promise<Track[]> {
+        let api = "v1/me/player/recently-played";
+        if (limit) {
+            api += `?limit=${limit}`;
+        }
+        let response = await musicClient.spotifyApiGet(api);
+        // check if the token needs to be refreshed
+        if (response.statusText === "EXPIRED") {
+            // refresh the token
+            await musicClient.refreshSpotifyToken();
+            // try again
+            response = await musicClient.spotifyApiGet(api);
+        }
+
+        let tracks: Track[] = [];
+        if (response && response.data && response.data.items) {
+            for (let i = 0; i < response.data.items.length; i++) {
+                let track: Track = response.data.items[i].track;
+                tracks.push(track);
+            }
+        }
+
+        return tracks;
+    }
+
     async getSpotifyPlayerContext(): Promise<PlayerContext> {
         let playerContext: PlayerContext = new PlayerContext();
         let api = "/v1/me/player";

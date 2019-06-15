@@ -2,6 +2,7 @@ const expect = require("chai").expect;
 import * as CodyMusic from "../../index";
 import { UserProfile, SpotifyUser } from "../../lib/profile";
 import { TestUtil } from "../util";
+import { PlayerName } from "../../lib/models";
 
 const userProfile = UserProfile.getInstance();
 const testUtil = new TestUtil();
@@ -35,6 +36,13 @@ describe("spotify profile tests", () => {
     it("fetch the spotify user profile", done => {
         userProfile.getUserProfile().then((result: SpotifyUser) => {
             expect(result.id).to.not.equal("");
+            done();
+        });
+    });
+
+    it("fetch recently played tracks", done => {
+        CodyMusic.getSpotifyRecentlyPlayedTracks(1).then(result => {
+            expect(result.length).to.not.equal(0);
             done();
         });
     });

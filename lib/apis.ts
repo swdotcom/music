@@ -10,13 +10,15 @@ import {
     PlaylistItem,
     CodyResponse,
     CodyConfig,
-    PaginationItem
+    PaginationItem,
+    PlayerContext
 } from "./models";
 import { MusicPlayerState } from "./playerstate";
 import { AudioStat } from "./audiostat";
 import { MusicStore } from "./store";
 import { MusicUtil } from "./util";
 import { Playlist } from "./playlist";
+import { UserProfile, SpotifyUser } from "./profile";
 
 // get the instances
 const musicCtr = MusicController.getInstance();
@@ -25,6 +27,7 @@ const musicStore = MusicStore.getInstance();
 const musicUtil = new MusicUtil();
 const audioStat = AudioStat.getInstance();
 const playlist = Playlist.getInstance();
+const userProfile = UserProfile.getInstance();
 
 /**
  * Initialize/set music credentials and settings
@@ -159,6 +162,24 @@ export async function getRunningTrack(): Promise<Track> {
     }
 
     return track;
+}
+
+/**
+ * Fetch the recently played spotify tracks
+ * @param limit
+ */
+export async function getSpotifyRecentlyPlayedTracks(
+    limit: number
+): Promise<Track[]> {
+    return musicPlayerCtr.getSpotifyRecentlyPlayedTracks(limit);
+}
+
+/**
+ * Fetch the spotify player context
+ * Info about the device, is playing state, etc.
+ */
+export async function getSpotifyPlayerContext(): Promise<PlayerContext> {
+    return musicPlayerCtr.getSpotifyPlayerContext();
 }
 
 /**
@@ -337,6 +358,13 @@ export function playSpotifyDevice(device_id: string) {
  */
 export function transferSpotifyDevice(device_id: string, play: boolean) {
     return musicCtr.playPauseSpotifyDevice(device_id, play);
+}
+
+/**
+ * Fetch the user's profile
+ */
+export function getUserProfile(): Promise<SpotifyUser> {
+    return userProfile.getUserProfile();
 }
 
 /**
