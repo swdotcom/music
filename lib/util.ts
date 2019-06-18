@@ -108,6 +108,27 @@ export class MusicUtil {
         return formatted;
     }
 
+    createUrisFromTrackIds(track_ids: string[], useUriObj: boolean = false) {
+        let tracks = [];
+
+        for (let i = 0; i < track_ids.length; i++) {
+            let uri = track_ids[i];
+            if (!uri.includes("spotify:track:")) {
+                uri = `spotify:track:${uri}`;
+            }
+            if (useUriObj) {
+                const urlObj = {
+                    uri
+                };
+                tracks.push(urlObj);
+            } else {
+                tracks.push(uri);
+            }
+        }
+
+        return tracks;
+    }
+
     createSpotifyIdFromUri(uri: string) {
         if (uri.indexOf("spotify:") === 0) {
             return uri.substring(uri.lastIndexOf(":") + 1);
