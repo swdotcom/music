@@ -108,6 +108,13 @@ export class MusicUtil {
         return formatted;
     }
 
+    createSpotifyIdFromUri(uri: string) {
+        if (uri.indexOf("spotify:") === 0) {
+            return uri.substring(uri.lastIndexOf(":") + 1);
+        }
+        return uri;
+    }
+
     extractAristFromSpotifyTrack(track: any) {
         if (!track) {
             return;

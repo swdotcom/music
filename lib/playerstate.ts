@@ -250,16 +250,21 @@ export class MusicPlayerState {
 
     launchWebPlayer(options: any) {
         if (options.album_id) {
+            const albumId = musicUtil.createSpotifyIdFromUri(options.album_id);
             return musicUtil.launchWebUrl(
-                `https://open.spotify.com/album/${options.album_id}`
+                `https://open.spotify.com/album/${albumId}`
             );
         } else if (options.track_id) {
+            const trackId = musicUtil.createSpotifyIdFromUri(options.track_id);
             return musicUtil.launchWebUrl(
-                `https://open.spotify.com/track/${options.track_id}`
+                `https://open.spotify.com/track/${trackId}`
             );
         } else if (options.playlist_id) {
+            const playlistId = musicUtil.createSpotifyIdFromUri(
+                options.playlist_id
+            );
             return musicUtil.launchWebUrl(
-                `https://open.spotify.com/playlist/${options.playlist_id}`
+                `https://open.spotify.com/playlist/${playlistId}`
             );
         }
         return musicUtil.launchWebUrl("https://open.spotify.com/browse");
