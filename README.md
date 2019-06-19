@@ -2,6 +2,8 @@
 
 New updates include:
 
+-   More comments for highest used APIs, more to come
+
 -   Interally setting "itunesAccessGranted"
     to true if the user has granted access to iTunes.
 
@@ -156,6 +158,11 @@ setConfig(config: CodyConfig)
 getSpotifyAccessToken()
 
 /**
+ * Returns true if the user has granted Mac OS access for iTunes control
+ */
+isItunesAccessGranted()
+
+/**
  * Checks if the Spotify desktop or web player is running or not
  * @returns {Promise<boolean>}
  */
@@ -221,10 +228,11 @@ getPlaylistTracks(player: PlayerName,
  * Plays a specific track on the Spotify or iTunes desktop
  * @param player
  * @param params
- *    * spotify example  ["spotify:track:0R8P9KfGJCDULmlEoBagcO", "spotify:album:6ZG5lRT77aJ3btmArcykra"]
- *      -- provice the trackID then the album or playlist ID
- *    * itunes example   ["Let Me Down Slowly", "MostRecents"]
- *      -- provide the track name then the playlist name
+ * spotify example  ["spotify:track:0R8P9KfGJCDULmlEoBagcO", "spotify:album:6ZG5lRT77aJ3btmArcykra"]
+ *   -- provide the trackID then the album or playlist ID
+ *   -- they can either be in either URI or ID format
+ * itunes example   ["Let Me Down Slowly", "MostRecents"]
+ *   -- provide the track name then the playlist name
  */
 playTrackInContext(player: PlayerName, params: any[])
 
@@ -238,21 +246,28 @@ playSpotifyDevice(device_id: string)
 /**
  * Initiate the play command for a specific player
  * @param player {spotify|spotify-web|itunes}
- * @param options
+ * @param options { uris, device_id }
+ * example
+ * -- the uris can be in either URI or ID format
+ * {device_id: <spotify_device_id>, uris: ["spotify:track:4iV5W9uYEdYUVa79Axb7Rh", "spotify:track:1301WleyT98MSxVHPZCA6M"]}
  */
 play(player: PlayerName, options: any = {})
 
 /**
  * Initiate the play command for a given trackId for a specific player
+ *  -- the trackId can be in either URI or ID format
  * @param player {spotify|spotify-web|itunes}
  * @param trackId {string}
  */
 playTrack(player: PlayerName, trackId: string)
 
 /**
- * Initiate the pause command for a given player
+ * Initiate the pause command for a specific player
  * @param player {spotify|spotify-web|itunes}
- * @param options
+ * @param options { uris, device_id }
+ * example
+ * -- the uris can be in either URI or ID format
+ * {device_id: <spotify_device_id>, uris: ["spotify:track:4iV5W9uYEdYUVa79Axb7Rh", "spotify:track:1301WleyT98MSxVHPZCA6M"]}
  */
 pause(player: PlayerName, options: any = {})
 
@@ -264,16 +279,22 @@ pause(player: PlayerName, options: any = {})
 playPause(player: PlayerName)
 
 /**
- * Initiate the next command for a given player
+ * Initiate the next command for a specific player
  * @param player {spotify|spotify-web|itunes}
- * @param options
+ * @param options { uris, device_id }
+ * example
+ * -- the uris can be in either URI or ID format
+ * {device_id: <spotify_device_id>, uris: ["spotify:track:4iV5W9uYEdYUVa79Axb7Rh", "spotify:track:1301WleyT98MSxVHPZCA6M"]}
  */
 next(player: PlayerName, options: any = {})
 
 /**
- * Initiate the previous command for a given player
+ * Initiate the previous command for a specific player
  * @param player {spotify|spotify-web|itunes}
- * @param options
+ * @param options { uris, device_id }
+ * example
+ * -- the uris can be in either URI or ID format
+ * {device_id: <spotify_device_id>, uris: ["spotify:track:4iV5W9uYEdYUVa79Axb7Rh", "spotify:track:1301WleyT98MSxVHPZCA6M"]}
  */
 previous(player: PlayerName, options: any = {})
 
