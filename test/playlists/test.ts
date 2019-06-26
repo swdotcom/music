@@ -2,6 +2,9 @@ const expect = require("chai").expect;
 import * as CodyMusic from "../../index";
 import { TestUtil } from "../util";
 import { PlayerName, PlaylistItem } from "../../lib/models";
+import { UserProfile, SpotifyUser } from "../../lib/profile";
+
+const userProfile = UserProfile.getInstance();
 
 const testUtil = new TestUtil();
 
@@ -68,10 +71,25 @@ describe("spotify playlist tests", () => {
             CodyMusic.getPlaylistTracks(
                 PlayerName.SpotifyWeb,
                 playlist_id
-            ).then(result => {
+            ).then(async result => {
+                const spotifyUser = await userProfile.getUserProfile();
+
                 expect(result.data.items[0]).to.not.equal(null);
                 expect(result.data.items[0].id).to.not.equal("");
-                done();
+
+                const playlistUri = `${
+                    spotifyUser.uri
+                }:playlist:${playlist_id}`;
+                const options = {
+                    context_uri: playlistUri,
+                    track_ids: [result.data.items[0].id]
+                };
+
+                CodyMusic.play(PlayerName.SpotifyWeb, options).then(result => {
+                    // this should result in 204, not 400 or 500
+                    expect(result.status).to.equal(204);
+                    done();
+                });
             });
         });
     });

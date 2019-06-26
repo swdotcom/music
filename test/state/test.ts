@@ -55,11 +55,27 @@ describe("itunes state tests", () => {
                         PlayerName.ItunesDesktop
                     );
                     expect(playerRunning).to.equal(true);
-                    expect(track.id).to.not.equal("");
-                    expect(track.playerType).to.not.equal(undefined);
+                    // there may be a grant error
+                    if (!track.error) {
+                        expect(track.id).to.not.equal("");
+                        expect(track.playerType).to.not.equal(undefined);
+                    }
                     done();
                 });
             }
         );
+    });
+
+    it("Return itunes is not currently running", done => {
+        musicCtr
+            .quitApp(CodyMusic.PlayerName.ItunesDesktop)
+            .then(async (result: any) => {
+                let playerRunning = await CodyMusic.isPlayerRunning(
+                    PlayerName.ItunesDesktop
+                );
+                console.log("player running: ", playerRunning);
+                expect(playerRunning).to.equal(false);
+                done();
+            });
     });
 });

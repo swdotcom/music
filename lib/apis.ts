@@ -82,7 +82,12 @@ export async function isPlayerRunning(player: PlayerName) {
     if (player === PlayerName.SpotifyWeb) {
         return await musicPlayerCtr.isSpotifyWebRunning();
     } else {
-        return await musicCtr.isMusicPlayerActive(player);
+        let state = await musicCtr.run(player, "checkPlayerRunningState");
+        try {
+            return JSON.parse(state);
+        } catch (err) {
+            return false;
+        }
     }
 }
 
@@ -162,6 +167,10 @@ export async function getRunningTrack(): Promise<Track> {
 
     if (!track) {
         track = new Track();
+    } else if (typeof track === "string" && track.includes("GRANT_ERROR")) {
+        const errorStr = track;
+        track = new Track();
+        track.error = errorStr;
     }
 
     return track;
@@ -377,7 +386,7 @@ export function getUserProfile(): Promise<SpotifyUser> {
  * @param options { uris, device_id }
  * example
  * -- the uris can be in either URI or ID format
- * {device_id: <spotify_device_id>, uris: ["spotify:track:4iV5W9uYEdYUVa79Axb7Rh", "spotify:track:1301WleyT98MSxVHPZCA6M"]}
+ * {device_id: <spotify_device_id>, uris: ["spotify:track:4iV5W9uYEdYUVa79Axb7Rh", "spotify:track:1301WleyT98MSxVHPZCA6M"], context_uri: <playlist_uri, album_uri>}
  */
 export function play(player: PlayerName, options: any = {}) {
     if (player === PlayerName.SpotifyWeb) {

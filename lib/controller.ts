@@ -19,6 +19,10 @@ export class MusicController {
             file: "get_state.{0}.applescript",
             requiresArgv: false
         },
+        checkPlayerRunningState: {
+            file: "check_state.{0}.applescript",
+            requiresArgv: false
+        },
         firstTrackState: {
             file: "get_first_track_state.{0}.applescript",
             requiresArgv: false
@@ -277,7 +281,7 @@ export class MusicController {
                 if (
                     result &&
                     result.error &&
-                    result.error.includes("Not authorized")
+                    result.error.toLowerCase().includes("not authorized")
                 ) {
                     // reset the apple events to show the request access again
                     // await musicUtil.execCmd("tccutil reset AppleEvents");
@@ -287,7 +291,7 @@ export class MusicController {
                     //     params,
                     //     argv
                     // );
-                    return "Desktop Player Access Not Authorized";
+                    return "[GRANT_ERROR] Desktop Player Access Not Authorized";
                 }
                 if (result === null || result === undefined || result === "") {
                     if (player === PlayerName.ItunesDesktop) {
@@ -359,6 +363,17 @@ export class MusicController {
             payload["uris"] = musicUtil.createUrisFromTrackIds(
                 options.track_ids
             );
+        }
+
+        if (options.context_uri) {
+            payload["context_uri"] = options.context_uri;
+        }
+
+        if (payload.context_uri && payload.uris) {
+            payload["offset"] = {
+                uri: payload.uris[0]
+            };
+            delete payload.uris;
         }
 
         return musicClient.spotifyApiPut(

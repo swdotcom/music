@@ -16,7 +16,8 @@ export enum TrackStatus {
     Playing = "playing",
     Paused = "paused",
     Advertisement = "advertisement",
-    NotAssigned = "notassigned"
+    NotAssigned = "notassigned",
+    GrantError = "granterror"
 }
 
 export enum CodyResponseType {
@@ -58,6 +59,7 @@ export class Track {
     volume: number = 0;
     state: TrackStatus = TrackStatus.NotAssigned;
     albumData: Album = new Album();
+    error: string = "";
 }
 
 export class Album {
