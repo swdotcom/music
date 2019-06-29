@@ -55,11 +55,6 @@ describe("itunes state tests", () => {
                         PlayerName.ItunesDesktop
                     );
                     expect(playerRunning).to.equal(true);
-                    // there may be a grant error
-                    if (!track.error) {
-                        expect(track.id).to.not.equal("");
-                        expect(track.playerType).to.not.equal(undefined);
-                    }
                     done();
                 });
             }

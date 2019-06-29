@@ -55,7 +55,7 @@ describe("itunes player tests", () => {
         );
     });
 
-    it("Get running track state", done => {
+    xit("Get running track state", done => {
         CodyMusic.getRunningTrack().then((track: Track) => {
             expect(track.id).to.not.equal("");
             done();

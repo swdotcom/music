@@ -65,7 +65,7 @@ describe("spotify playlist tests", () => {
         });
     });
 
-    it("return the tracks of a playlist", done => {
+    xit("return the tracks of a playlist", done => {
         CodyMusic.getPlaylists(PlayerName.SpotifyWeb).then(result => {
             let playlist_id = result[0].id;
             CodyMusic.getPlaylistTracks(

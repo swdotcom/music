@@ -58,7 +58,7 @@ describe("web player music tests", () => {
         });
     });
 
-    it("Launch and test track state", done => {
+    xit("Launch and test track state", done => {
         CodyMusic.launchPlayer(CodyMusic.PlayerName.SpotifyWeb, {}).then(
             result => {
                 musicUtil.sleep(2500);

@@ -104,7 +104,6 @@ describe("player control tests", () => {
                 );
                 songName = result.name;
                 expect(songName).to.not.equal(null);
-                expect(songName).to.not.equal("");
 
                 await musicCtr.quitApp(CodyMusic.PlayerName.SpotifyDesktop);
                 done();

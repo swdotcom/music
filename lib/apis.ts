@@ -124,7 +124,10 @@ export async function getRunningTrack(): Promise<Track> {
         // 1st try spotify web
         if (musicStore.spotifyApiEnabled) {
             spotifyWebTrack = await getTrack(PlayerName.SpotifyWeb);
+            // check if the spotify track is running (playing or paused)
             spotifyWebTrackRunning = musicUtil.isTrackRunning(spotifyWebTrack);
+
+            // if it's playing then return it
             if (
                 spotifyWebTrackRunning &&
                 spotifyWebTrack.state === TrackStatus.Playing
@@ -174,6 +177,7 @@ export async function getRunningTrack(): Promise<Track> {
                     }
                 }
 
+                // if itunes is not running, return the spotify web track we've gathered
                 const isItunesTrackRunning = musicUtil.isTrackRunning(track);
                 if (!isItunesTrackRunning) {
                     track = spotifyWebTrack;
