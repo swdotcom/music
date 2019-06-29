@@ -357,6 +357,23 @@ export function playTrackInContext(player: PlayerName, params: any[]) {
 }
 
 /**
+ * Quits/closes the mac Spotify or iTunes player
+ * @param player
+ */
+export function quitMacPlayer(player: PlayerName) {
+    return musicCtr.quitApp(player);
+}
+
+/**
+ * This is only meant for Mac iTunes or Mac Spotify desktop
+ * @param player
+ * @param params
+ */
+export async function playTrackInLibrary(player: PlayerName, params: any[]) {
+    return await musicCtr.run(player, "playSongFromLibrary", params);
+}
+
+/**
  * Initiate and play the specified Spotify device
  * @param device_id {string}
  */

@@ -125,4 +125,31 @@ describe("itunes player tests", () => {
             }
         );
     });
+
+    it("Play song in library", done => {
+        CodyMusic.getPlaylists(PlayerName.ItunesDesktop).then(
+            (result: PlaylistItem[]) => {
+                const playlistItem: PlaylistItem = result[0];
+                const playlistName = playlistItem.name;
+                CodyMusic.getPlaylistTracks(
+                    PlayerName.ItunesDesktop,
+                    playlistItem.id
+                ).then((result: CodyResponse) => {
+                    let pageItem: PaginationItem = result.data;
+                    let track: Track = pageItem.items[0];
+                    const trackName = track.name;
+                    console.log("playlist name: ", playlistName);
+                    CodyMusic.playTrackInLibrary(PlayerName.ItunesDesktop, [
+                        trackName,
+                        playlistName
+                    ]).then(result => {
+                        CodyMusic.getRunningTrack().then((result: Track) => {
+                            expect(result.name).to.equal(trackName);
+                            done();
+                        });
+                    });
+                });
+            }
+        );
+    });
 });

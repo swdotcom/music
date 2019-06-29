@@ -35,15 +35,15 @@ describe("itunes state tests", () => {
     });
 
     after("itunes player test completion", done => {
-        musicCtr
-            .quitApp(CodyMusic.PlayerName.SpotifyDesktop)
-            .then((result: any) => {
-                musicCtr
-                    .quitApp(CodyMusic.PlayerName.ItunesDesktop)
-                    .then((result: any) => {
-                        done();
-                    });
-            });
+        CodyMusic.quitMacPlayer(CodyMusic.PlayerName.SpotifyDesktop).then(
+            (result: any) => {
+                CodyMusic.quitMacPlayer(
+                    CodyMusic.PlayerName.ItunesDesktop
+                ).then((result: any) => {
+                    done();
+                });
+            }
+        );
     });
 
     it("Return itunes current track when itunes is the only app running", done => {

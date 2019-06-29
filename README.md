@@ -234,7 +234,22 @@ getPlaylistTracks(player: PlayerName,
  * itunes example   ["Let Me Down Slowly", "MostRecents"]
  *   -- provide the track name then the playlist name
  */
-playTrackInContext(player: PlayerName, params: any[])
+playTrackInContext(player: PlayerName, params: any[]);
+
+/**
+ * Quits/closes the mac Spotify or iTunes player
+ * @param player
+ */
+quitMacPlayer(player: PlayerName)
+
+/**
+ * Plays a specific track on the Spotify or iTunes desktop from a specified library
+ * @param player
+ * @param params
+ * itunes example   ["Let Me Down Slowly", "MostRecents"]
+ *   -- provide the track name then the playlist name
+ */
+playTrackInLibrary(player: PlayerName, params: any[])
 
 /**
  * Initiate and play the specified Spotify device
