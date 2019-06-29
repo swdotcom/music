@@ -118,19 +118,24 @@ export async function getRunningTrack(): Promise<Track> {
     const spotifyDevices = await getSpotifyDevices();
     let track = null;
     let spotifyWebTrack = null;
+    let spotifyWebTrackRunning = false;
 
     if (spotifyDevices.length > 0) {
         // 1st try spotify web
         if (musicStore.spotifyApiEnabled) {
             spotifyWebTrack = await getTrack(PlayerName.SpotifyWeb);
-            if (musicUtil.isTrackRunning(spotifyWebTrack)) {
+            spotifyWebTrackRunning = musicUtil.isTrackRunning(spotifyWebTrack);
+            if (
+                spotifyWebTrackRunning &&
+                spotifyWebTrack.state === TrackStatus.Playing
+            ) {
                 return spotifyWebTrack;
             }
         }
     }
 
     // spotify desktop try
-    if (musicStore.spotifyDesktopEnabled) {
+    if (!spotifyWebTrackRunning && musicStore.spotifyDesktopEnabled) {
         // next try spotify desktop
         const spotifyDesktopRunning = await isPlayerRunning(
             PlayerName.SpotifyDesktop
@@ -170,14 +175,8 @@ export async function getRunningTrack(): Promise<Track> {
                 }
 
                 const isItunesTrackRunning = musicUtil.isTrackRunning(track);
-
-                // default to spotify since we found devices and itunes isn't playing or paused
-                if (
-                    spotifyWebTrack &&
-                    spotifyWebTrack.id &&
-                    !isItunesTrackRunning
-                ) {
-                    return spotifyWebTrack;
+                if (!isItunesTrackRunning) {
+                    track = spotifyWebTrack;
                 }
             }
         }
