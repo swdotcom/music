@@ -1,5 +1,5 @@
 import { MusicStore } from "./store";
-import { PlayerName } from "./models";
+import { PlayerName, Track, TrackStatus } from "./models";
 
 const cp = require("child_process");
 
@@ -106,6 +106,19 @@ export class MusicUtil {
             }
         }
         return formatted;
+    }
+
+    isTrackRunning(track: Track) {
+        if (!track || !track.id) {
+            return false;
+        }
+        if (
+            track.state === TrackStatus.Paused ||
+            track.state === TrackStatus.Playing
+        ) {
+            return true;
+        }
+        return false;
     }
 
     createUrisFromTrackIds(track_ids: string[], useUriObj: boolean = false) {

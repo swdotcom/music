@@ -11,7 +11,8 @@ import {
     CodyResponse,
     CodyConfig,
     PaginationItem,
-    PlayerContext
+    PlayerContext,
+    TrackStatus
 } from "./models";
 import { MusicPlayerState } from "./playerstate";
 import { AudioStat } from "./audiostat";
@@ -107,6 +108,8 @@ export async function hasActiveTrack(): Promise<boolean> {
 /**
  * Returns the currently running track.
  * Spotify web, desktop, or itunes desktop.
+ * If it finds a spotify device but it's not playing, and mac iTunes is not playing
+ * or paused, then it will return the Spotify track.
  * It will return an empty Track object if it's unable to
  * find a running track.
  * @returns {Promise<Track>}
@@ -114,25 +117,29 @@ export async function hasActiveTrack(): Promise<boolean> {
 export async function getRunningTrack(): Promise<Track> {
     const spotifyDevices = await getSpotifyDevices();
     let track = null;
+    let spotifyWebTrack = null;
 
     if (spotifyDevices.length > 0) {
         // 1st try spotify web
         if (musicStore.spotifyApiEnabled) {
-            track = await getTrack(PlayerName.SpotifyWeb);
-        }
-    }
-    if (!track || !track.id) {
-        // spotify desktop try
-        if (musicStore.spotifyDesktopEnabled) {
-            // next try spotify desktop
-            const spotifyDesktopRunning = await isPlayerRunning(
-                PlayerName.SpotifyDesktop
-            );
-            if (spotifyDesktopRunning) {
-                track = await getTrack(PlayerName.SpotifyDesktop);
+            spotifyWebTrack = await getTrack(PlayerName.SpotifyWeb);
+            if (musicUtil.isTrackRunning(spotifyWebTrack)) {
+                return spotifyWebTrack;
             }
         }
     }
+
+    // spotify desktop try
+    if (musicStore.spotifyDesktopEnabled) {
+        // next try spotify desktop
+        const spotifyDesktopRunning = await isPlayerRunning(
+            PlayerName.SpotifyDesktop
+        );
+        if (spotifyDesktopRunning) {
+            track = await getTrack(PlayerName.SpotifyDesktop);
+        }
+    }
+
     if (!track || !track.id) {
         // itunes desktop try
         if (musicStore.itunesDesktopEnabled && musicStore.itunesAccessGranted) {
@@ -160,6 +167,17 @@ export async function getRunningTrack(): Promise<Track> {
                             //
                         }
                     }
+                }
+
+                const isItunesTrackRunning = musicUtil.isTrackRunning(track);
+
+                // default to spotify since we found devices and itunes isn't playing or paused
+                if (
+                    spotifyWebTrack &&
+                    spotifyWebTrack.id &&
+                    !isItunesTrackRunning
+                ) {
+                    return spotifyWebTrack;
                 }
             }
         }

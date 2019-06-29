@@ -200,6 +200,8 @@ getTrack(player: PlayerName): Promise<Track>
 /**
  * Returns the currently running track.
  * Spotify web, desktop, or itunes desktop.
+ * If it finds a spotify device but it's not playing, and mac iTunes is not playing
+ * or paused, then it will return the Spotify track.
  **/
 getRunningTrack(): Promise<Track>
 
