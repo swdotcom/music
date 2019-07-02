@@ -37,6 +37,10 @@ export class MusicController {
         },
         playTrackInContext:
             'tell application "{0}" to play track "{1}" {2} "{3}"',
+        playTrackNumberInPlaylist: {
+            file: "play_track_number_in_playlist.{0}.applescript",
+            requiresArgv: true
+        },
         play: 'tell application "{0}" to play',
         playFromLibrary: 'tell application "{0}" to play of playlist "{1}"',
         playSongFromLibrary:
@@ -178,7 +182,6 @@ export class MusicController {
             } else {
                 command = `osascript ${file}`;
             }
-            // script = fs.readFileSync(file).toString();
         } else {
             if (scriptName === "play" && player.toLowerCase() === "itunes") {
                 // if itunes is not currently running, default to play from the
@@ -214,6 +217,10 @@ export class MusicController {
             // apply the params to the one line script
             script = musicUtil.formatString(script, params);
             command = `osascript -e \'${script}\'`;
+
+            if (scriptName === "playTrackNumberInPlaylist") {
+                console.log("---- exeicute music command: ", command);
+            }
         }
 
         let result = await musicUtil.execCmd(command);

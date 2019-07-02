@@ -378,6 +378,25 @@ export function playTrackInContext(player: PlayerName, params: any[]) {
 }
 
 /**
+ * Mac iTunes only
+ * This will allow you to play a playlist starting at a specific playlist track number.
+ */
+export function playItunesTrackNumberInPlaylist(
+    playlistName: string,
+    trackNumber: number
+) {
+    console.log("running playItunesTrackNumberInPlaylist");
+    const emptyParams: any = [];
+    const scriptArgs: any = [playlistName, trackNumber];
+    return musicCtr.run(
+        PlayerName.ItunesDesktop,
+        "playTrackNumberInPlaylist",
+        emptyParams,
+        scriptArgs
+    );
+}
+
+/**
  * Quits/closes the mac Spotify or iTunes player
  * @param player
  */

@@ -62,7 +62,7 @@ describe("itunes player tests", () => {
         });
     });
 
-    it("Get running track with only iTunes running", done => {
+    xit("Get running track with only iTunes running", done => {
         CodyMusic.play(CodyMusic.PlayerName.ItunesDesktop).then(result => {
             musicUtil.sleep(3000);
             CodyMusic.getRunningTrack().then(track => {
@@ -72,7 +72,7 @@ describe("itunes player tests", () => {
         });
     });
 
-    it("Get itunes playlists", done => {
+    xit("Get itunes playlists", done => {
         CodyMusic.getPlaylists(PlayerName.ItunesDesktop).then(
             (result: PlaylistItem[]) => {
                 expect(result.length).to.not.equal(0);
@@ -83,7 +83,7 @@ describe("itunes player tests", () => {
         );
     });
 
-    it("Get itunes playlists tracks", done => {
+    xit("Get itunes playlists tracks", done => {
         CodyMusic.getPlaylists(PlayerName.ItunesDesktop).then(
             (result: PlaylistItem[]) => {
                 expect(result.length).to.not.equal(0);
@@ -100,7 +100,7 @@ describe("itunes player tests", () => {
         );
     });
 
-    it("Play track in context", done => {
+    xit("Play track in context", done => {
         CodyMusic.getPlaylists(PlayerName.ItunesDesktop).then(
             (result: PlaylistItem[]) => {
                 const playlistItem: PlaylistItem = result[0];
@@ -126,7 +126,7 @@ describe("itunes player tests", () => {
         );
     });
 
-    it("Play song in library", done => {
+    xit("Play song in library", done => {
         CodyMusic.getPlaylists(PlayerName.ItunesDesktop).then(
             (result: PlaylistItem[]) => {
                 const playlistItem: PlaylistItem = result[0];
@@ -138,7 +138,6 @@ describe("itunes player tests", () => {
                     let pageItem: PaginationItem = result.data;
                     let track: Track = pageItem.items[0];
                     const trackName = track.name;
-                    console.log("playlist name: ", playlistName);
                     CodyMusic.playTrackInLibrary(PlayerName.ItunesDesktop, [
                         trackName,
                         playlistName
@@ -149,6 +148,15 @@ describe("itunes player tests", () => {
                         });
                     });
                 });
+            }
+        );
+    });
+
+    it("Play track number in playlist", done => {
+        CodyMusic.playItunesTrackNumberInPlaylist("MostRecents", 7).then(
+            result => {
+                console.log("result: ", result);
+                done();
             }
         );
     });

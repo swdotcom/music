@@ -214,6 +214,12 @@ getTracksByPlaylistName(player: PlayerName,
     playListName: string): Promise<PlaylistItem[]>
 
 /**
+ * Mac iTunes only
+ * This will allow you to play a playlist starting at a specific playlist track number.
+ */
+playItunesTrackNumberInPlaylist(playlistName: string,trackNumber: number)
+
+/**
  * Returns the tracks that are found by the given playlist name
  * CodyResponse.data will contain <PaginationItem>
  *  - PaginationItem contains
