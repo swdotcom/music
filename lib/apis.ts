@@ -631,6 +631,7 @@ export async function getPlaylists(
                                 // {name, count}
                                 let item = JSON.parse(resultItem.trim());
                                 let playlistItem: PlaylistItem = new PlaylistItem();
+                                playlistItem.type = "playlist";
                                 playlistItem.public = true;
                                 playlistItem.name = item.name;
                                 playlistItem.id = item.name;

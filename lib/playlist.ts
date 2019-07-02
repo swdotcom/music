@@ -62,6 +62,7 @@ export class Playlist {
                 // ensure the playerType is set
                 playlists.map((playlist: PlaylistItem) => {
                     playlist.playerType = PlayerType.WebSpotify;
+                    playlist.type = "playlist";
                 });
             }
         }
