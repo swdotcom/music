@@ -217,10 +217,6 @@ export class MusicController {
             // apply the params to the one line script
             script = musicUtil.formatString(script, params);
             command = `osascript -e \'${script}\'`;
-
-            if (scriptName === "playTrackNumberInPlaylist") {
-                console.log("---- exeicute music command: ", command);
-            }
         }
 
         let result = await musicUtil.execCmd(command);
@@ -332,10 +328,6 @@ export class MusicController {
                 return result;
             })
             .catch(err => {
-                // console.log(
-                //     "Error updating itunes track loved status, error: ",
-                //     err.message
-                // );
                 return false;
             });
     }

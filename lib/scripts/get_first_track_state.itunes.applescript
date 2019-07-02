@@ -23,5 +23,6 @@ tell application "iTunes"
 	set t_info to t_info & ",\"state\":\"" & player state & "\""
 	set t_info to t_info & ",\"volume\": " & sound volume
 	set t_info to t_info & ",\"loved\": " & loved of trk
+	set t_info to t_info & ",\"popularity\": " & rating of trk
 	set t_info to t_info & "}"
 end tell

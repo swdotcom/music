@@ -223,12 +223,13 @@ export async function getSpotifyPlayerContext(): Promise<PlayerContext> {
  * @returns {artist, album, genre, disc_number, duration, played_count, track_number, id, name, state}
  */
 export async function getTrack(player: PlayerName): Promise<Track> {
-    let track;
+    let track: any;
     if (player === PlayerName.SpotifyWeb) {
         // fetch the web track
         track = await musicPlayerCtr.getSpotifyWebCurrentTrack();
     } else {
-        // fetch the track from the specified player name
+        // get the string representation of the track.
+        // fetch the track from the specified player name.
         track = await musicCtr.run(player, "state");
         if (track) {
             try {
@@ -385,7 +386,6 @@ export function playItunesTrackNumberInPlaylist(
     playlistName: string,
     trackNumber: number
 ) {
-    console.log("running playItunesTrackNumberInPlaylist");
     const emptyParams: any = [];
     const scriptArgs: any = [playlistName, trackNumber];
     return musicCtr.run(

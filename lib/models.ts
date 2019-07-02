@@ -139,13 +139,17 @@ export class PlaylistItem {
     collaborative: boolean = false;
     public: boolean = true;
     tracks: PlaylistTrackInfo = new PlaylistTrackInfo();
-    type: string = "playlist";
+    type: string = "";
     playerType: PlayerType = PlayerType.NotAssigned;
     tag: string = "";
     tooltip: string = "";
     state: TrackStatus = TrackStatus.NotAssigned;
     artists: string = "";
     command: string = "";
+    position: number = 0;
+    loved: boolean = false;
+    played_count: number = 0;
+    popularity: number = 0;
 }
 
 export class CodyConfig {
