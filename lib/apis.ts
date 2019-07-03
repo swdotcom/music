@@ -182,6 +182,8 @@ export async function getRunningTrack(): Promise<Track> {
                 if (!isItunesTrackRunning) {
                     track = spotifyWebTrack;
                 }
+            } else if (spotifyWebTrack) {
+                track = spotifyWebTrack;
             }
         }
     }
