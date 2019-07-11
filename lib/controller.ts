@@ -348,7 +348,7 @@ export class MusicController {
             device_ids: [device_id],
             play
         };
-        return musicClient.spotifyApiPut("v1/me/player", {}, payload);
+        return musicClient.spotifyApiPut("/v1/me/player", {}, payload);
     }
 
     public async spotifyWebPlay(options: any) {

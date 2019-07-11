@@ -1,4 +1,4 @@
-import { MusicClient } from "./client";
+import { MusicClient, SPOTIFY_ROOT_API } from "./client";
 import {
     CodyResponse,
     CodyResponseType,
@@ -29,6 +29,63 @@ export class Playlist {
         return Playlist.instance;
     }
 
+    async getSavedTracks(qsOptions: any = {}) {
+        let tracks: Track[] = [];
+
+        if (!qsOptions.limit) {
+            qsOptions["limit"] = 50;
+        } else if (qsOptions.limit < 1) {
+            qsOptions.limit = 1;
+        }
+        if (!qsOptions.offset) {
+            qsOptions["offset"] = 0;
+        }
+
+        console.log("qsoptions: ", qsOptions);
+
+        const api = `/v1/me/tracks`;
+        let codyResp: CodyResponse = await musicClient.spotifyApiGet(
+            api,
+            qsOptions
+        );
+
+        // check if the token needs to be refreshed
+        if (codyResp.statusText === "EXPIRED") {
+            // refresh the token
+            await musicClient.refreshSpotifyToken();
+            // try again
+            codyResp = await musicClient.spotifyApiGet(api, qsOptions);
+        }
+
+        while (true) {
+            if (codyResp && codyResp.data && codyResp.data.items) {
+                let trackContainers: any[] = codyResp.data.items;
+
+                // ensure the playerType is set
+                trackContainers.forEach((item: any) => {
+                    if (item.track) {
+                        const track: Track = this.buildTrack(item.track);
+                        tracks.push(track);
+                    }
+                });
+
+                if (codyResp.data.next) {
+                    // fetch the next set (remove the root)
+                    let nextApi = codyResp.data.next.substring(
+                        SPOTIFY_ROOT_API.length
+                    );
+                    codyResp = await musicClient.spotifyApiGet(nextApi, {});
+                } else {
+                    break;
+                }
+            } else {
+                break;
+            }
+        }
+
+        return tracks;
+    }
+
     async getPlaylists(qsOptions: any = {}): Promise<PlaylistItem[]> {
         let playlists: PlaylistItem[] = [];
         if (!musicStore.spotifyUserId) {
@@ -55,7 +112,7 @@ export class Playlist {
                 // refresh the token
                 await musicClient.refreshSpotifyToken();
                 // try again
-                codyResp = await musicClient.spotifyApiGet(api, {});
+                codyResp = await musicClient.spotifyApiGet(api, qsOptions);
             }
             if (codyResp && codyResp.data && codyResp.data.items) {
                 playlists = codyResp.data.items;
@@ -72,6 +129,7 @@ export class Playlist {
 
     async getPlaylistTracks(playlist_id: string, qsOptions: any = {}) {
         if (!qsOptions.limit) {
+            // maximum is 100 at a time
             qsOptions["limit"] = 100;
         } else if (qsOptions.limit < 1) {
             qsOptions.limit = 1;
@@ -96,55 +154,38 @@ export class Playlist {
             codyResp = await musicClient.spotifyApiPost(api, qsOptions);
         }
 
-        // get the artists
-        if (
-            codyResp.state === CodyResponseType.Success &&
-            codyResp.data.items
-        ) {
-            const paginationItem: PaginationItem = new PaginationItem();
-            paginationItem.offset = codyResp.data.offset;
-            paginationItem.next = codyResp.data.next;
-            paginationItem.previous = codyResp.data.previous;
-            paginationItem.limit = codyResp.data.limit;
-            paginationItem.total = codyResp.data.total;
+        const paginationItem: PaginationItem = new PaginationItem();
+        let tracks: Track[] = [];
+        while (true) {
+            if (codyResp && codyResp.data && codyResp.data.items) {
+                let trackContainers: any[] = codyResp.data.items;
 
-            let tracks: Track[] = [];
-
-            codyResp.data.items.forEach((item: any) => {
-                if (item.track) {
-                    // create a Track
-                    let track: Track = new Track();
-                    track.artists = item.track.artists.map((artist: any) => {
-                        return artist.name;
-                    });
-                    if (track.artist) {
-                        track.artist = track.artists.join(", ");
+                // ensure the playerType is set
+                trackContainers.forEach((item: any) => {
+                    if (item.track) {
+                        const track: Track = this.buildTrack(item.track);
+                        tracks.push(track);
                     }
-                    track.id = item.track.id;
-                    track.name = item.track.name;
-                    track.uri = item.track.uri;
-                    track.href = item.track.href;
-                    track.explicit = item.track.explicit;
-                    track.type = "track";
-                    track.playerType = PlayerType.WebSpotify;
+                });
 
-                    // get the album info
-                    let albumData: Album = new Album();
-                    albumData.id = item.track.album.id;
-                    albumData.name = item.track.album.name;
-                    track.albumData = albumData;
-                    track.album = albumData.name;
-
-                    tracks.push(track);
+                if (codyResp.data.next) {
+                    // fetch the next set (remove the root)
+                    let nextApi = codyResp.data.next.substring(
+                        SPOTIFY_ROOT_API.length
+                    );
+                    codyResp = await musicClient.spotifyApiGet(nextApi, {});
+                } else {
+                    break;
                 }
-            });
-
-            paginationItem.items = tracks;
-            // delete the old type of data
-            delete codyResp.data;
-            // update with the pagination item info
-            codyResp["data"] = paginationItem;
+            } else {
+                break;
+            }
         }
+
+        delete codyResp.data;
+        paginationItem.items = tracks;
+        paginationItem.total = tracks.length;
+        codyResp["data"] = paginationItem;
 
         return codyResp;
     }
@@ -329,5 +370,39 @@ export class Playlist {
         }
 
         return codyResp;
+    }
+
+    buildTrack(spotifyTrack: any) {
+        let artists: string[] = [];
+        if (spotifyTrack.artists) {
+            artists = spotifyTrack.artists.map((artist: any) => {
+                return artist.name;
+            });
+        }
+
+        let track: Track = new Track();
+        track.playerType = PlayerType.WebSpotify;
+        track.type = spotifyTrack.type;
+        track.artist = artists.join(", ");
+        track.artists = artists;
+        track.uri = spotifyTrack.uri;
+        track.id = spotifyTrack.id;
+        track.name = spotifyTrack.name;
+        track.popularity = spotifyTrack.popularity;
+        track.duration_ms = spotifyTrack.duration_ms;
+        track.duration = spotifyTrack.duration_ms;
+        track.disc_number = spotifyTrack.disc_number;
+        track.explicit = spotifyTrack.explicit;
+        track.href = spotifyTrack.href;
+
+        // get the album info
+        if (spotifyTrack.album) {
+            let albumData: Album = new Album();
+            albumData.id = spotifyTrack.album.id;
+            albumData.name = spotifyTrack.album.name;
+            track.albumData = albumData;
+            track.album = albumData.name;
+        }
+        return track;
     }
 }

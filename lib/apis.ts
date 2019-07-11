@@ -336,6 +336,17 @@ export async function getTracksByPlaylistName(
     return playlistItems;
 }
 
+export async function getSavedTracks(
+    player: PlayerName,
+    qsOptions: any = {}
+): Promise<Track[]> {
+    let tracks: Track[] = [];
+    if (player === PlayerName.SpotifyWeb) {
+        tracks = await playlist.getSavedTracks(qsOptions);
+    }
+    return tracks;
+}
+
 /**
  * Returns the tracks that are found by the given playlist name
  * - currently spofity-web support only

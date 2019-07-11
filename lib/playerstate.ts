@@ -202,7 +202,7 @@ export class MusicPlayerState {
     }
 
     async getSpotifyRecentlyPlayedTracks(limit: number): Promise<Track[]> {
-        let api = "v1/me/player/recently-played";
+        let api = "/v1/me/player/recently-played";
         if (limit) {
             api += `?limit=${limit}`;
         }

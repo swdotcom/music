@@ -4,9 +4,10 @@ import { CodyResponse, CodyResponseType } from "./models";
 const querystring = require("querystring");
 
 const musicStore = MusicStore.getInstance();
+export const SPOTIFY_ROOT_API = "https://api.spotify.com";
 
 const spotifyClient: AxiosInstance = axios.create({
-    baseURL: "https://api.spotify.com"
+    baseURL: SPOTIFY_ROOT_API
 });
 const spotifyAccountClient: AxiosInstance = axios.create({
     baseURL: "https://accounts.spotify.com",
