@@ -170,6 +170,7 @@ export class MusicUtil {
             delete track.artists;
             track.artists = artists;
             track["artist"] = artistNames.join(", ");
+            track["artist_names"] = artistNames;
         }
     }
 

@@ -382,6 +382,7 @@ export class Playlist {
         track.playerType = PlayerType.WebSpotify;
         track.type = spotifyTrack.type;
         track.artist = artists.join(", ");
+        track.artist_names = artists;
         track.artists = spotifyTrack.artists;
         track.uri = spotifyTrack.uri;
         track.id = spotifyTrack.id;

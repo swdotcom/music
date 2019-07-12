@@ -37,6 +37,7 @@ export class CodyResponse {
 // {artist, album, genre, disc_number, duration, played_count, track_number, id, name, state}
 export class Track {
     artist: string = "";
+    artist_names: string[] = [];
     album: string = "";
     genre: string = "";
     disc_number: number = 0;
