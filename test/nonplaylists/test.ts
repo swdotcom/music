@@ -1,11 +1,10 @@
 const expect = require("chai").expect;
 import * as CodyMusic from "../../index";
 import { TestUtil } from "../util";
-import { PlayerName, PlaylistItem, Track, Album } from "../../lib/models";
-import { UserProfile, SpotifyUser } from "../../lib/profile";
+import { PlayerName, Track, PlayerDevice, TrackStatus } from "../../lib/models";
+import { MusicUtil } from "../../lib/util";
 
-const userProfile = UserProfile.getInstance();
-
+const musicUtil = new MusicUtil();
 const testUtil = new TestUtil();
 
 /**
@@ -31,21 +30,57 @@ describe("spotify nonplaylist tests", () => {
     });
 
     after("clean up spotify nonplaylist testing", done => {
-        done();
+        CodyMusic.getSpotifyDevices().then(async (response: any) => {
+            if (response && response.length > 0) {
+                // get the 1st device id
+                const device_id = response[0].id;
+                const options = {
+                    device_id
+                };
+                response = await CodyMusic.pause(
+                    CodyMusic.PlayerName.SpotifyWeb,
+                    options
+                );
+                done();
+            } else {
+                done();
+            }
+        });
     });
 
     it("return songs not in a playlist", done => {
-        CodyMusic.getSavedTracks(PlayerName.SpotifyWeb, { limit: 50 })
-            .then(result => {
-                expect(result.length).to.not.equal(0);
-                done();
-            })
-            .catch(err => {
-                console.log("error getting saved tracks: ", err.message);
-            });
+        CodyMusic.getSpotifyDevices().then(devices => {
+            CodyMusic.getSavedTracks(PlayerName.SpotifyWeb, { limit: 50 })
+                .then(result => {
+                    expect(result.length).to.not.equal(0);
+                    if (devices && devices.length > 0) {
+                        const track: Track = result[0];
+                        const track_id = track.uri;
+                        const device: PlayerDevice = devices[0];
+                        const options = {
+                            device_id: device.id,
+                            track_ids: [track_id]
+                        };
+                        // play this track
+                        CodyMusic.play(
+                            CodyMusic.PlayerName.SpotifyWeb,
+                            options
+                        ).then(result => {
+                            musicUtil.sleep(3000);
+                            expect(result.status).to.equal(204);
+                            done();
+                        });
+                    } else {
+                        done();
+                    }
+                })
+                .catch(err => {
+                    console.log("error getting saved tracks: ", err.message);
+                });
+        });
     });
 
-    it("return the tracks of a playlist", done => {
+    xit("return the tracks of a playlist", done => {
         CodyMusic.getPlaylists(PlayerName.SpotifyWeb).then(result => {
             let playlist_id = result[0].id;
             CodyMusic.getPlaylistTracks(
@@ -58,8 +93,7 @@ describe("spotify nonplaylist tests", () => {
         });
     });
 
-    it("return a spotify track by id", done => {
-        // spotify:track:4iVVU8DyQvOVsKafv3KWIF
+    xit("return a spotify track by id", done => {
         CodyMusic.getSpotifyTrackById(
             "spotify:track:4iVVU8DyQvOVsKafv3KWIF",
             true
