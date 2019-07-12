@@ -22,6 +22,8 @@ try
 		set t_info to t_info & ",\"state\":\"" & player state & "\""
 		set t_info to t_info & ",\"volume\": " & sound volume
 		set t_info to t_info & ",\"popularity\": " & current track's popularity
+		set t_info to t_info & ",\"artwork_url\": \"" & current track's artwork url & "\""
+		set t_info to t_info & ",\"spotify_url\": \"" & current track's spotify url & "\""
 		set t_info to t_info & "}"
 	end tell
 on error

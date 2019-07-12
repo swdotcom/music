@@ -157,10 +157,17 @@ export class MusicUtil {
         if (track["artists"]) {
             const len = track["artists"].length;
             let artistNames = [];
+            let artists = [];
             for (let y = 0; y < len; y++) {
                 const artist = track["artists"][y];
                 artistNames.push(artist.name);
+                artists.push({
+                    name: artist.name,
+                    uri: artist.uri
+                });
             }
+            delete track.artists;
+            track.artists = artists;
             track["artist"] = artistNames.join(", ");
         }
     }

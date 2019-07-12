@@ -154,6 +154,48 @@ export class MusicPlayerState {
         return trackInfo;
     }
 
+    async getSpotifyTrackById(id: string): Promise<Track> {
+        // GET https://api.spotify.com/v1/tracks/{id}
+        id = musicUtil.createSpotifyIdFromUri(id);
+        let track: Track = new Track();
+        let api = `/v1/tracks/${id}`;
+
+        let response = await musicClient.spotifyApiGet(api);
+
+        // check if the token needs to be refreshed
+        if (response.statusText === "EXPIRED") {
+            // refresh the token
+            await musicClient.refreshSpotifyToken();
+            // try again
+            response = await musicClient.spotifyApiGet(api);
+        }
+
+        if (response && response.data && response.data) {
+            let spotifyTrack = response.data;
+            if (spotifyTrack) {
+                if (spotifyTrack.album) {
+                    delete spotifyTrack.album.available_markets;
+                }
+                if (spotifyTrack.available_markets) {
+                    delete spotifyTrack.available_markets;
+                }
+
+                musicUtil.extractAristFromSpotifyTrack(spotifyTrack);
+                track = { ...spotifyTrack };
+            }
+
+            // override "type" with "spotify"
+            track.type = "spotify";
+            if (track.duration_ms) {
+                track.duration = track.duration_ms;
+            }
+
+            track.playerType = PlayerType.WebSpotify;
+        }
+
+        return track;
+    }
+
     async getSpotifyWebCurrentTrack(): Promise<Track> {
         let track: Track = new Track();
 

@@ -218,6 +218,14 @@ export async function getSpotifyPlayerContext(): Promise<PlayerContext> {
 }
 
 /**
+ * Returns a track by the given spotify track id
+ * @param id
+ */
+export async function getSpotifyTrackById(id: string): Promise<Track> {
+    return musicPlayerCtr.getSpotifyTrackById(id);
+}
+
+/**
  * Returns the track of a given player {spotify|spotify-web|itunes}
  * - Spotify does not return a "genre"
  * - duration is in milliseconds
@@ -336,6 +344,11 @@ export async function getTracksByPlaylistName(
     return playlistItems;
 }
 
+/**
+ * Currently only returns Spotify Web tracks not associated with a playlist.
+ * @param player
+ * @param qsOptions
+ */
 export async function getSavedTracks(
     player: PlayerName,
     qsOptions: any = {}

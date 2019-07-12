@@ -41,8 +41,6 @@ export class Playlist {
             qsOptions["offset"] = 0;
         }
 
-        console.log("qsoptions: ", qsOptions);
-
         const api = `/v1/me/tracks`;
         let codyResp: CodyResponse = await musicClient.spotifyApiGet(
             api,

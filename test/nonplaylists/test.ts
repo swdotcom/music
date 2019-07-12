@@ -1,7 +1,7 @@
 const expect = require("chai").expect;
 import * as CodyMusic from "../../index";
 import { TestUtil } from "../util";
-import { PlayerName, PlaylistItem } from "../../lib/models";
+import { PlayerName, PlaylistItem, Track } from "../../lib/models";
 import { UserProfile, SpotifyUser } from "../../lib/profile";
 
 const userProfile = UserProfile.getInstance();
@@ -55,6 +55,16 @@ describe("spotify nonplaylist tests", () => {
                 expect(result.data.items.length).to.not.equal(0);
                 done();
             });
+        });
+    });
+
+    it("return a spotify track by id", done => {
+        // spotify:track:4iVVU8DyQvOVsKafv3KWIF
+        CodyMusic.getSpotifyTrackById(
+            "spotify:track:4iVVU8DyQvOVsKafv3KWIF"
+        ).then((track: Track) => {
+            expect(track.uri).to.equal("spotify:track:4iVVU8DyQvOVsKafv3KWIF");
+            done();
         });
     });
 });
