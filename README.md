@@ -198,6 +198,13 @@ hasActiveTrack(): Promise<boolean>
 getTrack(player: PlayerName): Promise<Track>
 
 /**
+ * Returns a track by the given spotify track id
+ * @param id (this can be the track uri or track id)
+ * @param includeFullArtistData (optional - if true it will return full artist info)
+ */
+getSpotifyTrackById(id: string, includeFullArtistData: boolean): Promise<Track>
+
+/**
  * Returns the currently running track.
  * Spotify web, desktop, or itunes desktop.
  * If it finds a spotify device but it's not playing, and mac iTunes is not playing

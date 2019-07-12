@@ -163,7 +163,8 @@ export class MusicUtil {
                 artistNames.push(artist.name);
                 artists.push({
                     name: artist.name,
-                    uri: artist.uri
+                    uri: artist.uri,
+                    id: artist.id
                 });
             }
             delete track.artists;

@@ -1,7 +1,7 @@
 const expect = require("chai").expect;
 import * as CodyMusic from "../../index";
 import { TestUtil } from "../util";
-import { PlayerName, PlaylistItem, Track } from "../../lib/models";
+import { PlayerName, PlaylistItem, Track, Album } from "../../lib/models";
 import { UserProfile, SpotifyUser } from "../../lib/profile";
 
 const userProfile = UserProfile.getInstance();
@@ -61,10 +61,21 @@ describe("spotify nonplaylist tests", () => {
     it("return a spotify track by id", done => {
         // spotify:track:4iVVU8DyQvOVsKafv3KWIF
         CodyMusic.getSpotifyTrackById(
-            "spotify:track:4iVVU8DyQvOVsKafv3KWIF"
-        ).then((track: Track) => {
-            expect(track.uri).to.equal("spotify:track:4iVVU8DyQvOVsKafv3KWIF");
-            done();
-        });
+            "spotify:track:4iVVU8DyQvOVsKafv3KWIF",
+            true
+        )
+            .then((track: Track) => {
+                expect(track.uri).to.equal(
+                    "spotify:track:4iVVU8DyQvOVsKafv3KWIF"
+                );
+                done();
+            })
+            .catch(err => {
+                console.log(
+                    "failed to return a spotify track by id, error: ",
+                    err.message
+                );
+                done();
+            });
     });
 });

@@ -7,7 +7,8 @@ import {
     Track,
     PlayerType,
     PlayerContext,
-    TrackStatus
+    TrackStatus,
+    Artist
 } from "./models";
 
 const musicStore = MusicStore.getInstance();
@@ -154,10 +155,12 @@ export class MusicPlayerState {
         return trackInfo;
     }
 
-    async getSpotifyTrackById(id: string): Promise<Track> {
-        // GET https://api.spotify.com/v1/tracks/{id}
+    async getSpotifyTrackById(
+        id: string,
+        includeArtistData: boolean = false
+    ): Promise<Track> {
         id = musicUtil.createSpotifyIdFromUri(id);
-        let track: Track = new Track();
+        let track: Track;
         let api = `/v1/tracks/${id}`;
 
         let response = await musicClient.spotifyApiGet(api);
@@ -170,34 +173,60 @@ export class MusicPlayerState {
             response = await musicClient.spotifyApiGet(api);
         }
 
-        if (response && response.data && response.data) {
-            let spotifyTrack = response.data;
-            if (spotifyTrack) {
-                if (spotifyTrack.album) {
-                    delete spotifyTrack.album.available_markets;
+        if (response && response.data) {
+            track = this.copySpotifyTrackToCodyTrack(response.data);
+
+            if (includeArtistData && track.artists) {
+                let artists: Artist[] = [];
+
+                for (let i = 0; i < track.artists.length; i++) {
+                    const artist = track.artists[i];
+                    const artistData: Artist = await this.getSpotifyArtistById(
+                        artist.id
+                    );
+                    artists.push(artistData);
                 }
-                if (spotifyTrack.available_markets) {
-                    delete spotifyTrack.available_markets;
+                if (artists.length > 0) {
+                    track.artists = artists;
                 }
-
-                musicUtil.extractAristFromSpotifyTrack(spotifyTrack);
-                track = { ...spotifyTrack };
             }
-
-            // override "type" with "spotify"
-            track.type = "spotify";
-            if (track.duration_ms) {
-                track.duration = track.duration_ms;
-            }
-
-            track.playerType = PlayerType.WebSpotify;
+        } else {
+            track = new Track();
         }
 
         return track;
     }
 
+    async getSpotifyArtistById(id: string): Promise<Artist> {
+        let artist: Artist;
+
+        id = musicUtil.createSpotifyIdFromUri(id);
+        let api = `/v1/artists/${id}`;
+
+        let response = await musicClient.spotifyApiGet(api);
+
+        // check if the token needs to be refreshed
+        if (response.statusText === "EXPIRED") {
+            // refresh the token
+            await musicClient.refreshSpotifyToken();
+            // try again
+            response = await musicClient.spotifyApiGet(api);
+        }
+
+        if (response && response.data) {
+            const artistData = response.data;
+            // delete external_urls
+            delete artistData.external_urls;
+            artist = artistData;
+        } else {
+            artist = new Artist();
+        }
+
+        return artist;
+    }
+
     async getSpotifyWebCurrentTrack(): Promise<Track> {
-        let track: Track = new Track();
+        let track: Track;
 
         let api = "/v1/me/player/currently-playing";
         let response = await musicClient.spotifyApiGet(api);
@@ -211,15 +240,9 @@ export class MusicPlayerState {
         }
 
         if (response && response.data && response.data.item) {
-            track = response.data.item;
-            // override "type" with "spotify"
-            track.type = "spotify";
-            if (track.duration_ms) {
-                track.duration = track.duration_ms;
-            }
-            musicUtil.extractAristFromSpotifyTrack(track);
-
-            track.playerType = PlayerType.WebSpotify;
+            track = this.copySpotifyTrackToCodyTrack(response.data.item);
+        } else {
+            track = new Track();
         }
 
         // initialize it with not assigned
@@ -260,7 +283,10 @@ export class MusicPlayerState {
         let tracks: Track[] = [];
         if (response && response.data && response.data.items) {
             for (let i = 0; i < response.data.items.length; i++) {
-                let track: Track = response.data.items[i].track;
+                let spotifyTrack = response.data.items[i].track;
+                const track: Track = this.copySpotifyTrackToCodyTrack(
+                    spotifyTrack
+                );
                 tracks.push(track);
             }
         }
@@ -284,6 +310,7 @@ export class MusicPlayerState {
         if (response && response.data && response.data.item) {
             // override "type" with "spotify"
             response.data.item["type"] = "spotify";
+            response.data.item["playerType"] = PlayerType.WebSpotify;
             musicUtil.extractAristFromSpotifyTrack(response.data.item);
             playerContext = response.data;
         }
@@ -310,5 +337,43 @@ export class MusicPlayerState {
             );
         }
         return musicUtil.launchWebUrl("https://open.spotify.com/browse");
+    }
+
+    copySpotifyTrackToCodyTrack(spotifyTrack: any): Track {
+        let track: Track;
+        if (spotifyTrack) {
+            // delete some attributes that are currently not needed
+            if (spotifyTrack.album) {
+                delete spotifyTrack.album.available_markets;
+                delete spotifyTrack.album.external_urls;
+            }
+            if (spotifyTrack.available_markets) {
+                delete spotifyTrack.available_markets;
+            }
+
+            if (spotifyTrack.external_urls) {
+                delete spotifyTrack.external_urls;
+            }
+
+            if (spotifyTrack.external_ids) {
+                delete spotifyTrack.external_ids;
+            }
+
+            // pull out the artist info into a more readable set of attributes
+            musicUtil.extractAristFromSpotifyTrack(spotifyTrack);
+
+            track = spotifyTrack;
+
+            if (spotifyTrack.duration_ms) {
+                track.duration = spotifyTrack.duration_ms;
+            }
+        } else {
+            track = new Track();
+        }
+
+        track.type = "spotify";
+        track.playerType = PlayerType.WebSpotify;
+
+        return track;
     }
 }

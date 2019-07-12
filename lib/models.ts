@@ -53,13 +53,23 @@ export class Track {
     href: string = "";
     // "spotify", "itunes"
     type: string = "";
-    artists: string[] = [];
+    artists: Artist[] = [];
     playerType: PlayerType = PlayerType.NotAssigned;
     loved: boolean = false;
     volume: number = 0;
     state: TrackStatus = TrackStatus.NotAssigned;
     albumData: Album = new Album();
     error: string = "";
+}
+
+export class Artist {
+    followers: any = {};
+    genres: string[] = [];
+    id: string = "";
+    uri: string = "";
+    name: string = "";
+    images: any[] = [];
+    popularity: number = 0;
 }
 
 export class Album {

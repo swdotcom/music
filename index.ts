@@ -3,6 +3,7 @@
 export * from "./lib/apis";
 export {
     Album,
+    Artist,
     CodyResponse,
     CodyResponseType,
     PlayerName,

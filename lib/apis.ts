@@ -220,9 +220,13 @@ export async function getSpotifyPlayerContext(): Promise<PlayerContext> {
 /**
  * Returns a track by the given spotify track id
  * @param id
+ * @param includeFullArtistData (optional - if true it will return full artist info)
  */
-export async function getSpotifyTrackById(id: string): Promise<Track> {
-    return musicPlayerCtr.getSpotifyTrackById(id);
+export async function getSpotifyTrackById(
+    id: string,
+    includeFullArtistData: boolean = false
+): Promise<Track> {
+    return musicPlayerCtr.getSpotifyTrackById(id, includeFullArtistData);
 }
 
 /**
