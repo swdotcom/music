@@ -39,6 +39,34 @@ export function setConfig(config: CodyConfig) {
 }
 
 /**
+ * Valid types are: album, artist, playlist, and track
+ * keywords: send the keywords to search against.
+ * Use specific filter name if you want to search against certain
+ * fields.
+ * Example searchTracks("track:what a time artist:tom")
+ *
+ * @param string
+ * @param limit (min of 1 and a max of 50)
+ */
+export function searchTracks(keywords: string, limit: number = 50) {
+    return playlist.search("track", keywords, limit);
+}
+
+/**
+ * Valid types are: album, artist, playlist, and track
+ * keywords: send the keywords to search against.
+ * Use specific filter name if you want to search against certain
+ * fields.
+ * Example searchTracks("track:what a time artist:tom")
+ *
+ * @param string
+ * @param limit (min of 1 and a max of 50)
+ */
+export function searchArtists(keywords: string, limit: number = 50) {
+    return playlist.search("artist", keywords, limit);
+}
+
+/**
  * Returns true if the user has granted Mac OS access for iTunes control
  */
 export function isItunesAccessGranted() {

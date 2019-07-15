@@ -254,6 +254,66 @@ export class Playlist {
     }
 
     /**
+     * type: Valid types are: album , artist, playlist, and track
+     * q: can have a filter and keywords, or just keywords. You
+     * can have a wildcard as well. The query will search against
+     * the name and description if a specific filter isn't specified.
+     * examples:
+     * 1) search for a track by name "what a time to be alive"
+     *    query string: ?q=name:what%20a%20time&type=track
+     *    result: this should return tracks matching the track name
+     * 2) search for a track using a wildcard in the name
+     *    query string: ?q=name:what*&type=track&limit=50
+     *    result: will return all tracks with "what" in the name
+     * 3) search for an artist in name or description
+     *    query string: ?tania%20bowra&type=artist
+     *    result: will return all artists where tania bowra is in
+     *            the name or description
+     * limit: max of 50
+     * @param type
+     * @param q
+     */
+    async search(type: string, q: string, limit: number = 50) {
+        let qryObj: any = {
+            type,
+            q,
+            limit: limit < 1 ? 1 : limit > 50 ? 50 : limit
+        };
+
+        // concat the key/value filterObjects
+
+        const api = `/v1/search`;
+
+        let codyResp: CodyResponse = await musicClient.spotifyApiGet(
+            api,
+            qryObj
+        );
+
+        // check if the token needs to be refreshed
+        if (codyResp.statusText === "EXPIRED") {
+            // refresh the token
+            await musicClient.refreshSpotifyToken();
+            // try again
+            codyResp = await musicClient.spotifyApiGet(api, qryObj);
+        }
+
+        let emptyResult: any = {};
+        if (!codyResp.data) {
+            if (type === "track") {
+                emptyResult["tracks"] = { items: [] };
+            } else if (type === "album") {
+                emptyResult["albums"] = { items: [] };
+            } else if (type === "artist") {
+                emptyResult["artists"] = { items: [] };
+            } else {
+                emptyResult["playlists"] = { items: [] };
+            }
+        }
+
+        return codyResp.data ? codyResp.data : emptyResult;
+    }
+
+    /**
      * Add tracks to a given playlist
      * @param playlist_id
      * @param track_ids

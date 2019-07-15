@@ -152,6 +152,32 @@ Full set of APIs
 setConfig(config: CodyConfig)
 
 /**
+ * Valid types are: album, artist, playlist, and track
+ * keywords: send the keywords to search against.
+ * Use specific filter name if you want to search against certain
+ * fields.
+ * Example searchTracks("track:what a time artist:tom")
+ *
+ * @param string
+ * @param limit (min of 1 and a max of 50)
+ * @return {tracks: {href, items: [<track>...], limit, next, offset, previous, total}}
+ */
+searchTracks(keywords: string, limit: number = 50);
+
+/**
+ * Valid types are: album, artist, playlist, and track
+ * keywords: send the keywords to search against.
+ * Use specific filter name if you want to search against certain
+ * fields.
+ * Example searchTracks("track:what a time artist:tom")
+ *
+ * @param string
+ * @param limit (min of 1 and a max of 50)
+ * @return {artists: {href, items: [<track>...], limit, next, offset, previous, total}}
+ */
+searchArtists(keywords: string, limit: number = 50);
+
+/**
  * Get the Spotify accessToken provided via through the setConfig api
  * @returns {string} the spotify access token string
  */
