@@ -169,7 +169,7 @@ searchTracks(keywords: string, limit: number = 50);
  * keywords: send the keywords to search against.
  * Use specific filter name if you want to search against certain
  * fields.
- * Example searchTracks("track:what a time artist:tom")
+ * Example searchArtists("track:what a time artist:tom")
  *
  * @param string
  * @param limit (min of 1 and a max of 50)
