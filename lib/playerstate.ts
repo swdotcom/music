@@ -94,7 +94,7 @@ export class MusicPlayerState {
         if (response.data && response.data.devices) {
             devices = response.data.devices;
         }
-        cacheUtil.setItem("devices", devices, 60 /* second */);
+        cacheUtil.setItem("devices", devices, 20 /* second */);
 
         // cache these results for a minute
         return devices;
