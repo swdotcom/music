@@ -2,6 +2,7 @@ import { MusicUtil } from "./util";
 import { MusicController } from "./controller";
 import { MusicStore } from "./store";
 import { MusicClient } from "./client";
+import { CacheUtil } from "./cache";
 import {
     PlayerDevice,
     Track,
@@ -13,6 +14,7 @@ import {
 
 const musicStore = MusicStore.getInstance();
 const musicClient = MusicClient.getInstance();
+const cacheUtil = CacheUtil.getInstance();
 const musicUtil = new MusicUtil();
 
 export class MusicPlayerState {
@@ -73,7 +75,11 @@ export class MusicPlayerState {
         }
      */
     async getSpotifyDevices(): Promise<PlayerDevice[]> {
-        let devices: PlayerDevice[] = [];
+        let devices: PlayerDevice[] = cacheUtil.getItem("devices");
+        if (devices) {
+            // return the value from cache
+            return devices;
+        }
 
         const api = "/v1/me/player/devices";
         let response = await musicClient.spotifyApiGet(api);
@@ -88,6 +94,9 @@ export class MusicPlayerState {
         if (response.data && response.data.devices) {
             devices = response.data.devices;
         }
+        cacheUtil.setItem("devices", devices, 60 /* second */);
+
+        // cache these results for a minute
         return devices;
     }
 

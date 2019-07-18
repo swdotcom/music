@@ -175,7 +175,7 @@ export class MusicClient {
         }
         api = this.addQueryStringToApi(api, qsOptions);
 
-        console.log(`GET API: ${api}`);
+        // console.log(`GET API: ${api}`);
 
         spotifyClient.defaults.headers.common["Authorization"] = `Bearer ${
             musicStore.spotifyAccessToken
