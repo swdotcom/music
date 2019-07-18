@@ -78,7 +78,7 @@ export class MusicPlayerState {
         let devices: PlayerDevice[] = cacheUtil.getItem("devices");
         if (devices) {
             // return the value from cache
-            return devices;
+            return devices || [];
         }
 
         const api = "/v1/me/player/devices";
@@ -94,7 +94,9 @@ export class MusicPlayerState {
         if (response.data && response.data.devices) {
             devices = response.data.devices;
         }
-        cacheUtil.setItem("devices", devices, 20 /* second */);
+        if (devices) {
+            cacheUtil.setItem("devices", devices, 20 /* second */);
+        }
 
         // cache these results for a minute
         return devices;
