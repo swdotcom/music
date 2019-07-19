@@ -132,15 +132,13 @@ export class MusicClient {
         ] = `Basic ${encodedAuthPayload}`;
         spotifyAccountClient.defaults.headers.post["Content-Type"] =
             "application/x-www-form-urlencoded";
-        const payload = {
-            grant_type: "refresh_token",
-            refresh_token: musicStore.spotifyRefreshToken
-        };
-        const params = new URLSearchParams();
-        params.append("grant_type", "refresh_token");
-        params.append("refresh_token", musicStore.spotifyRefreshToken);
         let response = await spotifyAccountClient
-            .post("/api/token", params)
+            .post(
+                `/api/token?grant_type=refresh_token&refresh_token=${
+                    musicStore.spotifyRefreshToken
+                }`,
+                null
+            )
             .then(resp => {
                 if (resp.data && resp.data.access_token) {
                     return { status: "success", data: resp.data.access_token };
@@ -152,6 +150,7 @@ export class MusicClient {
                 }
             })
             .catch(err => {
+                console.log("err: ", JSON.stringify(err, null, 2));
                 if (err.response) {
                     return {
                         status: "failed",

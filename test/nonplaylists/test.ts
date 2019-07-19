@@ -93,11 +93,8 @@ describe("spotify nonplaylist tests", () => {
         });
     });
 
-    xit("return a spotify track by id", done => {
-        CodyMusic.getSpotifyTrackById(
-            "spotify:track:4iVVU8DyQvOVsKafv3KWIF",
-            true
-        )
+    it("return a spotify track by id", done => {
+        CodyMusic.getSpotifyTrackById("4iVVU8DyQvOVsKafv3KWIF", true)
             .then((track: Track) => {
                 expect(track.uri).to.equal(
                     "spotify:track:4iVVU8DyQvOVsKafv3KWIF"
