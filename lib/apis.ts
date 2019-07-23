@@ -761,7 +761,7 @@ export function launchPlayer(playerName: PlayerName, options: any = {}) {
  * @returns {Promise<PlayerDevice[]>}
  */
 export function getSpotifyDevices(): Promise<PlayerDevice[]> {
-    return musicPlayerCtr.getSpotifyDevices();
+    return musicPlayerCtr.getSpotifyDevices(true /*skipCache*/);
 }
 
 /**

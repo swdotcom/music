@@ -74,9 +74,11 @@ export class MusicPlayerState {
         } ]
         }
      */
-    async getSpotifyDevices(): Promise<PlayerDevice[]> {
+    async getSpotifyDevices(
+        skipCache: boolean = false
+    ): Promise<PlayerDevice[]> {
         let devices: PlayerDevice[] = cacheUtil.getItem("devices");
-        if (devices) {
+        if (devices && !skipCache) {
             // return the value from cache
             return devices;
         }
