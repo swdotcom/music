@@ -523,6 +523,15 @@ export function play(player: PlayerName, options: any = {}) {
 }
 
 /**
+ * Play a specific spotify track by trackId (it can be the URI or the ID)
+ * @param trackId
+ * @param deviceId (optional)
+ */
+export function playSpotifyTrack(trackId: string, deviceId: string = "") {
+    return musicCtr.spotifyWebPlayTrack(trackId, deviceId);
+}
+
+/**
  * Initiate the play command for a given trackId for a specific player
  * @param player {spotify|spotify-web|itunes}
  * @param trackId {any (string|number)}

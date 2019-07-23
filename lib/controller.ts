@@ -351,6 +351,31 @@ export class MusicController {
         return musicClient.spotifyApiPut("/v1/me/player", {}, payload);
     }
 
+    public async spotifyWebPlayTrack(trackId: string, deviceId: string = "") {
+        /**
+         * to play a track without the play list id
+         * curl -X "PUT" "https://api.spotify.com/v1/me/player/play?device_id=4f38ae14f61b3a2e4ed97d537a5cb3d09cf34ea1"
+         * --data "{\"uris\":[\"spotify:track:2j5hsQvApottzvTn4pFJWF\"]}"
+         */
+
+        const trackUris = musicUtil.createUrisFromTrackIds([trackId]);
+        const qsOptions = deviceId ? { device_id: deviceId } : {};
+        const payload = {
+            uris: trackUris
+        };
+        const api = "/v1/me/player/play";
+        let response = await musicClient.spotifyApiPut(api, qsOptions, payload);
+
+        // check if the token needs to be refreshed
+        if (response.statusText === "EXPIRED") {
+            // refresh the token
+            await musicClient.refreshSpotifyToken();
+            // try again
+            response = await musicClient.spotifyApiPut(api, qsOptions, payload);
+        }
+        return response;
+    }
+
     public async spotifyWebPlay(options: any) {
         const qsOptions = options.device_id
             ? { device_id: options.device_id }
@@ -364,10 +389,8 @@ export class MusicController {
             );
         }
 
-        payload["offset"] = {};
-
         if (options.offset) {
-            payload.offset = options.offset;
+            payload["offset"] = options.offset;
         }
 
         if (options.context_uri) {
@@ -375,10 +398,16 @@ export class MusicController {
         }
 
         if (payload.context_uri && payload.uris) {
-            payload["offset"] = {
-                ...payload.offset,
-                uri: payload.uris[0]
-            };
+            if (payload.offset) {
+                payload["offset"] = {
+                    ...payload.offset,
+                    uri: payload.uris[0]
+                };
+            } else {
+                payload["offset"] = {
+                    uri: payload.uris[0]
+                };
+            }
             delete payload.uris;
         }
 

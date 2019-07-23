@@ -318,6 +318,13 @@ play(player: PlayerName, options: any = {})
 playTrack(player: PlayerName, trackId: string)
 
 /**
+ * Play a specific spotify track by trackId (it can be the URI or the ID)
+ * @param trackId
+ * @param deviceId (optional)
+ */
+playSpotifyTrack(trackId: string, deviceId: string = "")
+
+/**
  * Initiate the pause command for a specific player
  * @param player {spotify|spotify-web|itunes}
  * @param options { uris, device_id }
