@@ -364,22 +364,35 @@ export class MusicController {
             );
         }
 
+        payload["offset"] = {};
+
+        if (options.offset) {
+            payload.offset = options.offset;
+        }
+
         if (options.context_uri) {
             payload["context_uri"] = options.context_uri;
         }
 
         if (payload.context_uri && payload.uris) {
             payload["offset"] = {
+                ...payload.offset,
                 uri: payload.uris[0]
             };
             delete payload.uris;
         }
 
-        return musicClient.spotifyApiPut(
-            "/v1/me/player/play",
-            qsOptions,
-            payload
-        );
+        const api = "/v1/me/player/play";
+        let response = await musicClient.spotifyApiPut(api, qsOptions, payload);
+
+        // check if the token needs to be refreshed
+        if (response.statusText === "EXPIRED") {
+            // refresh the token
+            await musicClient.refreshSpotifyToken();
+            // try again
+            response = await musicClient.spotifyApiPut(api, qsOptions, payload);
+        }
+        return response;
     }
 
     public async spotifyWebPause(options: any) {

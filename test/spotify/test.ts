@@ -4,6 +4,7 @@ import { MusicUtil } from "../../lib/util";
 import { MusicController } from "../../lib/controller";
 import { MusicPlayerState } from "../../lib/playerstate";
 import { TestUtil } from "../util";
+import { PlayerName } from "../../lib/models";
 
 const testUtil = new TestUtil();
 
@@ -80,7 +81,7 @@ describe("player control tests", () => {
             });
     });
 
-    it("Launch and play Spotify on the desktop", done => {
+    xit("Launch and play Spotify on the desktop", done => {
         musicCtr
             .launchApp(CodyMusic.PlayerName.SpotifyDesktop)
             .then(async () => {
@@ -109,4 +110,20 @@ describe("player control tests", () => {
                 done();
             });
     });
+
+    // it("Play playlist by offset", done => {
+    //     // https://open.spotify.com/playlist/6jCkTED0V5NEuM8sKbGG1Z
+    //     let options = {
+    //         offset: { position: 1 },
+    //         context_uri: "spotify:playlist:6jCkTED0V5NEuM8sKbGG1Z"
+    //     };
+    //     CodyMusic.play(PlayerName.SpotifyWeb, options)
+    //         .then(result => {
+    //             console.log("play result: ", result);
+    //             done();
+    //         })
+    //         .catch(err => {
+    //             done();
+    //         });
+    // });
 });
