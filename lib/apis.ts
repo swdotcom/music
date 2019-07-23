@@ -381,6 +381,17 @@ export async function getTracksByPlaylistName(
  * @param player
  * @param qsOptions
  */
+export async function getSpotifyLikedSongs(
+    qsOptions: any = {}
+): Promise<Track[]> {
+    return getSavedTracks(PlayerName.SpotifyWeb, qsOptions);
+}
+
+/**
+ * Currently only returns Spotify Web tracks not associated with a playlist.
+ * @param player
+ * @param qsOptions
+ */
 export async function getSavedTracks(
     player: PlayerName,
     qsOptions: any = {}

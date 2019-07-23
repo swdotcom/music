@@ -407,11 +407,19 @@ export class MusicController {
                 options.track_ids
             );
         }
-        return musicClient.spotifyApiPut(
-            "/v1/me/player/pause",
-            qsOptions,
-            payload
-        );
+
+        const api = "/v1/me/player/pause";
+        let codyResp = await musicClient.spotifyApiPut(api, qsOptions, payload);
+
+        // check if the token needs to be refreshed
+        if (codyResp.statusText === "EXPIRED") {
+            // refresh the token
+            await musicClient.refreshSpotifyToken();
+            // try again
+            codyResp = await musicClient.spotifyApiPut(api, qsOptions, payload);
+        }
+
+        return codyResp;
     }
 
     public async spotifyWebPrevious(options: any) {
@@ -426,11 +434,27 @@ export class MusicController {
                 options.track_ids
             );
         }
-        return musicClient.spotifyApiPost(
-            "/v1/me/player/previous",
+
+        const api = "/v1/me/player/previous";
+        let codyResp = await musicClient.spotifyApiPost(
+            api,
             qsOptions,
             payload
         );
+
+        // check if the token needs to be refreshed
+        if (codyResp.statusText === "EXPIRED") {
+            // refresh the token
+            await musicClient.refreshSpotifyToken();
+            // try again
+            codyResp = await musicClient.spotifyApiPost(
+                api,
+                qsOptions,
+                payload
+            );
+        }
+
+        return codyResp;
     }
 
     public async spotifyWebNext(options: any) {
@@ -445,11 +469,27 @@ export class MusicController {
                 options.track_ids
             );
         }
-        return musicClient.spotifyApiPost(
-            "/v1/me/player/next",
+
+        const api = "/v1/me/player/next";
+        let codyResp = await musicClient.spotifyApiPost(
+            api,
             qsOptions,
             payload
         );
+
+        // check if the token needs to be refreshed
+        if (codyResp.statusText === "EXPIRED") {
+            // refresh the token
+            await musicClient.refreshSpotifyToken();
+            // try again
+            codyResp = await musicClient.spotifyApiPost(
+                api,
+                qsOptions,
+                payload
+            );
+        }
+
+        return codyResp;
     }
 
     public async getGenre(

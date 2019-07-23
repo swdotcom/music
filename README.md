@@ -450,6 +450,12 @@ launchPlayer(playerName: PlayerName, options: any = {})
 getSpotifyDevices(): Promise<PlayerDevice[]>
 
 /**
+ * Currently only returns Spotify Web tracks not associated with a playlist.
+ * @param qsOptions (i.e. {limit: 10, offset: 0} return 10 tracks starting at offset 0 (base of zero))
+ */
+getSpotifyLikedSongs(qsOptions: any = {}): Promise<Track[]>
+
+/**
  * Returns the genre for a provided arguments
  * @param artist {string} is required
  * @param songName {string} is optional
