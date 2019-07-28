@@ -145,73 +145,78 @@ export async function hasActiveTrack(): Promise<boolean> {
 export async function getRunningTrack(): Promise<Track> {
     const spotifyDevices = await getSpotifyDevices();
     let track = null;
-    let spotifyWebTrack = null;
-    let spotifyWebTrackRunning = false;
 
+    // spotify web try
     if (spotifyDevices.length > 0) {
         // 1st try spotify web
         if (musicStore.spotifyApiEnabled) {
-            spotifyWebTrack = await getTrack(PlayerName.SpotifyWeb);
+            track = await getTrack(PlayerName.SpotifyWeb);
             // check if the spotify track is running (playing or paused)
-            spotifyWebTrackRunning = musicUtil.isTrackRunning(spotifyWebTrack);
+            let spotifyWebTrackRunning = musicUtil.isTrackRunning(track);
 
             // if it's playing then return it
-            if (
-                spotifyWebTrackRunning &&
-                spotifyWebTrack.state === TrackStatus.Playing
-            ) {
-                return spotifyWebTrack;
+            if (spotifyWebTrackRunning && track.state === TrackStatus.Playing) {
+                // spotify web track is running. it's the highest priority track
+                return track;
             }
         }
     }
 
+    let spotifyDesktopTrack = null;
     // spotify desktop try
-    if (!spotifyWebTrackRunning && musicStore.spotifyDesktopEnabled) {
+    if (musicStore.spotifyDesktopEnabled) {
         // next try spotify desktop
         const spotifyDesktopRunning = await isPlayerRunning(
             PlayerName.SpotifyDesktop
         );
         if (spotifyDesktopRunning) {
-            track = await getTrack(PlayerName.SpotifyDesktop);
+            spotifyDesktopTrack = await getTrack(PlayerName.SpotifyDesktop);
+            if (spotifyDesktopTrack.state === TrackStatus.Playing) {
+                return spotifyDesktopTrack;
+            }
         }
     }
 
-    if (!track || !track.id) {
-        // itunes desktop try
-        if (musicStore.itunesDesktopEnabled && musicStore.itunesAccessGranted) {
-            // still no track, try itunes desktop
-            const itunesDesktopRunning = await isPlayerRunning(
-                PlayerName.ItunesDesktop
-            );
+    // itunes desktop try
+    if (musicStore.itunesDesktopEnabled && musicStore.itunesAccessGranted) {
+        // still no track or it's paused, try itunes desktop
+        const itunesDesktopRunning = await isPlayerRunning(
+            PlayerName.ItunesDesktop
+        );
 
-            if (itunesDesktopRunning) {
-                track = await getTrack(PlayerName.ItunesDesktop);
-                if (track && !track.id) {
-                    // get the 1st track
-                    track = await musicCtr.run(
-                        PlayerName.ItunesDesktop,
-                        "firstTrackState"
-                    );
-                    if (track) {
-                        try {
-                            track = JSON.parse(track);
-                            if (track) {
-                                track["playerType"] =
-                                    PlayerType.MacItunesDesktop;
-                            }
-                        } catch (e) {
-                            //
+        let itunesTrack = null;
+        if (itunesDesktopRunning) {
+            itunesTrack = await getTrack(PlayerName.ItunesDesktop);
+            if (itunesTrack && !itunesTrack.id) {
+                // get the 1st track
+                itunesTrack = await musicCtr.run(
+                    PlayerName.ItunesDesktop,
+                    "firstTrackState"
+                );
+                if (itunesTrack) {
+                    try {
+                        itunesTrack = JSON.parse(itunesTrack);
+                        if (itunesTrack) {
+                            itunesTrack["playerType"] =
+                                PlayerType.MacItunesDesktop;
                         }
+                    } catch (e) {
+                        //
                     }
                 }
+            }
 
-                // if itunes is not running, return the spotify web track we've gathered
-                const isItunesTrackRunning = musicUtil.isTrackRunning(track);
-                if (!isItunesTrackRunning) {
-                    track = spotifyWebTrack;
-                }
-            } else if (spotifyWebTrack) {
-                track = spotifyWebTrack;
+            // if itunes is not running, return the spotify web track we've gathered
+            const isItunesTrackRunning = musicUtil.isTrackRunning(itunesTrack);
+
+            if (itunesTrack.state === TrackStatus.Playing) {
+                // itunes track is playing, return it
+                return itunesTrack;
+            } else if (isItunesRunning && (!track || track.id)) {
+                // this means the spotify web track was null or empty, use itunes but it's paused
+                track = itunesTrack;
+            } else if (spotifyDesktopTrack && spotifyDesktopTrack.id) {
+                track = spotifyDesktopTrack;
             }
         }
     }
