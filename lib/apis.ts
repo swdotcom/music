@@ -212,7 +212,12 @@ export async function getRunningTrack(): Promise<Track> {
             if (itunesTrack.state === TrackStatus.Playing) {
                 // itunes track is playing, return it
                 return itunesTrack;
-            } else if (isItunesRunning && (!track || track.id)) {
+            } else if (
+                isItunesTrackRunning &&
+                (!track ||
+                    track.id ||
+                    track.playerType === PlayerType.NotAssigned)
+            ) {
                 // this means the spotify web track was null or empty, use itunes but it's paused
                 track = itunesTrack;
             } else if (spotifyDesktopTrack && spotifyDesktopTrack.id) {
