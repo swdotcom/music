@@ -11,10 +11,12 @@ import {
     TrackStatus,
     Artist
 } from "./models";
+import { AudioStat } from "./audiostat";
 
 const musicStore = MusicStore.getInstance();
 const musicClient = MusicClient.getInstance();
 const cacheUtil = CacheUtil.getInstance();
+const audioStat = AudioStat.getInstance();
 const musicUtil = new MusicUtil();
 
 export class MusicPlayerState {
@@ -172,7 +174,8 @@ export class MusicPlayerState {
 
     async getSpotifyTrackById(
         id: string,
-        includeArtistData: boolean = false
+        includeArtistData: boolean = false,
+        includeAudioFeaturesData: boolean = false
     ): Promise<Track> {
         id = musicUtil.createSpotifyIdFromUri(id);
         let track: Track;
@@ -191,6 +194,7 @@ export class MusicPlayerState {
         if (response && response.data) {
             track = this.copySpotifyTrackToCodyTrack(response.data);
 
+            // get the arist data
             if (includeArtistData && track.artists) {
                 let artists: Artist[] = [];
 
@@ -205,6 +209,16 @@ export class MusicPlayerState {
                     track.artists = artists;
                 }
             }
+
+            // get the features
+            if (includeAudioFeaturesData) {
+                const spotifyAudioFeatures = await audioStat.getSpotifyAudioFeatures(
+                    [id]
+                );
+                if (spotifyAudioFeatures && spotifyAudioFeatures.length > 0) {
+                    track.features = spotifyAudioFeatures[0];
+                }
+            }
         } else {
             track = new Track();
         }
@@ -216,23 +230,33 @@ export class MusicPlayerState {
         let artist: Artist;
 
         id = musicUtil.createSpotifyIdFromUri(id);
-        let api = `/v1/artists/${id}`;
 
-        let response = await musicClient.spotifyApiGet(api);
+        // check the cache first
+        artist = cacheUtil.getItem(`artist_${id}`);
+        if (!artist) {
+            let api = `/v1/artists/${id}`;
 
-        // check if the token needs to be refreshed
-        if (response.statusText === "EXPIRED") {
-            // refresh the token
-            await musicClient.refreshSpotifyToken();
-            // try again
-            response = await musicClient.spotifyApiGet(api);
+            let response = await musicClient.spotifyApiGet(api);
+
+            // check if the token needs to be refreshed
+            if (response.statusText === "EXPIRED") {
+                // refresh the token
+                await musicClient.refreshSpotifyToken();
+                // try again
+                response = await musicClient.spotifyApiGet(api);
+            }
+
+            if (response && response.data) {
+                const artistData = response.data;
+                // delete external_urls
+                delete artistData.external_urls;
+                artist = artistData;
+            }
         }
 
-        if (response && response.data) {
-            const artistData = response.data;
-            // delete external_urls
-            delete artistData.external_urls;
-            artist = artistData;
+        if (artist) {
+            // cache it (24 hours)
+            cacheUtil.setItem(`artist_${id}`, artist, 60 * 60 * 24);
         } else {
             artist = new Artist();
         }

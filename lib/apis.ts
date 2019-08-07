@@ -262,9 +262,14 @@ export async function getSpotifyPlayerContext(): Promise<PlayerContext> {
  */
 export async function getSpotifyTrackById(
     id: string,
-    includeFullArtistData: boolean = false
+    includeFullArtistData: boolean = false,
+    includeAudioFeaturesData: boolean = false
 ): Promise<Track> {
-    return musicPlayerCtr.getSpotifyTrackById(id, includeFullArtistData);
+    return musicPlayerCtr.getSpotifyTrackById(
+        id,
+        includeFullArtistData,
+        includeAudioFeaturesData
+    );
 }
 
 /**

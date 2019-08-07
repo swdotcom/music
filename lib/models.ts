@@ -61,6 +61,7 @@ export class Track {
     state: TrackStatus = TrackStatus.NotAssigned;
     albumData: Album = new Album();
     error: string = "";
+    features: SpotifyAudioFeature = new SpotifyAudioFeature();
 }
 
 export class Artist {
@@ -147,10 +148,12 @@ export class PlaylistTrackInfo {
 export class PlaylistItem {
     name: string = "";
     id: string = "";
+    playlistTypeId: string = "";
     collaborative: boolean = false;
     public: boolean = true;
     tracks: PlaylistTrackInfo = new PlaylistTrackInfo();
     type: string = "";
+    itemType: string = "";
     playerType: PlayerType = PlayerType.NotAssigned;
     tag: string = "";
     tooltip: string = "";
@@ -161,6 +164,7 @@ export class PlaylistItem {
     loved: boolean = false;
     played_count: number = 0;
     popularity: number = 0;
+    artist: string = "";
 }
 
 export class CodyConfig {

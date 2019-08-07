@@ -1,7 +1,12 @@
 import { SpotifyAudioFeature } from "./models";
 import { MusicClient } from "./client";
+import { MusicUtil } from "./util";
+import { CacheUtil } from "./cache";
 
 const musicClient = MusicClient.getInstance();
+const musicUtil = new MusicUtil();
+
+const cacheUtil = CacheUtil.getInstance();
 
 export class AudioStat {
     private static instance: AudioStat;
@@ -22,20 +27,38 @@ export class AudioStat {
         if (!ids || ids.length === 0) {
             return audiofeatures;
         }
-        const qstr = `?ids=${ids.join(",")}`;
-        const api = `/v1/audio-features${qstr}`;
-        let response = await musicClient.spotifyApiGet(api);
-        // check if the token needs to be refreshed
-        if (response.statusText === "EXPIRED") {
-            // refresh the token
-            await musicClient.refreshSpotifyToken();
-            // try again
-            response = await musicClient.spotifyApiGet(api);
+        // make sure the IDs are the short spotify ID format
+        ids = ids.map(id => {
+            return musicUtil.createSpotifyIdFromUri(id);
+        });
+
+        // try to find as many features from cache as possible 1st
+        for (let i = ids.length - 1; i >= 0; i--) {
+            let feature = cacheUtil.getItem(`feature_${ids[i]}`);
+            if (feature) {
+                audiofeatures.push(feature);
+                ids.pop();
+            }
         }
-        // response.data will have a listof audio_features if it's successful:
-        if (response.data && response.data.audio_features) {
-            /**
-             * { "audio_features":
+
+        if (ids.length > 0) {
+            // still some ids left, fetch the features for these ids
+            const qstr = `?ids=${ids.join(",")}`;
+
+            const api = `/v1/audio-features${qstr}`;
+
+            let response = await musicClient.spotifyApiGet(api);
+            // check if the token needs to be refreshed
+            if (response.statusText === "EXPIRED") {
+                // refresh the token
+                await musicClient.refreshSpotifyToken();
+                // try again
+                response = await musicClient.spotifyApiGet(api);
+            }
+            // response.data will have a listof audio_features if it's successful:
+            if (response.data && response.data.audio_features) {
+                /**
+                * { "audio_features":
                 [ { "danceability": 0.808,
                     "energy": 0.626,
                     "key": 7,
@@ -55,8 +78,23 @@ export class AudioStat {
                     "duration_ms": 535223,
                     "time_signature": 4
                     },
-            */
-            audiofeatures = response.data.audio_features;
+                */
+                let audio_features: SpotifyAudioFeature[] =
+                    response.data.audio_features;
+                if (audio_features && audio_features.length > 0) {
+                    audio_features.forEach(feature => {
+                        if (feature) {
+                            // save to cache (24 hours)
+                            cacheUtil.setItem(
+                                `feature_${feature.id}`,
+                                feature,
+                                60 * 60 * 24
+                            );
+                            audiofeatures.push(feature);
+                        }
+                    });
+                }
+            }
         }
         return audiofeatures;
     }

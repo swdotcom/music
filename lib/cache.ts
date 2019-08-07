@@ -30,7 +30,8 @@ export class CacheUtil {
 
     getItem(key: string) {
         if (this.cache[key] && !this.isCacheExpired(key)) {
-            return JSON.parse(this.cache[key].value);
+            const val = JSON.parse(this.cache[key].value);
+            return val;
         }
         return null;
     }

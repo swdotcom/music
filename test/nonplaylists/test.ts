@@ -93,20 +93,19 @@ describe("spotify nonplaylist tests", () => {
         });
     });
 
-    it("return a spotify track by id", done => {
-        CodyMusic.getSpotifyTrackById("4iVVU8DyQvOVsKafv3KWIF", true)
-            .then((track: Track) => {
-                expect(track.uri).to.equal(
-                    "spotify:track:4iVVU8DyQvOVsKafv3KWIF"
-                );
-                done();
-            })
-            .catch(err => {
-                console.log(
-                    "failed to return a spotify track by id, error: ",
-                    err.message
-                );
-                done();
-            });
+    it("return a spotify track by id", async () => {
+        let track: Track = await CodyMusic.getSpotifyTrackById(
+            "4iVVU8DyQvOVsKafv3KWIF",
+            true,
+            true
+        );
+
+        expect(track.uri).to.equal("spotify:track:4iVVU8DyQvOVsKafv3KWIF");
+        track = await CodyMusic.getSpotifyTrackById(
+            "4iVVU8DyQvOVsKafv3KWIF",
+            true,
+            true
+        );
+        expect(track.uri).to.equal("spotify:track:4iVVU8DyQvOVsKafv3KWIF");
     });
 });
