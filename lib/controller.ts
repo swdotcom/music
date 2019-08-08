@@ -141,7 +141,7 @@ export class MusicController {
         }
 
         player = musicUtil.getPlayerName(player);
-        const command = `open -a ${player}`;
+        const command = `open -a ${player} -gj`;
         let result = await musicUtil.execCmd(command);
         if (result === null || result === undefined || result === "") {
             result = "ok";
