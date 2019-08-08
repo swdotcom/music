@@ -360,11 +360,17 @@ export class MusicController {
         playlistId = musicUtil.createPlaylistUriFromPlaylistId(playlistId);
         const trackUris = musicUtil.createUrisFromTrackIds([startingTrackId]);
         // play playlist needs body params...
-        // {"context_uri":"spotify:playlist:<id>"}
+        // {"context_uri":"spotify:playlist:<id>", "uris":["spotify:track:234235..."]}
+
         const payload = {
             context_uri: playlistId,
             uris: trackUris
         };
+        if (!trackUris || trackUris.length === 0) {
+            // delete the uris. If it's empty the playlist won't play
+            delete payload.uris;
+        }
+
         const api = "/v1/me/player/play";
         let response = await musicClient.spotifyApiPut(api, qsOptions, payload);
 
