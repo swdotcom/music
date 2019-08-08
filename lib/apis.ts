@@ -448,6 +448,10 @@ export async function getPlaylistTracks(
     return codyResp;
 }
 
+export function playSpotifyPlaylist(playlistId: string) {
+    return musicCtr.spotifyWebPlayPlaylist(playlistId);
+}
+
 /**
  * Plays a specific track on the Spotify or iTunes desktop
  * @param player

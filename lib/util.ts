@@ -121,6 +121,13 @@ export class MusicUtil {
         return false;
     }
 
+    createPlaylistUriFromPlaylistId(playlist_id: string) {
+        if (!playlist_id.includes("spotify:playlist:")) {
+            playlist_id = `spotify:playlist:${playlist_id}`;
+        }
+        return playlist_id;
+    }
+
     createUrisFromTrackIds(track_ids: string[], useUriObj: boolean = false) {
         let tracks = [];
 

@@ -34,20 +34,20 @@ describe("spotify playlist tests", () => {
         done();
     });
 
-    it("create a spotify playlist", done => {
-        CodyMusic.createPlaylist("cody-favs", false /*isPublic*/).then(
-            result => {
-                expect(result.data.id).to.not.equal("");
-                const playlist_id = result.data.id;
-                CodyMusic.deletePlaylist(playlist_id).then(result => {
-                    expect(result.status).to.equal(200);
-                    done();
-                });
-            }
+    it("create a spotify playlist", async () => {
+        let result = await CodyMusic.createPlaylist(
+            "cody-favs",
+            false /*isPublic*/
         );
+        expect(result.data.id).to.not.equal("");
+        const playlist_id = result.data.id;
+        result = await CodyMusic.playSpotifyPlaylist(playlist_id);
+        console.log("result of playing the playlist: ", result);
+        result = await CodyMusic.deletePlaylist(playlist_id);
+        expect(result.status).to.equal(200);
     });
 
-    it("return spotify playlists", done => {
+    xit("return spotify playlists", done => {
         CodyMusic.getPlaylists(PlayerName.SpotifyWeb).then(
             (result: PlaylistItem[]) => {
                 expect(result.length).to.not.equal(0);
@@ -58,7 +58,7 @@ describe("spotify playlist tests", () => {
         );
     });
 
-    it("return spotify playlist names", done => {
+    xit("return spotify playlist names", done => {
         CodyMusic.getPlaylistNames(PlayerName.SpotifyWeb).then(result => {
             expect(result.length).to.not.equal(0);
             done();
