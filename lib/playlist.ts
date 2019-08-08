@@ -453,15 +453,7 @@ export class Playlist {
         track.disc_number = spotifyTrack.disc_number;
         track.explicit = spotifyTrack.explicit;
         track.href = spotifyTrack.href;
-
-        // get the album info
-        if (spotifyTrack.album) {
-            let albumData: Album = new Album();
-            albumData.id = spotifyTrack.album.id;
-            albumData.name = spotifyTrack.album.name;
-            track.albumData = albumData;
-            track.album = albumData.name;
-        }
+        track.album = spotifyTrack.album;
         return track;
     }
 }

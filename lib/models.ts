@@ -38,7 +38,7 @@ export class CodyResponse {
 export class Track {
     artist: string = "";
     artist_names: string[] = [];
-    album: string = "";
+    album: any;
     genre: string = "";
     disc_number: number = 0;
     duration: number = 0;
@@ -59,7 +59,6 @@ export class Track {
     loved: boolean = false;
     volume: number = 0;
     state: TrackStatus = TrackStatus.NotAssigned;
-    albumData: Album = new Album();
     error: string = "";
     features: SpotifyAudioFeature = new SpotifyAudioFeature();
 }
