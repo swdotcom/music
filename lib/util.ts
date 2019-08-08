@@ -133,6 +133,9 @@ export class MusicUtil {
 
         for (let i = 0; i < track_ids.length; i++) {
             let uri = track_ids[i];
+            if (!uri || uri.length === 0) {
+                continue;
+            }
             if (!uri.includes("spotify:track:")) {
                 uri = `spotify:track:${uri}`;
             }

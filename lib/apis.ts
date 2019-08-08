@@ -448,8 +448,21 @@ export async function getPlaylistTracks(
     return codyResp;
 }
 
-export function playSpotifyPlaylist(playlistId: string) {
-    return musicCtr.spotifyWebPlayPlaylist(playlistId);
+/**
+ * Plays a playlist at the beginning if the starting track id is not provided.
+ * @param playlistId either the ID or URI of the playlist
+ * @param startingTrackId either the ID or URI of the track
+ */
+export function playSpotifyPlaylist(
+    playlistId: string,
+    startingTrackId: string = "",
+    deviceId: string = ""
+) {
+    return musicCtr.spotifyWebPlayPlaylist(
+        playlistId,
+        startingTrackId,
+        deviceId
+    );
 }
 
 /**

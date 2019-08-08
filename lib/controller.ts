@@ -351,22 +351,29 @@ export class MusicController {
         return musicClient.spotifyApiPut("/v1/me/player", {}, payload);
     }
 
-    public async spotifyWebPlayPlaylist(playlistId: string) {
+    public async spotifyWebPlayPlaylist(
+        playlistId: string,
+        startingTrackId: string = "",
+        deviceId: string = ""
+    ) {
+        const qsOptions = deviceId ? { device_id: deviceId } : {};
         playlistId = musicUtil.createPlaylistUriFromPlaylistId(playlistId);
+        const trackUris = musicUtil.createUrisFromTrackIds([startingTrackId]);
         // play playlist needs body params...
         // {"context_uri":"spotify:playlist:<id>"}
         const payload = {
-            context_uri: playlistId
+            context_uri: playlistId,
+            uris: trackUris
         };
         const api = "/v1/me/player/play";
-        let response = await musicClient.spotifyApiPut(api, {}, payload);
+        let response = await musicClient.spotifyApiPut(api, qsOptions, payload);
 
         // check if the token needs to be refreshed
         if (response.statusText === "EXPIRED") {
             // refresh the token
             await musicClient.refreshSpotifyToken();
             // try again
-            response = await musicClient.spotifyApiPut(api, {}, payload);
+            response = await musicClient.spotifyApiPut(api, qsOptions, payload);
         }
         return response;
     }
