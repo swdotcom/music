@@ -266,6 +266,17 @@ getPlaylistTracks(player: PlayerName,
     qsOptions: any = {}): Promise<CodyResponse>
 
 /**
+ * Plays a playlist at the beginning if the starting track id is not provided.
+ * @param playlistId either the ID or URI of the playlist
+ * @param startingTrackId either the ID or URI of the track
+ * @param deviceId
+ */
+playSpotifyPlaylist(
+    playlistId: string,
+    startingTrackId: string = "",
+    deviceId: string = "")
+
+/**
  * Plays a specific track on the Spotify or iTunes desktop
  * @param player
  * @param params
