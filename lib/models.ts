@@ -148,7 +148,7 @@ export class PlaylistTrackInfo {
 export class PlaylistItem {
     name: string = "";
     id: string = "";
-    playlistTypeId: string = "";
+    playlistTypeId: number = 0;
     collaborative: boolean = false;
     public: boolean = true;
     tracks: PlaylistTrackInfo = new PlaylistTrackInfo();
