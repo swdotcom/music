@@ -830,7 +830,7 @@ export function launchPlayer(playerName: PlayerName, options: any = {}) {
     if (playerName === PlayerName.SpotifyWeb) {
         return musicPlayerCtr.launchWebPlayer(options);
     } else {
-        return musicCtr.startPlayer(playerName);
+        return musicCtr.startPlayer(playerName, options);
     }
 }
 

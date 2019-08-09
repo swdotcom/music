@@ -135,13 +135,14 @@ export class MusicController {
         return result;
     }
 
-    async startPlayer(player: string) {
+    async startPlayer(player: string, options: any = {}) {
         if (!musicUtil.isMac()) {
             return "";
         }
 
         player = musicUtil.getPlayerName(player);
-        const command = `open -a ${player} -gj`;
+        const quietly = options && options.quietly ? options.quietly : false;
+        const command = quietly ? `open -a ${player} -gj` : `open -a ${player}`;
         let result = await musicUtil.execCmd(command);
         if (result === null || result === undefined || result === "") {
             result = "ok";
