@@ -141,7 +141,15 @@ export class MusicController {
         }
 
         player = musicUtil.getPlayerName(player);
-        const quietly = options && options.quietly ? options.quietly : false;
+        let quietly = true;
+        if (
+            options &&
+            options.quietly !== undefined &&
+            options.quietly !== null
+        ) {
+            quietly = options.quietly;
+        }
+
         const command = quietly ? `open -a ${player} -gj` : `open -a ${player}`;
         let result = await musicUtil.execCmd(command);
         if (result === null || result === undefined || result === "") {
