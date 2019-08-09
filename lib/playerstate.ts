@@ -17,6 +17,7 @@ const musicStore = MusicStore.getInstance();
 const musicClient = MusicClient.getInstance();
 const cacheUtil = CacheUtil.getInstance();
 const audioStat = AudioStat.getInstance();
+const musicController = MusicController.getInstance();
 const musicUtil = new MusicUtil();
 
 export class MusicPlayerState {
@@ -175,7 +176,8 @@ export class MusicPlayerState {
     async getSpotifyTrackById(
         id: string,
         includeArtistData: boolean = false,
-        includeAudioFeaturesData: boolean = false
+        includeAudioFeaturesData: boolean = false,
+        includeGenre: boolean = false
     ): Promise<Track> {
         id = musicUtil.createSpotifyIdFromUri(id);
         let track: Track;
@@ -207,6 +209,29 @@ export class MusicPlayerState {
                 }
                 if (artists.length > 0) {
                     track.artists = artists;
+                }
+            }
+
+            if (!track.genre && includeGenre) {
+                // first check if we have an artist in artists
+                // artists[0].genres[0]
+                let genre = "";
+                if (
+                    track.artists &&
+                    track.artists.length > 0 &&
+                    track.artists[0].genres
+                ) {
+                    genre = track.artists[0].genres.join(" ");
+                }
+                if (!genre) {
+                    // get the genre
+                    genre = await musicController.getGenre(
+                        track.artist,
+                        track.name
+                    );
+                }
+                if (genre) {
+                    track.genre = genre;
                 }
             }
 
@@ -255,8 +280,8 @@ export class MusicPlayerState {
         }
 
         if (artist) {
-            // cache it (24 hours)
-            cacheUtil.setItem(`artist_${id}`, artist, 60 * 60 * 24);
+            // cache it (48 hours)
+            cacheUtil.setItem(`artist_${id}`, artist, 60 * 60 * 24 * 2);
         } else {
             artist = new Artist();
         }

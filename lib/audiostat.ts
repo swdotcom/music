@@ -84,11 +84,11 @@ export class AudioStat {
                 if (audio_features && audio_features.length > 0) {
                     audio_features.forEach(feature => {
                         if (feature) {
-                            // save to cache (24 hours)
+                            // save to cache (48 hours)
                             cacheUtil.setItem(
                                 `feature_${feature.id}`,
                                 feature,
-                                60 * 60 * 24
+                                60 * 60 * 24 * 2
                             );
                             audiofeatures.push(feature);
                         }

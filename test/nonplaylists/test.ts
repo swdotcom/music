@@ -97,15 +97,18 @@ describe("spotify nonplaylist tests", () => {
         let track: Track = await CodyMusic.getSpotifyTrackById(
             "4iVVU8DyQvOVsKafv3KWIF",
             true,
-            true
+            true,
+            false
         );
 
         expect(track.uri).to.equal("spotify:track:4iVVU8DyQvOVsKafv3KWIF");
         track = await CodyMusic.getSpotifyTrackById(
             "4iVVU8DyQvOVsKafv3KWIF",
             true,
+            true,
             true
         );
+
         expect(track.uri).to.equal("spotify:track:4iVVU8DyQvOVsKafv3KWIF");
     });
 });
