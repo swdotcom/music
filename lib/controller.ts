@@ -373,13 +373,15 @@ export class MusicController {
         // play playlist needs body params...
         // {"context_uri":"spotify:playlist:<id>"}
 
-        let payload: any = {};
+        let payload: any = {
+            offset: { position: 0 }
+        };
 
         // playlistId is required
         payload["context_uri"] = playlistId;
 
         if (trackUris && trackUris.length > 0) {
-            payload["offset"] = {
+            payload.offset = {
                 uri: trackUris[0]
             };
         }
