@@ -2,7 +2,7 @@ import { MusicUtil } from "../../lib/util";
 const expect = require("chai").expect;
 import * as CodyMusic from "../../index";
 import { MusicController } from "../../lib/controller";
-import { PlayerName } from "../../lib/models";
+import { PlayerName, Track } from "../../lib/models";
 import { TestUtil } from "../util";
 
 const musicUtil = new MusicUtil();
@@ -73,7 +73,7 @@ describe("music track tests", () => {
         });
     });
 
-    it("get best currently running track", done => {
+    xit("get best currently running track", done => {
         CodyMusic.launchPlayer(CodyMusic.PlayerName.ItunesDesktop).then(
             async () => {
                 musicUtil.sleep(2500);
@@ -88,10 +88,28 @@ describe("music track tests", () => {
         );
     });
 
-    it("checks if it has an active track", done => {
+    xit("checks if it has an active track", done => {
         CodyMusic.hasActiveTrack().then((result: any) => {
             expect(result).to.equal(true);
             done();
         });
+    });
+
+    it("play specific track", async () => {
+        await CodyMusic.launchPlayer(CodyMusic.PlayerName.SpotifyDesktop);
+        musicUtil.sleep(1500);
+        // either...
+        // await CodyMusic.playTrackInContext(PlayerName.SpotifyDesktop, [
+        //     "spotify:track:6t52BHKOeX3os9AxPqET1R",
+        //     "Liked Songs"
+        // ]);
+        // or...
+        await CodyMusic.playTrack(
+            PlayerName.SpotifyDesktop,
+            "spotify:track:6t52BHKOeX3os9AxPqET1R"
+        );
+        // both work
+        let runningTrack: Track = await CodyMusic.getRunningTrack();
+        console.log("running track name: ", runningTrack.name);
     });
 });

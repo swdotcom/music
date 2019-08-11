@@ -598,8 +598,8 @@ export function playSpotifyTrack(trackId: string, deviceId: string = "") {
  * @param player {spotify|spotify-web|itunes}
  * @param trackId {any (string|number)}
  */
-export function playTrack(player: PlayerName, trackId: any) {
-    return playTrackInContext(player, [trackId]);
+export function playTrack(PlayerName: PlayerName, trackId: any) {
+    return musicCtr.run(PlayerName, "playTrack", [trackId]);
 }
 
 /**

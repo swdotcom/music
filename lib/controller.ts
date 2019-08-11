@@ -47,7 +47,7 @@ export class MusicController {
         playFromLibrary: 'tell application "{0}" to play of playlist "{1}"',
         playSongFromLibrary:
             'tell application "{0}" to play track "{1}" of playlist "{2}"',
-        playTrack: 'tell application "{0}" to play track {1}',
+        playTrack: 'tell application "{0}" to play track "{1}"',
         pause: 'tell application "{0}" to pause',
         playPause: 'tell application "{0}" to playpause',
         next: 'tell application "{0}" to play (next track)',
