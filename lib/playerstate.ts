@@ -96,7 +96,7 @@ export class MusicPlayerState {
             // try again
             response = await musicClient.spotifyApiGet(api);
         }
-        if (response.data && response.data.devices) {
+        if (response.data && response.status === 200 && response.data.devices) {
             devices = response.data.devices;
             if (devices) {
                 cacheUtil.setItem("devices", devices, 20 /* second */);
@@ -193,7 +193,7 @@ export class MusicPlayerState {
             response = await musicClient.spotifyApiGet(api);
         }
 
-        if (response && response.data) {
+        if (response && response.status === 200 && response.data) {
             track = this.copySpotifyTrackToCodyTrack(response.data);
 
             // get the arist data
@@ -209,6 +209,8 @@ export class MusicPlayerState {
                 }
                 if (artists.length > 0) {
                     track.artists = artists;
+                } else {
+                    track.artists = [];
                 }
             }
 
@@ -271,7 +273,7 @@ export class MusicPlayerState {
                 response = await musicClient.spotifyApiGet(api);
             }
 
-            if (response && response.data) {
+            if (response && response.status === 200 && response.data) {
                 const artistData = response.data;
                 // delete external_urls
                 delete artistData.external_urls;
@@ -303,7 +305,12 @@ export class MusicPlayerState {
             response = await musicClient.spotifyApiGet(api);
         }
 
-        if (response && response.data && response.data.item) {
+        if (
+            response &&
+            response.status === 200 &&
+            response.data &&
+            response.data.item
+        ) {
             track = this.copySpotifyTrackToCodyTrack(response.data.item);
         } else {
             track = new Track();
@@ -345,7 +352,12 @@ export class MusicPlayerState {
         }
 
         let tracks: Track[] = [];
-        if (response && response.data && response.data.items) {
+        if (
+            response &&
+            response.status === 200 &&
+            response.data &&
+            response.data.items
+        ) {
             for (let i = 0; i < response.data.items.length; i++) {
                 let spotifyTrack = response.data.items[i].track;
                 const track: Track = this.copySpotifyTrackToCodyTrack(
@@ -371,7 +383,12 @@ export class MusicPlayerState {
             response = await musicClient.spotifyApiGet(api);
         }
 
-        if (response && response.data && response.data.item) {
+        if (
+            response &&
+            response.status === 200 &&
+            response.data &&
+            response.data.item
+        ) {
             // override "type" with "spotify"
             response.data.item["type"] = "spotify";
             response.data.item["playerType"] = PlayerType.WebSpotify;

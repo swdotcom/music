@@ -109,6 +109,8 @@ describe("spotify nonplaylist tests", () => {
             true
         );
 
+        // console.log("track: ", JSON.stringify(track, null, 2));
+
         expect(track.uri).to.equal("spotify:track:4iVVU8DyQvOVsKafv3KWIF");
     });
 });

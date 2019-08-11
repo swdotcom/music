@@ -56,7 +56,12 @@ export class Playlist {
         }
 
         while (true) {
-            if (codyResp && codyResp.data && codyResp.data.items) {
+            if (
+                codyResp &&
+                codyResp.status === 200 &&
+                codyResp.data &&
+                codyResp.data.items
+            ) {
                 let trackContainers: any[] = codyResp.data.items;
 
                 // ensure the playerType is set
@@ -112,7 +117,12 @@ export class Playlist {
                 // try again
                 codyResp = await musicClient.spotifyApiGet(api, qsOptions);
             }
-            if (codyResp && codyResp.data && codyResp.data.items) {
+            if (
+                codyResp &&
+                codyResp.status === 200 &&
+                codyResp.data &&
+                codyResp.data.items
+            ) {
                 playlists = codyResp.data.items;
                 // ensure the playerType is set
                 playlists.map((playlist: PlaylistItem) => {
@@ -155,7 +165,12 @@ export class Playlist {
         const paginationItem: PaginationItem = new PaginationItem();
         let tracks: Track[] = [];
         while (true) {
-            if (codyResp && codyResp.data && codyResp.data.items) {
+            if (
+                codyResp &&
+                codyResp.status === 200 &&
+                codyResp.data &&
+                codyResp.data.items
+            ) {
                 let trackContainers: any[] = codyResp.data.items;
 
                 // ensure the playerType is set
@@ -298,7 +313,7 @@ export class Playlist {
         }
 
         let emptyResult: any = {};
-        if (!codyResp.data) {
+        if (codyResp && !codyResp.data) {
             if (type === "track") {
                 emptyResult["tracks"] = { items: [] };
             } else if (type === "album") {
@@ -310,7 +325,9 @@ export class Playlist {
             }
         }
 
-        return codyResp.data ? codyResp.data : emptyResult;
+        return codyResp && codyResp.status === 200 && codyResp.data
+            ? codyResp.data
+            : emptyResult;
     }
 
     /**

@@ -47,7 +47,7 @@ export class UserProfile {
             response = await musicClient.spotifyApiGet(api);
         }
 
-        if (response && response.data) {
+        if (response && response.status === 200 && response.data) {
             spotifyUser = response.data;
             musicStore.spotifyUserId = spotifyUser.id;
         }

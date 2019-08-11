@@ -289,6 +289,11 @@ export class MusicClient {
         }
         codyResp.state = CodyResponseType.Failed;
         codyResp.error = err;
+        if (err.response && err.response.data && err.response.data.error) {
+            codyResp.message = err.response.data.error.message;
+        } else {
+            codyResp.message = err.message;
+        }
         codyResp.message = err.message;
         if (err.response && err.response.status === 401) {
             codyResp.statusText = "EXPIRED";

@@ -56,7 +56,11 @@ export class AudioStat {
                 response = await musicClient.spotifyApiGet(api);
             }
             // response.data will have a listof audio_features if it's successful:
-            if (response.data && response.data.audio_features) {
+            if (
+                response.data &&
+                response.status === 200 &&
+                response.data.audio_features
+            ) {
                 /**
                 * { "audio_features":
                 [ { "danceability": 0.808,
