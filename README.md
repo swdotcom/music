@@ -111,9 +111,7 @@ Specify either "Spotify" or "iTunes" (case-insensitive).
 ```javascript
 // get the track info using get state
 await CodyMusic.getRunningTrack().then((track: Track) => {
-    // - "genre" will be empty from Spotify
-    // - duration is in milliseconds
-    // {artist, album, genre, disc_number, duration, played_count, track_number, id, loved, name, state, volume}
+    // returns the Track data
 });
 
 // play a specific spotify track
@@ -160,22 +158,25 @@ setConfig(config: CodyConfig)
  *
  * @param string
  * @param limit (min of 1 and a max of 50)
- * @return {tracks: {href, items: [<track>...], limit, next, offset, previous, total}}
  */
-searchTracks(keywords: string, limit: number = 50);
+searchTracks(keywords: string, limit: number = 50)
 
 /**
  * Valid types are: album, artist, playlist, and track
  * keywords: send the keywords to search against.
  * Use specific filter name if you want to search against certain
  * fields.
- * Example searchArtists("track:what a time artist:tom")
+ * Example searchTracks("track:what a time artist:tom")
  *
  * @param string
  * @param limit (min of 1 and a max of 50)
- * @return {artists: {href, items: [<track>...], limit, next, offset, previous, total}}
  */
-searchArtists(keywords: string, limit: number = 50);
+searchArtists(keywords: string, limit: number = 50)
+
+/**
+ * Returns true if the user has granted Mac OS access for iTunes control
+ */
+isItunesAccessGranted()
 
 /**
  * Get the Spotify accessToken provided via through the setConfig api
@@ -184,28 +185,23 @@ searchArtists(keywords: string, limit: number = 50);
 getSpotifyAccessToken()
 
 /**
- * Returns true if the user has granted Mac OS access for iTunes control
- */
-isItunesAccessGranted()
-
-/**
  * Checks if the Spotify desktop or web player is running or not
  * @returns {Promise<boolean>}
  */
-isSpotifyRunning(): Promise<boolean>
+isSpotifyRunning()
 
 /**
  * Checks if the iTunes desktop player is running or not
  * @returns {Promise<boolean>}
  */
-isItunesRunning(): Promise<boolean>
+isItunesRunning()
 
 /**
  * Checks if one of the specified players is running
  * @param player {spotify|spotify-web|itunes}
  * @returns {Promise<boolean>}
  */
-isPlayerRunning(player: PlayerName): Promise<boolean>
+isPlayerRunning(player: PlayerName)
 
 /**
  * Returns whether there's an active track,
@@ -215,7 +211,44 @@ isPlayerRunning(player: PlayerName): Promise<boolean>
 hasActiveTrack(): Promise<boolean>
 
 /**
- * Returns the player state and track of a given player {spotify|spotify-web|itunes}
+ * Returns the currently running track.
+ * Spotify web, desktop, or itunes desktop.
+ * If it finds a spotify device but it's not playing, and mac iTunes is not playing
+ * or paused, then it will return the Spotify track.
+ * It will return an empty Track object if it's unable to
+ * find a running track.
+ * @returns {Promise<Track>}
+ **/
+getRunningTrack(): Promise<Track>
+
+/**
+ * Fetch the recently played spotify tracks
+ * @param limit
+ */
+getSpotifyRecentlyPlayedTracks(limit: number): Promise<Track[]>
+
+/**
+ * Fetch the spotify player context
+ * Info about the device, is playing state, etc.
+ */
+getSpotifyPlayerContext(): Promise<PlayerContext>
+
+/**
+ * Returns a track by the given spotify track id
+ * @param id
+ * @param includeFullArtistData (optional - if true it will return full artist info)
+ * @package includeAudioFeaturesData (optional)
+ * @param includeGenre (optional)
+ */
+getSpotifyTrackById(
+    id: string,
+    includeFullArtistData: boolean = false,
+    includeAudioFeaturesData: boolean = false,
+    includeGenre: boolean = false
+): Promise<Track>
+
+/**
+ * Returns the track of a given player {spotify|spotify-web|itunes}
  * - Spotify does not return a "genre"
  * - duration is in milliseconds
  * @param player {spotify|spotif-web|itunes}
@@ -224,46 +257,46 @@ hasActiveTrack(): Promise<boolean>
 getTrack(player: PlayerName): Promise<Track>
 
 /**
- * Returns a track by the given spotify track id
- * @param id (this can be the track uri or track id)
- * @param includeFullArtistData (optional - if true it will return full artist info)
- */
-getSpotifyTrackById(id: string, includeFullArtistData: boolean): Promise<Track>
-
-/**
- * Returns the currently running track.
- * Spotify web, desktop, or itunes desktop.
- * If it finds a spotify device but it's not playing, and mac iTunes is not playing
- * or paused, then it will return the Spotify track.
- **/
-getRunningTrack(): Promise<Track>
-
-/**
- * Returns the tracks that are found by the given playlist name
- * @param player {spotify|spotify-web|itunes}
+ * Returns the tracks that are found for itunes
+ * @param player {itunes}
  * @param playListName
  */
-getTracksByPlaylistName(player: PlayerName,
-    playListName: string): Promise<PlaylistItem[]>
+getTracksByPlaylistName(
+    player: PlayerName,
+    playListName: string
+): Promise<Track[]>
 
 /**
- * Mac iTunes only
- * This will allow you to play a playlist starting at a specific playlist track number.
+ * Currently only returns Spotify Web tracks not associated with a playlist.
+ * @param player
+ * @param qsOptions
  */
-playItunesTrackNumberInPlaylist(playlistName: string,trackNumber: number)
+getSpotifyLikedSongs(
+    qsOptions: any = {}
+): Promise<Track[]>
+
+/**
+ * Currently only returns Spotify Web tracks not associated with a playlist.
+ * @param player
+ * @param qsOptions
+ */
+getSavedTracks(
+    player: PlayerName,
+    qsOptions: any = {}
+): Promise<Track[]>
 
 /**
  * Returns the tracks that are found by the given playlist name
- * CodyResponse.data will contain <PaginationItem>
- *  - PaginationItem contains
- *    {tracks:Track[], offset, next, previous, limit, total}
- * @param player {spotify|spotify-web|itunes}
- * @param playlist_id
+ * - currently spofity-web support only
+ * @param player {spotify-web}
+ * @param playlist_id (optional)
  * @param qsOptions (optional) {offset, limit}
  */
-getPlaylistTracks(player: PlayerName,
+getPlaylistTracks(
+    player: PlayerName,
     playlist_id: string,
-    qsOptions: any = {}): Promise<CodyResponse>
+    qsOptions: any = {}
+): Promise<CodyResponse>
 
 /**
  * Plays a playlist at the beginning if the starting track id is not provided.
@@ -274,7 +307,8 @@ getPlaylistTracks(player: PlayerName,
 playSpotifyPlaylist(
     playlistId: string,
     startingTrackId: string = "",
-    deviceId: string = "")
+    deviceId: string = ""
+)
 
 /**
  * Plays a specific track on the Spotify or iTunes desktop
@@ -286,7 +320,16 @@ playSpotifyPlaylist(
  * itunes example   ["Let Me Down Slowly", "MostRecents"]
  *   -- provide the track name then the playlist name
  */
-playTrackInContext(player: PlayerName, params: any[]);
+playTrackInContext(player: PlayerName, params: any[])
+
+/**
+ * Mac iTunes only
+ * This will allow you to play a playlist starting at a specific playlist track number.
+ */
+playItunesTrackNumberInPlaylist(
+    playlistName: string,
+    trackNumber: number
+)
 
 /**
  * Quits/closes the mac Spotify or iTunes player
@@ -295,20 +338,29 @@ playTrackInContext(player: PlayerName, params: any[]);
 quitMacPlayer(player: PlayerName)
 
 /**
- * Plays a specific track on the Spotify or iTunes desktop from a specified library
+ * This is only meant for Mac iTunes or Mac Spotify desktop
  * @param player
  * @param params
- * itunes example   ["Let Me Down Slowly", "MostRecents"]
- *   -- provide the track name then the playlist name
  */
 playTrackInLibrary(player: PlayerName, params: any[])
 
 /**
  * Initiate and play the specified Spotify device
  * @param device_id {string}
- * @param play {boolean}
  */
 playSpotifyDevice(device_id: string)
+
+/**
+ * Initiate and play the specified Spotify device
+ * @param device_id {string}
+ * @param play {boolean} true to play and false to keep current play state
+ */
+transferSpotifyDevice(device_id: string, play: boolean)
+
+/**
+ * Fetch the user's profile
+ */
+getUserProfile(): Promise<SpotifyUser>
 
 /**
  * Initiate the play command for a specific player
@@ -316,17 +368,9 @@ playSpotifyDevice(device_id: string)
  * @param options { uris, device_id }
  * example
  * -- the uris can be in either URI or ID format
- * {device_id: <spotify_device_id>, uris: ["spotify:track:4iV5W9uYEdYUVa79Axb7Rh", "spotify:track:1301WleyT98MSxVHPZCA6M"]}
+ * {device_id: <spotify_device_id>, uris: ["spotify:track:4iV5W9uYEdYUVa79Axb7Rh", "spotify:track:1301WleyT98MSxVHPZCA6M"], context_uri: <playlist_uri, album_uri>}
  */
 play(player: PlayerName, options: any = {})
-
-/**
- * Initiate the play command for a given trackId for a specific player
- *  -- the trackId can be in either URI or ID format
- * @param player {spotify|spotify-web|itunes}
- * @param trackId {string}
- */
-playTrack(player: PlayerName, trackId: string)
 
 /**
  * Play a specific spotify track by trackId (it can be the URI or the ID)
@@ -336,12 +380,16 @@ playTrack(player: PlayerName, trackId: string)
 playSpotifyTrack(trackId: string, deviceId: string = "")
 
 /**
- * Initiate the pause command for a specific player
+ * Initiate the play command for a given trackId for a specific player
  * @param player {spotify|spotify-web|itunes}
- * @param options { uris, device_id }
- * example
- * -- the uris can be in either URI or ID format
- * {device_id: <spotify_device_id>, uris: ["spotify:track:4iV5W9uYEdYUVa79Axb7Rh", "spotify:track:1301WleyT98MSxVHPZCA6M"]}
+ * @param trackId {any (string|number)}
+ */
+playTrack(PlayerName: PlayerName, trackId: any)
+
+/**
+ * Initiate the pause command for a given player
+ * @param player {spotify|spotify-web|itunes}
+ * @param options
  */
 pause(player: PlayerName, options: any = {})
 
@@ -353,22 +401,16 @@ pause(player: PlayerName, options: any = {})
 playPause(player: PlayerName)
 
 /**
- * Initiate the next command for a specific player
+ * Initiate the next command for a given player
  * @param player {spotify|spotify-web|itunes}
- * @param options { uris, device_id }
- * example
- * -- the uris can be in either URI or ID format
- * {device_id: <spotify_device_id>, uris: ["spotify:track:4iV5W9uYEdYUVa79Axb7Rh", "spotify:track:1301WleyT98MSxVHPZCA6M"]}
+ * @param options
  */
 next(player: PlayerName, options: any = {})
 
 /**
- * Initiate the previous command for a specific player
+ * Initiate the previous command for a given player
  * @param player {spotify|spotify-web|itunes}
- * @param options { uris, device_id }
- * example
- * -- the uris can be in either URI or ID format
- * {device_id: <spotify_device_id>, uris: ["spotify:track:4iV5W9uYEdYUVa79Axb7Rh", "spotify:track:1301WleyT98MSxVHPZCA6M"]}
+ * @param options
  */
 previous(player: PlayerName, options: any = {})
 
@@ -408,16 +450,14 @@ setVolume(player: PlayerName, volume: number)
 /**
  * Increments the players volume by a number
  * @param player {spotify|spotify-web|itunes}
- * @param volume {0-100}
  */
-volumeUp(player: PlayerName, volume: number)
+volumeUp(player: PlayerName)
 
 /**
  * Decrements the players volume by a number
  * @param player {spotify|spotify-web|itunes}
- * @param volume {0-100}
  */
-volumeDown(player: PlayerName, volume: number)
+volumeDown(player: PlayerName)
 
 /**
  * Mutes the players volume
@@ -450,9 +490,12 @@ getPlaylists(
 /**
  * Get the full list of the playlist names for a given player
  * @param player {spotify|spotify-web|itunes}
- * @param (optional) {limit, offset}
+ * @param qsOptions (optional) {limit, offset}
  */
-getPlaylistNames(player: PlayerName, qsOptions: any = {}):Promise<string[]>
+getPlaylistNames(
+    player: PlayerName,
+    qsOptions: any = {}
+): Promise<string[]>
 
 /**
  * Launches a player device
@@ -468,17 +511,14 @@ launchPlayer(playerName: PlayerName, options: any = {})
 getSpotifyDevices(): Promise<PlayerDevice[]>
 
 /**
- * Currently only returns Spotify Web tracks not associated with a playlist.
- * @param qsOptions (i.e. {limit: 10, offset: 0} return 10 tracks starting at offset 0 (base of zero))
- */
-getSpotifyLikedSongs(qsOptions: any = {}): Promise<Track[]>
-
-/**
  * Returns the genre for a provided arguments
  * @param artist {string} is required
  * @param songName {string} is optional
  */
-getGenre(artist: string, songName: string = ""): Promise<string>
+getGenre(
+    artist: string,
+    songName: string = ""
+): Promise<string>
 
 /**
  * Returns the spotify genre for a provided arguments
@@ -490,7 +530,9 @@ getSpotifyGenre(artist: string): Promise<string>
  * Returns the audio features of the given track IDs
  * @param ids these are the track ids (sans spotify:track)
  */
-getSpotifyAudioFeatures(ids: string[]): Promise<SpotifyAudioFeature[]>
+getSpotifyAudioFeatures(
+    ids: string[]
+): Promise<SpotifyAudioFeature[]>
 
 /**
  * Create a playlist for a Spotify user. (The playlist will be empty until you add tracks.)
@@ -498,12 +540,16 @@ getSpotifyAudioFeatures(ids: string[]): Promise<SpotifyAudioFeature[]>
  * @param isPublic if the playlist will be public or private
  * @param description (Optioal) displayed in Spotify Clients and in the Web API
  */
-createPlaylist(name: string, isPublic: boolean, description: string = "")
+createPlaylist(
+    name: string,
+    isPublic: boolean,
+    description: string = ""
+)
 
 /**
- * Deletes a playlist given a specified playlist ID.
+ * Deletes a playlist of a given playlist ID.
  * @param playlist_id
- **/
+ */
 deletePlaylist(playlist_id: string)
 
 /**
@@ -548,44 +594,66 @@ removeTracksFromPlaylist(
  * @returns <boolean>
  */
 requiresSpotifyAccessInfo(): boolean
-```
 
-Deprecated APIs
-
-```js
-
-// deprecate, please use "getSpotifyAccessToken()"
-getAccessToken()
-
-// deprecated, please use "getRunningTrack()"
-getCurrentlyRunningTrackState(): Promise<Track>
-
-// deprecated, please use "getTrack"
+/**
+ * Deprecated - use "getTrack(player)"
+ */
 getPlayerState(player: PlayerName): Promise<Track>
 
-// deprecated, please use "getTrack"
+/**
+ * Deprecated - use "getRunningTrack()" instead
+ */
+getCurrentlyRunningTrackState(): Promise<Track>
+
+/**
+ * Deprecated - please use "getPlayerState"
+ */
 getState(player: PlayerName): Promise<Track>
 
-// deprecated, please use "launchPlayer('spotify')"
+/**
+ * Deprecated - please use "launchPlayer('spotify')"
+ **/
 startSpotifyIfNotRunning()
 
-// deprecated, please use "launchPlayer('itunes')"
+/**
+ * Deprecated - please use "launchPlayer('itunes')"
+ */
 startItunesIfNotRunning()
 
-// deprecated, please use "isSpotifyRunning" or "isItunesRunning"
+/**
+ * Deprecated - please use "isSpotifyRunning" or "isItunesRunning"
+ */
 isRunning(player: PlayerName): Promise<boolean>
 
-// deprecated, please use "setRepat(player, repeat)"
+/**
+ * Deprecated - please use "setRepat(player, repeat)"
+ */
 repeatOn(player: PlayerName)
 
-// deprecated, please use "setRepat(player, repeat)"
+/**
+ * Deprecated - please use "setRepat(player, repeat)"
+ */
 repeatOff(player: PlayerName)
 
-// deprecated, please use "unmute(player)"
+/**
+ * Deprecated - please use "unmute(player)"
+ */
 unMute(player: PlayerName)
 
-// Deprecated, please use "setConfig(config: CodyConfig)"
+/**
+ * Deprecated - please use "setConfig(config: CodyConfig)"
+ * Set Credentials (currently only supports Spotify)
+ * Accepted credentials: clientId, clientSecret, refreshToken, accessToken
+ * @param credentials
+ */
 setCredentials(credentials: any)
+
+/**
+ * Deprecated - please use "getSpotifyAccessToken()"
+ * Get the accessToken provided via through the setCredentials api
+ * @returns {string} the access token string
+ */
+getAccessToken()
 ```
 
 ## Contributors
