@@ -5,17 +5,18 @@ import {
     PlaylistItem,
     Track,
     PaginationItem,
-    PlayerType,
-    Album
+    PlayerType
 } from "./models";
 import { MusicStore } from "./store";
 import { UserProfile } from "./profile";
 import { MusicUtil } from "./util";
+import { CacheUtil } from "./cache";
 
 const musicClient = MusicClient.getInstance();
 const musicStore = MusicStore.getInstance();
 const userProfile = UserProfile.getInstance();
 const musicUtil = new MusicUtil();
+const cacheUtil = CacheUtil.getInstance();
 
 export class Playlist {
     private static instance: Playlist;
@@ -289,10 +290,20 @@ export class Playlist {
      * @param q
      */
     async search(type: string, q: string, limit: number = 50) {
+        limit = limit < 1 ? 1 : limit > 50 ? 50 : limit;
+        q = q.trim();
+
+        const cacheId = `search_${type}_${q}_${limit}`;
+        let searchResult = cacheUtil.getItem(cacheId);
+        if (searchResult) {
+            // return the value from cache
+            return searchResult;
+        }
+
         let qryObj: any = {
             type,
             q,
-            limit: limit < 1 ? 1 : limit > 50 ? 50 : limit
+            limit
         };
 
         // concat the key/value filterObjects
@@ -312,8 +323,69 @@ export class Playlist {
             codyResp = await musicClient.spotifyApiGet(api, qryObj);
         }
 
+        let hasData =
+            codyResp &&
+            codyResp.data &&
+            codyResp.data.tracks &&
+            codyResp.data.tracks.items &&
+            codyResp.data.tracks.items.length > 0
+                ? true
+                : false;
+
+        // empty result example (and the basic result structure)
+        /**
+         * {"status":200,"state":"success","statusText":"OK","message":"",
+         *   "data":{
+         *     "tracks":{
+         *       "href":"https://api.spotify.com/v1/search?query=track%3AEl+Perd%C3%B3n+artist%3ANicky+Jam+%26+Enrique+Iglesias&type=track&market=US&offset=0&limit=1",
+         *       "items":[],
+         *       "limit":1,
+         *       "next":null,
+         *       "offset":0,
+         *       "previous":null,
+         *       "total":0
+         *     }
+         *   },
+         *   "error":{}
+         *  }
+         */
+        // If the search doesn't return anything for a track and the search
+        // included "track:" and "artist:", try again with just the "track:"
+        if (type === "track" && !hasData) {
+            // create a new query with just the track
+            if (q.includes("track:") && q.includes("artist:")) {
+                const trackIdx = q.indexOf("track:");
+                const artistIdx = q.indexOf("artist:");
+                if (artistIdx > trackIdx) {
+                    // grab everything up until the artistIdx
+                    q = q.substring(0, artistIdx);
+                } else {
+                    // grab everything start from the trackIdx
+                    q = q.substring(trackIdx);
+                }
+
+                q = q.trim();
+
+                qryObj = {
+                    type,
+                    q,
+                    limit
+                };
+                codyResp = await musicClient.spotifyApiGet(api, qryObj);
+            }
+        }
+
+        hasData =
+            codyResp &&
+            codyResp.data &&
+            codyResp.data.tracks &&
+            codyResp.data.tracks.items &&
+            codyResp.data.tracks.items.length > 0
+                ? true
+                : false;
+
         let emptyResult: any = {};
-        if (codyResp && !codyResp.data) {
+        if (!hasData) {
             if (type === "track") {
                 emptyResult["tracks"] = { items: [] };
             } else if (type === "album") {
@@ -325,9 +397,13 @@ export class Playlist {
             }
         }
 
-        return codyResp && codyResp.status === 200 && codyResp.data
-            ? codyResp.data
-            : emptyResult;
+        searchResult = hasData ? codyResp.data : emptyResult;
+        if (hasData) {
+            // 24 hours
+            cacheUtil.setItem(cacheId, searchResult, 60 * 60 * 24 /* second */);
+        }
+
+        return searchResult;
     }
 
     /**

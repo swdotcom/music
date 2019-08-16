@@ -28,27 +28,30 @@ describe("spotify search tests", () => {
         done();
     });
 
-    it("search for tracks", done => {
-        CodyMusic.searchTracks("track:what a time artist:tom", 1)
-            .then((result: any) => {
-                expect(result.tracks.items.length).to.not.equal(0);
-                done();
-            })
-            .catch((err: any) => {
-                console.log("error searching for tracks: ", err.message);
-                done();
-            });
+    it("search for tracks", async () => {
+        let result = await CodyMusic.searchTracks(
+            "track:what a time artist:tom",
+            1
+        );
+        expect(result.tracks.items.length).to.not.equal(0);
+
+        result = await CodyMusic.searchTracks(
+            "artist:Nicky Jam & Enrique Iglesias track:El Perdón",
+            1
+        );
+        expect(result.tracks.items.length).to.not.equal(0);
+
+        // trying again to show we're using cache
+        result = await CodyMusic.searchTracks(
+            "artist:Nicky Jam & Enrique Iglesias track:El Perdón",
+            1
+        );
+
+        expect(result.tracks.items.length).to.not.equal(0);
     });
 
-    it("search for artists", done => {
-        CodyMusic.searchArtists("tom walker", 1)
-            .then((result: any) => {
-                expect(result.artists.items.length).to.not.equal(0);
-                done();
-            })
-            .catch((err: any) => {
-                console.log("error searching for tracks: ", err.message);
-                done();
-            });
+    xit("search for artists", async () => {
+        let result = await CodyMusic.searchArtists("walker", 1);
+        expect(result.artists.items.length).to.not.equal(0);
     });
 });

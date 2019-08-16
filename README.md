@@ -155,6 +155,8 @@ setConfig(config: CodyConfig)
  * Use specific filter name if you want to search against certain
  * fields.
  * Example searchTracks("track:what a time artist:tom")
+ * If you use track and artist and internally it doesn't return a match,
+ * it will search again with only the track part of the query.
  *
  * @param string
  * @param limit (min of 1 and a max of 50)
