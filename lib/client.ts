@@ -47,9 +47,9 @@ export class MusicClient {
         const qryStr = `q=${qParam}&type=artist&limit=1`;
         const api = `/v1/search?${qryStr}`;
 
-        spotifyClient.defaults.headers.common["Authorization"] = `Bearer ${
-            musicStore.spotifyAccessToken
-        }`;
+        spotifyClient.defaults.headers.common[
+            "Authorization"
+        ] = `Bearer ${musicStore.spotifyAccessToken}`;
         return spotifyClient
             .get(api)
             .then(resp => {
@@ -122,9 +122,7 @@ export class MusicClient {
                 message: "Missing Spotify Credentials"
             };
         }
-        const authPayload = `${musicStore.spotifyClientId}:${
-            musicStore.spotifyClientSecret
-        }`;
+        const authPayload = `${musicStore.spotifyClientId}:${musicStore.spotifyClientSecret}`;
         const encodedAuthPayload = Buffer.from(authPayload).toString("base64");
 
         spotifyAccountClient.defaults.headers.common[
@@ -134,9 +132,7 @@ export class MusicClient {
             "application/x-www-form-urlencoded";
         let response = await spotifyAccountClient
             .post(
-                `/api/token?grant_type=refresh_token&refresh_token=${
-                    musicStore.spotifyRefreshToken
-                }`,
+                `/api/token?grant_type=refresh_token&refresh_token=${musicStore.spotifyRefreshToken}`,
                 null
             )
             .then(resp => {
@@ -174,11 +170,11 @@ export class MusicClient {
         }
         api = this.addQueryStringToApi(api, qsOptions);
 
-        // console.log(`GET API: ${api}`);
+        console.log(`GET API: ${api}`);
 
-        spotifyClient.defaults.headers.common["Authorization"] = `Bearer ${
-            musicStore.spotifyAccessToken
-        }`;
+        spotifyClient.defaults.headers.common[
+            "Authorization"
+        ] = `Bearer ${musicStore.spotifyAccessToken}`;
 
         return spotifyClient
             .get(api)
@@ -200,9 +196,9 @@ export class MusicClient {
         }
         api = this.addQueryStringToApi(api, qsOptions);
 
-        spotifyClient.defaults.headers.common["Authorization"] = `Bearer ${
-            musicStore.spotifyAccessToken
-        }`;
+        spotifyClient.defaults.headers.common[
+            "Authorization"
+        ] = `Bearer ${musicStore.spotifyAccessToken}`;
         return spotifyClient
             .put(api, payload)
             .then((resp: any) => {
@@ -223,9 +219,9 @@ export class MusicClient {
         }
         api = this.addQueryStringToApi(api, qsOptions);
 
-        spotifyClient.defaults.headers.common["Authorization"] = `Bearer ${
-            musicStore.spotifyAccessToken
-        }`;
+        spotifyClient.defaults.headers.common[
+            "Authorization"
+        ] = `Bearer ${musicStore.spotifyAccessToken}`;
         return spotifyClient
             .post(api, payload)
             .then((resp: any) => {
@@ -246,9 +242,9 @@ export class MusicClient {
         }
         api = this.addQueryStringToApi(api, qsOptions);
 
-        spotifyClient.defaults.headers.common["Authorization"] = `Bearer ${
-            musicStore.spotifyAccessToken
-        }`;
+        spotifyClient.defaults.headers.common[
+            "Authorization"
+        ] = `Bearer ${musicStore.spotifyAccessToken}`;
         return spotifyClient
             .delete(api, payload)
             .then((resp: any) => {

@@ -2,15 +2,12 @@ const expect = require("chai").expect;
 import * as CodyMusic from "../../index";
 import { MusicUtil } from "../../lib/util";
 import { MusicController } from "../../lib/controller";
-import { MusicPlayerState } from "../../lib/playerstate";
 import { TestUtil } from "../util";
-import { PlayerName } from "../../lib/models";
 
 const testUtil = new TestUtil();
 
 const musicUtil = new MusicUtil();
 const musicCtr = MusicController.getInstance();
-const musicPlayerCtr = MusicPlayerState.getInstance();
 
 /**
  * Don't add "async" into the it condition.
@@ -111,19 +108,50 @@ describe("player control tests", () => {
             });
     });
 
-    // it("Play playlist by offset", done => {
-    //     // https://open.spotify.com/playlist/6jCkTED0V5NEuM8sKbGG1Z
-    //     let options = {
-    //         offset: { position: 1 },
-    //         context_uri: "spotify:playlist:6jCkTED0V5NEuM8sKbGG1Z"
-    //     };
-    //     CodyMusic.play(PlayerName.SpotifyWeb, options)
-    //         .then(result => {
-    //             console.log("play result: ", result);
-    //             done();
-    //         })
-    //         .catch(err => {
-    //             done();
-    //         });
-    // });
+    it("Get recommended tracks", async () => {
+        let limit = 5;
+        let recommendedTracks = await CodyMusic.getRecommendationsForTracks(
+            ["4ut5G4rgB1ClpMTMfjoIuy"],
+            limit,
+            "US",
+            2
+        );
+
+        let names = recommendedTracks.map(track => {
+            return track.name;
+        });
+
+        let myTrack = await CodyMusic.getSpotifyTrackById(
+            "spotify:track:0i0wnv9UoFdZ5MfuFGQzMy"
+        );
+
+        console.log(`requested ${limit} recommendations`);
+        console.log("seed track: ", myTrack.name);
+        console.log("recommended tracks: ", names.join(", "));
+    });
+
+    it("Get recommended track for multiple seed", async () => {
+        let limit = 10;
+        let recommendedTracks = await CodyMusic.getRecommendationsForTracks(
+            ["4ut5G4rgB1ClpMTMfjoIuy", "0i0wnv9UoFdZ5MfuFGQzMy"],
+            limit,
+            "US",
+            2
+        );
+
+        let names = recommendedTracks.map(track => {
+            return track.name;
+        });
+
+        let myTrack1 = await CodyMusic.getSpotifyTrackById(
+            "spotify:track:4ut5G4rgB1ClpMTMfjoIuy"
+        );
+        let myTrack2 = await CodyMusic.getSpotifyTrackById(
+            "spotify:track:0i0wnv9UoFdZ5MfuFGQzMy"
+        );
+
+        console.log(`requested ${limit} recommendations`);
+        console.log("seed tracks: ", myTrack1.name, myTrack2.name);
+        console.log("recommended tracks: ", names.join(", "));
+    });
 });

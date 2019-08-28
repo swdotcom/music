@@ -213,6 +213,20 @@ isPlayerRunning(player: PlayerName)
 hasActiveTrack(): Promise<boolean>
 
 /**
+ * Returns the recommended tracks for the
+ * @param trackIds (required) 1 or more
+ * @param limit (optional) will default to 40 if not specified
+ * @param market (optional) will default to none if not specified
+ * @param min_popularity (optional) will default to a min or 20
+ */
+getRecommendationsForTracks(
+    trackIds: string[],
+    limit: number = 40,
+    market: string = "",
+    min_popularity: number = 20
+): Promise<Track[]>
+
+/**
  * Returns the currently running track.
  * Spotify web, desktop, or itunes desktop.
  * If it finds a spotify device but it's not playing, and mac iTunes is not playing

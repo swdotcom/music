@@ -128,6 +128,15 @@ export class MusicUtil {
         return playlist_id;
     }
 
+    createTrackIdsFromUris(uris: string[]) {
+        let trackIds = [];
+        for (let i = 0; i < uris.length; i++) {
+            trackIds.push(this.createSpotifyIdFromUri(uris[i]));
+        }
+
+        return trackIds;
+    }
+
     createUrisFromTrackIds(track_ids: string[], useUriObj: boolean = false) {
         let tracks = [];
 

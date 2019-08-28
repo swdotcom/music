@@ -370,6 +370,41 @@ export class MusicPlayerState {
         return tracks;
     }
 
+    async getRecommendationsForTracks(
+        trackIds: string[],
+        limit: number = 40,
+        market: string = "",
+        min_popularity: number = 20
+    ) {
+        let tracks: Track[] = [];
+
+        // change the trackIds to non-uri ids
+        trackIds = musicUtil.createTrackIdsFromUris(trackIds);
+        const qsOptions = {
+            market,
+            seed_tracks: trackIds.join(","),
+            limit,
+            min_popularity
+        };
+        const api = `/v1/recommendations`;
+
+        let response = await musicClient.spotifyApiGet(api, qsOptions);
+
+        // check if the token needs to be refreshed
+        if (response.statusText === "EXPIRED") {
+            // refresh the token
+            await musicClient.refreshSpotifyToken();
+            // try again
+            response = await musicClient.spotifyApiGet(api, qsOptions);
+        }
+
+        if (musicUtil.isResponseOk(response)) {
+            tracks = response.data.tracks;
+        }
+
+        return tracks;
+    }
+
     async getSpotifyPlayerContext(): Promise<PlayerContext> {
         let playerContext: PlayerContext = new PlayerContext();
         let api = "/v1/me/player";
