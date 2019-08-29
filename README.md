@@ -16,6 +16,7 @@ Cody Music is an open source package designed to help you perform Mac iTunes and
 -   Fetching Spotify devices
 -   Access token refresh retry
 -   Track recommendations from Spotify
+-   Add and remove to the Liked playlist
 
 ## iTunes API support
 
@@ -478,6 +479,20 @@ unmute(player: PlayerName)
  * @param player {spotify|spotify-web|itunes}
  */
 setItunesLoved(loved: boolean)
+
+/**
+ * Save tracks to your liked playlist
+ * @param trackIds (i.e. ["4iV5W9uYEdYUVa79Axb7Rh", "1301WleyT98MSxVHPZCA6M"])
+ */
+saveToSpotifyLiked(trackIds: string[]): Promise<CodyResponse>
+
+/**
+ * Remove tracks from your liked playlist
+ * @param trackIds (i.e. ["4iV5W9uYEdYUVa79Axb7Rh", "1301WleyT98MSxVHPZCA6M"])
+ */
+removeFromSpotifyLiked(
+    trackIds: string[]
+): Promise<CodyResponse>
 
 /**
  * Returns the playlists for a given player

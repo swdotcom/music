@@ -30,6 +30,56 @@ export class Playlist {
         return Playlist.instance;
     }
 
+    async removeFromSpotifyLiked(trackIds: string[]): Promise<CodyResponse> {
+        trackIds = musicUtil.createTrackIdsFromUris(trackIds);
+        const api = `/v1/me/tracks`;
+        /**
+         * ["4iV5W9uYEdYUVa79Axb7Rh", "1301WleyT98MSxVHPZCA6M"]
+         */
+        const qsOptions = { ids: trackIds.join(",") };
+        let codyResp: CodyResponse = await musicClient.spotifyApiDelete(
+            api,
+            qsOptions
+        );
+
+        // check if the token needs to be refreshed
+        if (codyResp.statusText === "EXPIRED") {
+            // refresh the token
+            await musicClient.refreshSpotifyToken();
+            // try again
+            codyResp = await musicClient.spotifyApiDelete(api, qsOptions);
+        }
+
+        return codyResp;
+    }
+
+    async saveToSpotifyLiked(trackIds: string[]): Promise<CodyResponse> {
+        trackIds = musicUtil.createTrackIdsFromUris(trackIds);
+        const api = `/v1/me/tracks`;
+        /**
+         * {ids:["4iV5W9uYEdYUVa79Axb7Rh", "1301WleyT98MSxVHPZCA6M"]}
+         */
+        const qsOptions = {};
+        const payload = {
+            ids: trackIds
+        };
+        let codyResp: CodyResponse = await musicClient.spotifyApiPut(
+            api,
+            qsOptions,
+            payload
+        );
+
+        // check if the token needs to be refreshed
+        if (codyResp.statusText === "EXPIRED") {
+            // refresh the token
+            await musicClient.refreshSpotifyToken();
+            // try again
+            codyResp = await musicClient.spotifyApiPut(api, qsOptions, payload);
+        }
+
+        return codyResp;
+    }
+
     async getSavedTracks(qsOptions: any = {}) {
         let tracks: Track[] = [];
 
@@ -58,9 +108,7 @@ export class Playlist {
 
         while (true) {
             if (
-                codyResp &&
-                codyResp.status === 200 &&
-                codyResp.data &&
+                musicUtil.isResponseOkWithData(codyResp) &&
                 codyResp.data.items
             ) {
                 let trackContainers: any[] = codyResp.data.items;

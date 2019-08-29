@@ -29,7 +29,14 @@ export class MusicUtil {
     }
 
     isResponseOk(resp: any) {
-        if (resp && resp.statusText === "OK") {
+        if (resp && resp.status === 200) {
+            return true;
+        }
+        return false;
+    }
+
+    isResponseOkWithData(resp: any) {
+        if (resp && resp.status === 200 && resp.data) {
             return true;
         }
         return false;

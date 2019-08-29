@@ -764,6 +764,24 @@ export function setItunesLoved(loved: boolean) {
 }
 
 /**
+ * Save tracks to your liked playlist
+ * @param trackIds (i.e. ["4iV5W9uYEdYUVa79Axb7Rh", "1301WleyT98MSxVHPZCA6M"])
+ */
+export function saveToSpotifyLiked(trackIds: string[]): Promise<CodyResponse> {
+    return playlist.saveToSpotifyLiked(trackIds);
+}
+
+/**
+ * Remove tracks from your liked playlist
+ * @param trackIds (i.e. ["4iV5W9uYEdYUVa79Axb7Rh", "1301WleyT98MSxVHPZCA6M"])
+ */
+export function removeFromSpotifyLiked(
+    trackIds: string[]
+): Promise<CodyResponse> {
+    return playlist.removeFromSpotifyLiked(trackIds);
+}
+
+/**
  * Returns the playlists for a given player
  * @param player {spotify|spotify-web|itunes}
  * @param (optional) {limit, offset}

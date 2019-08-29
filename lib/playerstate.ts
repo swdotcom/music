@@ -492,4 +492,8 @@ export class MusicPlayerState {
 
         return track;
     }
+
+    updateSpotifyLoved(loved: boolean) {
+        //
+    }
 }

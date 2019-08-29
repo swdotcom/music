@@ -3,10 +3,13 @@ import * as CodyMusic from "../../index";
 import { TestUtil } from "../util";
 import { PlayerName, PlaylistItem } from "../../lib/models";
 import { UserProfile, SpotifyUser } from "../../lib/profile";
+import { create } from "domain";
 
 const userProfile = UserProfile.getInstance();
 
 const testUtil = new TestUtil();
+
+const trackId = "4iV5W9uYEdYUVa79Axb7Rh";
 
 /**
  * Don't add "async" into the it condition.
@@ -17,24 +20,24 @@ const testUtil = new TestUtil();
  * "Error: Resolution method is overspecified. Specify a callback *or* return a Promise; not both."
  */
 describe("spotify playlist tests", () => {
-    before(done => {
+    before(async () => {
         let configFile = __dirname + "/../config.json";
         let data = testUtil.getJsonFromFile(configFile);
-        CodyMusic.setCredentials({
+        await CodyMusic.setCredentials({
             refreshToken: data.refreshToken,
             clientSecret: data.clientSecret,
             clientId: data.clientId,
             accessToken: data.accessToken
         });
 
-        done();
+        await CodyMusic.removeFromSpotifyLiked([trackId]);
     });
 
     after("clean up spotify playlist testing", done => {
         done();
     });
 
-    it("create a spotify playlist", async () => {
+    xit("create a spotify playlist", async () => {
         let result = await CodyMusic.createPlaylist(
             "cody-favs",
             false /*isPublic*/
@@ -77,9 +80,7 @@ describe("spotify playlist tests", () => {
                 expect(result.data.items[0]).to.not.equal(null);
                 expect(result.data.items[0].id).to.not.equal("");
 
-                const playlistUri = `${
-                    spotifyUser.uri
-                }:playlist:${playlist_id}`;
+                const playlistUri = `${spotifyUser.uri}:playlist:${playlist_id}`;
                 const options = {
                     context_uri: playlistUri,
                     track_ids: [result.data.items[0].id]
@@ -92,5 +93,33 @@ describe("spotify playlist tests", () => {
                 });
             });
         });
+    });
+
+    it("save tracks to liked playlist", async () => {
+        const resp = await CodyMusic.saveToSpotifyLiked([trackId]);
+
+        let tracks = await CodyMusic.getSavedTracks(PlayerName.SpotifyWeb, {
+            limit: 50
+        });
+
+        let createdTrack = tracks.filter(n => n.id === trackId);
+
+        expect(createdTrack).to.not.equal(null);
+
+        // now delete it
+
+        await CodyMusic.removeFromSpotifyLiked([trackId]);
+
+        tracks = await CodyMusic.getSavedTracks(PlayerName.SpotifyWeb, {
+            limit: 50
+        });
+
+        createdTrack = tracks.filter(n => n.id === trackId);
+
+        // should be an empty list
+        const isEmtpy = !createdTrack || createdTrack.length === 0;
+
+        // now it should be null
+        expect(isEmtpy).to.equal(true);
     });
 });
