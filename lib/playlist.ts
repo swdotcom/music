@@ -399,8 +399,8 @@ export class Playlist {
 
         searchResult = hasData ? codyResp.data : emptyResult;
         if (hasData) {
-            // 24 hours
-            cacheUtil.setItem(cacheId, searchResult, 60 * 60 * 24 /* second */);
+            // 6 hours
+            cacheUtil.setItem(cacheId, searchResult, 60 * 60 * 6);
         }
 
         return searchResult;

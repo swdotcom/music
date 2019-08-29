@@ -1,25 +1,6 @@
 # cody-music
 
-New updates include:
-
--   More comments for highest used APIs, more to come
-
--   Interally setting "itunesAccessGranted"
-    to true if the user has granted access to iTunes.
-
--   This is accessible via the api:
-
-    -   isItunesAccessGranted()
-
--   Support to specify which players are enabled for lookup
-
--   Improved playlist model definition to provide a tree view structure
-
--   Set or update Spotify access or other settings using the CodyConfig with the following api:
-
-    -   setConfig(codyConfig)
-
--   You can send all or partial settings updates
+Cody Music is an open source package designed to help you perform Mac iTunes and Spotify Web API playback functionality.
 
 ## Player control support
 
@@ -28,23 +9,28 @@ New updates include:
 
 ## Spotify web API support
 
--   Audio features
+-   Fetching Spotify audio features
 -   Playlists
     (create, delete, fetch playlist tracks, replace playlist tracks)
 -   Genre search
--   Spotify devices
+-   Fetching Spotify devices
 -   Access token refresh retry
+-   Track recommendations from Spotify
 
 ## iTunes API support
 
 -   Genre search
 
-More coming soon
-
 ## Installation
 
 ```
-$ npm install cody-music
+npm
+
+$ npm install cody-music --save
+
+yarn
+
+$ yarn add cody-music
 ```
 
 ## Running unit tests

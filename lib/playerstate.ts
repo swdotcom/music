@@ -282,8 +282,8 @@ export class MusicPlayerState {
         }
 
         if (artist) {
-            // cache it (48 hours)
-            cacheUtil.setItem(`artist_${id}`, artist, 60 * 60 * 24 * 2);
+            // cache it (6 hours)
+            cacheUtil.setItem(`artist_${id}`, artist, 60 * 60 * 6);
         } else {
             artist = new Artist();
         }

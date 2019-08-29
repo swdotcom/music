@@ -582,11 +582,11 @@ export class MusicController {
             genre = await this.getGenreFromSpotify(artist);
         }
         if (genre) {
-            // 48 hour cache
+            // 6 hour cache
             cacheUtil.setItem(
                 `genre_${artist}_${songName}`,
                 genre,
-                60 * 60 * 24 * 2
+                60 * 60 * 6
             );
         }
         return genre;
