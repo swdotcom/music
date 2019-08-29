@@ -3,8 +3,12 @@ export class CacheUtil {
 
     private static instance: CacheUtil;
     private constructor() {
-        //
+        // every 10 minutes check if we should expire any of the cache items
+        setInterval(() => {
+            this.checkCacheItemExpiration();
+        }, 1000 * 60 * 10);
     }
+
     static getInstance() {
         if (!CacheUtil.instance) {
             CacheUtil.instance = new CacheUtil();
@@ -45,7 +49,25 @@ export class CacheUtil {
         };
     }
 
+    deleteItem(key: string) {
+        if (this.cache[key]) {
+            this.cache[key] = null;
+        }
+    }
+
     resetCache() {
         this.cache = {};
+    }
+
+    // logic to check if we should expire the cache
+    checkCacheItemExpiration() {
+        if (this.cache) {
+            Object.keys(this.cache).forEach(key => {
+                if (this.isCacheExpired(key)) {
+                    // delete the cache
+                    this.deleteItem(key);
+                }
+            });
+        }
     }
 }

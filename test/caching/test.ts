@@ -1,13 +1,12 @@
-import { MusicUtil } from "../../lib/util";
-const expect = require("chai").expect;
 import * as CodyMusic from "../../index";
-import { TrackStatus, Track } from "../../lib/models";
+import { CacheUtil } from "../../lib/cache";
 import { MusicController } from "../../lib/controller";
 import { TestUtil } from "../util";
+const expect = require("chai").expect;
 
-const musicUtil = new MusicUtil();
 const musicCtr = MusicController.getInstance();
 const testUtil = new TestUtil();
+const cacheUtil = CacheUtil.getInstance();
 
 /**
  * Don't add "async" into the it condition.
@@ -40,6 +39,18 @@ describe("api caching tests", () => {
             await CodyMusic.getSpotifyDevices();
             await CodyMusic.getSpotifyDevices();
             await CodyMusic.getSpotifyDevices();
+            done();
+        });
+    });
+
+    it("Expire cache", done => {
+        CodyMusic.getSpotifyDevices().then(async (response: any) => {
+            cacheUtil.setItem("key1", "myval", 1);
+            let val = cacheUtil.getItem("key1");
+            expect(val).to.equal("myval");
+            cacheUtil.deleteItem("key1");
+            val = cacheUtil.getItem("key1");
+            expect(val).to.equal(null);
             done();
         });
     });
