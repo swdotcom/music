@@ -437,34 +437,34 @@ export class MusicPlayerState {
     }
 
     async launchAndPlaySpotifyTrack(
-        trackId: string,
-        spotifyUserId: string,
+        trackId: string = "",
         playlistId: string = ""
     ) {
         // check if there's any spotify devices
         const spotifyDevices: PlayerDevice[] = await this.getSpotifyDevices(
             true
         );
+
         if (!spotifyDevices || spotifyDevices.length === 0) {
             // no spotify devices found, lets launch the web player with the track
 
             // launch it
             await this.launchWebPlayer(PlayerName.SpotifyWeb);
 
-            // now select it from within the playlist within 1.2 seconds
-            setTimeout(() => {
+            // now select it from within the playlist within 2 seconds
+            await setTimeout(() => {
                 this.playSpotifyTrackFromPlaylist(
                     trackId,
-                    spotifyUserId,
+                    musicStore.spotifyUserId,
                     playlistId,
                     5 /* checkTrackStateAndTryAgain */
                 );
-            }, 1200);
+            }, 2000);
         } else {
             // a device is found, play using the device
             await this.playSpotifyTrackFromPlaylist(
                 trackId,
-                spotifyUserId,
+                musicStore.spotifyUserId,
                 playlistId,
                 2 /* checkTrackStateAndTryAgain */
             );
@@ -520,6 +520,10 @@ export class MusicPlayerState {
             );
         }
 
+        //
+        // Make sure the track is running.
+        //
+
         if (checkTrackStateAndTryAgainCount > 0) {
             const track: Track = await this.getSpotifyWebCurrentTrack();
 
@@ -529,7 +533,7 @@ export class MusicPlayerState {
 
             checkTrackStateAndTryAgainCount--;
 
-            // try again, 1.3 seconds
+            // try again, 1.5 seconds
             setTimeout(() => {
                 this.playSpotifyTrackFromPlaylist(
                     trackId,
@@ -537,7 +541,7 @@ export class MusicPlayerState {
                     playlistId,
                     checkTrackStateAndTryAgainCount
                 );
-            }, 1300);
+            }, 1500);
         }
     }
 
