@@ -9,7 +9,8 @@ import {
     PlayerType,
     PlayerContext,
     TrackStatus,
-    Artist
+    Artist,
+    PlayerName
 } from "./models";
 import { AudioStat } from "./audiostat";
 
@@ -19,6 +20,8 @@ const cacheUtil = CacheUtil.getInstance();
 const audioStat = AudioStat.getInstance();
 const musicController = MusicController.getInstance();
 const musicUtil = new MusicUtil();
+
+export const SPOTIFY_LIKED_SONGS_PLAYLIST_NAME = "Liked Songs";
 
 export class MusicPlayerState {
     private static instance: MusicPlayerState;
@@ -431,6 +434,111 @@ export class MusicPlayerState {
             playerContext = response.data;
         }
         return playerContext;
+    }
+
+    async launchAndPlaySpotifyTrack(
+        trackId: string,
+        spotifyUserId: string,
+        playlistId: string = ""
+    ) {
+        // check if there's any spotify devices
+        const spotifyDevices: PlayerDevice[] = await this.getSpotifyDevices(
+            true
+        );
+        if (!spotifyDevices || spotifyDevices.length === 0) {
+            // no spotify devices found, lets launch the web player with the track
+
+            // launch it
+            await this.launchWebPlayer(PlayerName.SpotifyWeb);
+
+            // now select it from within the playlist within 1.2 seconds
+            setTimeout(() => {
+                this.playSpotifyTrackFromPlaylist(
+                    trackId,
+                    spotifyUserId,
+                    playlistId,
+                    5 /* checkTrackStateAndTryAgain */
+                );
+            }, 1200);
+        } else {
+            // a device is found, play using the device
+            await this.playSpotifyTrackFromPlaylist(
+                trackId,
+                spotifyUserId,
+                playlistId,
+                2 /* checkTrackStateAndTryAgain */
+            );
+        }
+    }
+
+    async playSpotifyTrackFromPlaylist(
+        trackId: string,
+        spotifyUserId: string,
+        playlistId: string = "",
+        checkTrackStateAndTryAgainCount: number = 0
+    ) {
+        const spotifyUserUri = musicUtil.createSpotifyUserUriFromId(
+            spotifyUserId
+        );
+        if (playlistId === SPOTIFY_LIKED_SONGS_PLAYLIST_NAME) {
+            playlistId = "";
+        }
+        const spotifyDevices: PlayerDevice[] = await this.getSpotifyDevices(
+            false
+        );
+        const deviceId = spotifyDevices.length > 0 ? spotifyDevices[0].id : "";
+        let options: any = {};
+        if (deviceId) {
+            options["device_id"] = deviceId;
+        }
+
+        if (trackId) {
+            options["track_ids"] = [trackId];
+        } else {
+            options["offset"] = { position: 0 };
+        }
+        if (playlistId) {
+            const playlistUri = `${spotifyUserUri}:playlist:${playlistId}`;
+            options["context_uri"] = playlistUri;
+        }
+
+        /**
+         * to play a track without the play list id
+         * curl -X "PUT" "https://api.spotify.com/v1/me/player/play?device_id=4f38ae14f61b3a2e4ed97d537a5cb3d09cf34ea1"
+         * --data "{\"uris\":[\"spotify:track:2j5hsQvApottzvTn4pFJWF\"]}"
+         */
+
+        if (!playlistId) {
+            // just play by track id
+            await musicController.spotifyWebPlayTrack(trackId, deviceId);
+        } else {
+            // we have playlist id within the options, use that
+            await musicController.spotifyWebPlayPlaylist(
+                playlistId,
+                trackId,
+                deviceId
+            );
+        }
+
+        if (checkTrackStateAndTryAgainCount > 0) {
+            const track: Track = await this.getSpotifyWebCurrentTrack();
+
+            if (musicUtil.isTrackPlaying(track)) {
+                return;
+            }
+
+            checkTrackStateAndTryAgainCount--;
+
+            // try again, 1.3 seconds
+            setTimeout(() => {
+                this.playSpotifyTrackFromPlaylist(
+                    trackId,
+                    spotifyUserId,
+                    playlistId,
+                    checkTrackStateAndTryAgainCount
+                );
+            }, 1300);
+        }
     }
 
     launchWebPlayer(options: any) {

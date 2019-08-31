@@ -877,6 +877,18 @@ export function launchPlayer(playerName: PlayerName, options: any = {}) {
     }
 }
 
+export function launchAndPlaySpotifyTrack(
+    trackId: string,
+    spotifyUserId: string,
+    playlistId: string = ""
+) {
+    return musicPlayerCtr.launchAndPlaySpotifyTrack(
+        trackId,
+        spotifyUserId,
+        playlistId
+    );
+}
+
 /**
  * Returns available Spotify devices
  * @returns {Promise<PlayerDevice[]>}

@@ -128,6 +128,16 @@ export class MusicUtil {
         return false;
     }
 
+    isTrackPlaying(track: Track) {
+        if (!track || !track.id) {
+            return false;
+        }
+        if (track.state === TrackStatus.Playing) {
+            return true;
+        }
+        return false;
+    }
+
     createPlaylistUriFromPlaylistId(playlist_id: string) {
         if (!playlist_id.includes("spotify:playlist:")) {
             playlist_id = `spotify:playlist:${playlist_id}`;
@@ -168,8 +178,15 @@ export class MusicUtil {
         return tracks;
     }
 
+    createSpotifyUserUriFromId(id: string) {
+        if (id && !id.includes("spotify:user:")) {
+            id = `spotify:user:${id}`;
+        }
+        return id;
+    }
+
     createSpotifyIdFromUri(uri: string) {
-        if (uri.indexOf("spotify:") === 0) {
+        if (uri && uri.indexOf("spotify:") === 0) {
             return uri.substring(uri.lastIndexOf(":") + 1);
         }
         return uri;
