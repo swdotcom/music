@@ -530,6 +530,14 @@ launchPlayer(playerName: PlayerName, options: any = {})
 launchAndPlaySpotifyTrack(trackId: string = "", playlistId: string = "")
 
 /**
+ * Plays a Spotify Mac Desktop track within a playlist.
+ * It will also launch Spotify if it is not already available by checking the device Ids.
+ * @param trackId (optional) If it's not supplied then the playlistId must be provided
+ * @param playlistId (optional) If it's not supplied then the trackId must be provided
+ */
+playSpotifyMacDesktopTrack(trackId: string = "", playlistId: string = "")
+
+/**
  * Returns available Spotify devices
  * @returns {Promise<PlayerDevice[]>}
  */

@@ -343,6 +343,20 @@ export class MusicController {
             });
     }
 
+    playSpotifyDesktopTrack(trackId: string = "", playlistId: string = "") {
+        trackId = musicUtil.createUriFromTrackId(trackId);
+        playlistId = musicUtil.createPlaylistUriFromPlaylistId(playlistId);
+
+        if (playlistId) {
+            this.playTrackInContext(PlayerName.SpotifyDesktop, [
+                trackId,
+                playlistId
+            ]);
+        } else {
+            this.run(PlayerName.SpotifyDesktop, "playTrack", [trackId]);
+        }
+    }
+
     playTrackInContext(player: string, params: any[]) {
         return this.execScript(player, "playTrackInContext", params).then(
             result => {

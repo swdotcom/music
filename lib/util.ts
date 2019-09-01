@@ -154,6 +154,14 @@ export class MusicUtil {
         return trackIds;
     }
 
+    createUriFromTrackId(track_id: string) {
+        if (track_id && !track_id.includes("spotify:track:")) {
+            track_id = `spotify:track:${track_id}`;
+        }
+
+        return track_id;
+    }
+
     createUrisFromTrackIds(track_ids: string[], useUriObj: boolean = false) {
         let tracks = [];
 
@@ -162,9 +170,8 @@ export class MusicUtil {
             if (!uri || uri.length === 0) {
                 continue;
             }
-            if (!uri.includes("spotify:track:")) {
-                uri = `spotify:track:${uri}`;
-            }
+            uri = this.createUriFromTrackId(uri);
+
             if (useUriObj) {
                 const urlObj = {
                     uri
