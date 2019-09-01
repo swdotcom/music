@@ -534,7 +534,13 @@ export class MusicPlayerState {
             checkTrackStateAndTryAgainCount--;
 
             // try again, 1.5 seconds
-            setTimeout(() => {
+            setTimeout(async () => {
+                const track: Track = await this.getSpotifyWebCurrentTrack();
+
+                if (musicUtil.isTrackPlaying(track)) {
+                    return;
+                }
+
                 this.playSpotifyTrackFromPlaylist(
                     trackId,
                     spotifyUserId,
