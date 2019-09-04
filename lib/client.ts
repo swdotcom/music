@@ -113,7 +113,7 @@ export class MusicClient {
     /**
      * Refresh the spotify access token
      */
-    async refreshSpotifyToken() {
+    async refreshSpotifyToken(optionalRefreshToken: string = "") {
         if (!musicStore.spotifyRefreshToken) {
             return {
                 status: "failed",
@@ -130,9 +130,14 @@ export class MusicClient {
         ] = `Basic ${encodedAuthPayload}`;
         spotifyAccountClient.defaults.headers.post["Content-Type"] =
             "application/x-www-form-urlencoded";
+
+        const useOptionalAccessToken = optionalRefreshToken ? true : false;
+        const refreshToken = optionalRefreshToken
+            ? optionalRefreshToken
+            : musicStore.spotifyRefreshToken;
         let response = await spotifyAccountClient
             .post(
-                `/api/token?grant_type=refresh_token&refresh_token=${musicStore.spotifyRefreshToken}`,
+                `/api/token?grant_type=refresh_token&refresh_token=${refreshToken}`,
                 null
             )
             .then(resp => {
@@ -155,7 +160,7 @@ export class MusicClient {
                 }
                 return err;
             });
-        if (response.status === "success") {
+        if (response.status === "success" && !useOptionalAccessToken) {
             musicStore.spotifyAccessToken = response.data;
         }
         return response;
@@ -163,7 +168,8 @@ export class MusicClient {
 
     async spotifyApiGet(
         api: string,
-        qsOptions: any = {}
+        qsOptions: any = {},
+        optionalAccessToken: string = ""
     ): Promise<CodyResponse> {
         if (!musicStore.spotifyAccessToken) {
             return this.throwNoSpotifyTokenInfoError();
@@ -171,10 +177,13 @@ export class MusicClient {
         api = this.addQueryStringToApi(api, qsOptions);
 
         // console.log(`GET API: ${api}`);
+        const accessToken = optionalAccessToken
+            ? optionalAccessToken
+            : musicStore.spotifyAccessToken;
 
         spotifyClient.defaults.headers.common[
             "Authorization"
-        ] = `Bearer ${musicStore.spotifyAccessToken}`;
+        ] = `Bearer ${accessToken}`;
 
         return spotifyClient
             .get(api)

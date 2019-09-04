@@ -140,6 +140,32 @@ export async function hasActiveTrack(): Promise<boolean> {
  * @param market (optional) will default to none if not specified
  * @param min_popularity (optional) will default to a min or 20
  */
+export async function getRecommendationsForTracksForUser(
+    trackIds: string[],
+    options: any
+): Promise<Track[]> {
+    const limit = options.limit || 40;
+    const market = options.market || "";
+    const min_popularity = options.min_popularity || 20;
+    const optionalAccesstoken = options.accessToken || "";
+    const optionalRefreshToken = options.refreshToken || "";
+    return musicPlayerCtr.getRecommendationsForTracks(
+        trackIds,
+        limit,
+        market,
+        min_popularity,
+        optionalAccesstoken,
+        optionalRefreshToken
+    );
+}
+
+/**
+ * Returns the recommended tracks for the
+ * @param trackIds (required) 1 or more
+ * @param limit (optional) will default to 40 if not specified
+ * @param market (optional) will default to none if not specified
+ * @param min_popularity (optional) will default to a min or 20
+ */
 export async function getRecommendationsForTracks(
     trackIds: string[],
     limit: number = 40,

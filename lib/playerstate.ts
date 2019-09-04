@@ -377,7 +377,9 @@ export class MusicPlayerState {
         trackIds: string[],
         limit: number = 40,
         market: string = "",
-        min_popularity: number = 20
+        min_popularity: number = 20,
+        optionalAccessToken: string = "",
+        optionalRefreshToken: string = ""
     ) {
         let tracks: Track[] = [];
 
@@ -391,14 +393,27 @@ export class MusicPlayerState {
         };
         const api = `/v1/recommendations`;
 
-        let response = await musicClient.spotifyApiGet(api, qsOptions);
+        let response = await musicClient.spotifyApiGet(
+            api,
+            qsOptions,
+            optionalAccessToken
+        );
 
         // check if the token needs to be refreshed
         if (response.statusText === "EXPIRED") {
             // refresh the token
-            await musicClient.refreshSpotifyToken();
+            const refreshTokenResponse = await musicClient.refreshSpotifyToken(
+                optionalRefreshToken
+            );
+            if (optionalRefreshToken) {
+                optionalAccessToken = refreshTokenResponse.data;
+            }
             // try again
-            response = await musicClient.spotifyApiGet(api, qsOptions);
+            response = await musicClient.spotifyApiGet(
+                api,
+                qsOptions,
+                optionalAccessToken
+            );
         }
 
         if (musicUtil.isResponseOk(response)) {
