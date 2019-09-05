@@ -377,9 +377,7 @@ export class MusicPlayerState {
         trackIds: string[],
         limit: number = 40,
         market: string = "",
-        min_popularity: number = 20,
-        optionalAccessToken: string = "",
-        optionalRefreshToken: string = ""
+        min_popularity: number = 20
     ) {
         let tracks: Track[] = [];
 
@@ -389,37 +387,25 @@ export class MusicPlayerState {
         if (trackIds.length > 5) {
             trackIds.length = 5;
         }
-        const qsOptions = {
-            market,
+        const qsOptions: any = {
             seed_tracks: trackIds.join(","),
             limit,
             min_popularity
         };
+        if (market) {
+            qsOptions["market"] = market;
+        }
         const api = `/v1/recommendations`;
 
         // add to the api to prevent the querystring from escaping the comma
 
-        let response = await musicClient.spotifyApiGet(
-            api,
-            qsOptions,
-            optionalAccessToken
-        );
+        let response = await musicClient.spotifyApiGet(api, qsOptions);
 
         // check if the token needs to be refreshed
         if (response.statusText === "EXPIRED") {
             // refresh the token
-            const refreshTokenResponse = await musicClient.refreshSpotifyToken(
-                optionalRefreshToken
-            );
-            if (optionalRefreshToken) {
-                optionalAccessToken = refreshTokenResponse.data;
-            }
             // try again
-            response = await musicClient.spotifyApiGet(
-                api,
-                {},
-                optionalAccessToken
-            );
+            response = await musicClient.spotifyApiGet(api, qsOptions);
         }
 
         if (musicUtil.isResponseOk(response)) {
