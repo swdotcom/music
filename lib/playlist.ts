@@ -10,13 +10,11 @@ import {
 import { MusicStore } from "./store";
 import { UserProfile } from "./profile";
 import { MusicUtil } from "./util";
-import { CacheUtil } from "./cache";
 
 const musicClient = MusicClient.getInstance();
 const musicStore = MusicStore.getInstance();
 const userProfile = UserProfile.getInstance();
 const musicUtil = new MusicUtil();
-const cacheUtil = CacheUtil.getInstance();
 
 export class Playlist {
     private static instance: Playlist;
@@ -341,13 +339,6 @@ export class Playlist {
         limit = limit < 1 ? 1 : limit > 50 ? 50 : limit;
         q = q.trim();
 
-        const cacheId = `search_${type}_${q}_${limit}`;
-        let searchResult = cacheUtil.getItem(cacheId);
-        if (searchResult) {
-            // return the value from cache
-            return searchResult;
-        }
-
         let qryObj: any = {
             type,
             q,
@@ -445,11 +436,7 @@ export class Playlist {
             }
         }
 
-        searchResult = hasData ? codyResp.data : emptyResult;
-        if (hasData) {
-            // 6 hours
-            cacheUtil.setItem(cacheId, searchResult, 60 * 60 * 6);
-        }
+        const searchResult = hasData ? codyResp.data : emptyResult;
 
         return searchResult;
     }

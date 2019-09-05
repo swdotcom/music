@@ -1,12 +1,9 @@
 import { SpotifyAudioFeature } from "./models";
 import { MusicClient } from "./client";
 import { MusicUtil } from "./util";
-import { CacheUtil } from "./cache";
 
 const musicClient = MusicClient.getInstance();
 const musicUtil = new MusicUtil();
-
-const cacheUtil = CacheUtil.getInstance();
 
 export class AudioStat {
     private static instance: AudioStat;
@@ -31,15 +28,6 @@ export class AudioStat {
         ids = ids.map(id => {
             return musicUtil.createSpotifyIdFromUri(id);
         });
-
-        // try to find as many features from cache as possible 1st
-        for (let i = ids.length - 1; i >= 0; i--) {
-            let feature = cacheUtil.getItem(`feature_${ids[i]}`);
-            if (feature) {
-                audiofeatures.push(feature);
-                ids.pop();
-            }
-        }
 
         if (ids.length > 0) {
             // still some ids left, fetch the features for these ids
@@ -88,12 +76,6 @@ export class AudioStat {
                 if (audio_features && audio_features.length > 0) {
                     audio_features.forEach(feature => {
                         if (feature) {
-                            // save to cache (6 hours)
-                            cacheUtil.setItem(
-                                `feature_${feature.id}`,
-                                feature,
-                                60 * 60 * 6
-                            );
                             audiofeatures.push(feature);
                         }
                     });

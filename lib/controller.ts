@@ -2,11 +2,9 @@ import { MusicUtil } from "./util";
 import { MusicClient } from "./client";
 import { PlayerName } from "./models";
 import { MusicStore } from "./store";
-import { CacheUtil } from "./cache";
 
 const musicClient = MusicClient.getInstance();
 const musicUtil = new MusicUtil();
-const cacheUtil = CacheUtil.getInstance();
 
 export class MusicController {
     static readonly WINDOWS_SPOTIFY_TRACK_FIND: string =
@@ -587,22 +585,11 @@ export class MusicController {
         artist: string,
         songName: string = ""
     ): Promise<string> {
-        let genre = cacheUtil.getItem(`genre_${artist}_${songName}`);
-        if (genre) {
-            return genre;
-        }
-        genre = await musicClient.getGenreFromItunes(artist, songName);
+        let genre = await musicClient.getGenreFromItunes(artist, songName);
         if (!genre || genre === "") {
             genre = await this.getGenreFromSpotify(artist);
         }
-        if (genre) {
-            // 6 hour cache
-            cacheUtil.setItem(
-                `genre_${artist}_${songName}`,
-                genre,
-                60 * 60 * 6
-            );
-        }
+
         return genre;
     }
 
