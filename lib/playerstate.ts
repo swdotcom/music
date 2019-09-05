@@ -404,6 +404,7 @@ export class MusicPlayerState {
         // check if the token needs to be refreshed
         if (response.statusText === "EXPIRED") {
             // refresh the token
+            await musicClient.refreshSpotifyToken();
             // try again
             response = await musicClient.spotifyApiGet(api, qsOptions);
         }
