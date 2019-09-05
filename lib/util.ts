@@ -241,7 +241,7 @@ export class MusicUtil {
         return this.execCmd(cmd);
     }
 
-    buildQueryString(obj: any) {
+    buildQueryString(obj: any, encodeVals: boolean = true) {
         let params = [];
         if (obj) {
             let keys = Object.keys(obj);
@@ -250,8 +250,12 @@ export class MusicUtil {
                     let key = keys[i];
                     let val = obj[key];
                     if (val && val !== undefined) {
-                        let encodedVal = encodeURIComponent(val);
-                        params.push(`${key}=${encodedVal}`);
+                        if (encodeVals) {
+                            let encodedVal = encodeURIComponent(val);
+                            params.push(`${key}=${encodedVal}`);
+                        } else {
+                            params.push(`${key}=${val}`);
+                        }
                     }
                 }
             }
