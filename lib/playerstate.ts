@@ -385,20 +385,23 @@ export class MusicPlayerState {
 
         // change the trackIds to non-uri ids
         trackIds = musicUtil.createTrackIdsFromUris(trackIds);
-        const qsObj = {
+        // it can only take up to 5, remove the rest
+        if (trackIds.length > 5) {
+            trackIds.length = 5;
+        }
+        const qsOptions = {
             market,
             seed_tracks: trackIds.join(","),
             limit,
             min_popularity
         };
-        const qrtStr = musicUtil.buildQueryString(qsObj, false);
-        const api = `/v1/recommendations${qrtStr}`;
+        const api = `/v1/recommendations`;
 
         // add to the api to prevent the querystring from escaping the comma
 
         let response = await musicClient.spotifyApiGet(
             api,
-            {},
+            qsOptions,
             optionalAccessToken
         );
 
