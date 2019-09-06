@@ -1,7 +1,10 @@
 import { MusicClient } from "./client";
 import { MusicStore } from "./store";
+import { MusicPlayerState } from "./playerstate";
+import { SpotifyAuthState } from "./models";
 
 const musicClient = MusicClient.getInstance();
+const musicPlayerCtr = MusicPlayerState.getInstance();
 const musicStore = MusicStore.getInstance();
 
 export class SpotifyUser {
@@ -53,5 +56,22 @@ export class UserProfile {
         }
 
         return spotifyUser;
+    }
+
+    async spotifyAuthState(): Promise<SpotifyAuthState> {
+        // check if they have oauth activated
+        const oauthActivated = musicStore.spotifyAccessToken ? true : false;
+
+        // they have a spotify access token, check devices
+        const devices = await musicPlayerCtr.getSpotifyDevices();
+
+        const loggedIn =
+            oauthActivated && devices && devices.length > 0 ? true : false;
+
+        let authState: SpotifyAuthState = new SpotifyAuthState();
+        authState.loggedIn = loggedIn;
+        authState.oauthActivated = oauthActivated;
+
+        return authState;
     }
 }

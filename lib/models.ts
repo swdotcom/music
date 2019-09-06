@@ -175,3 +175,8 @@ export class CodyConfig {
     enableSpotifyDesktop: boolean = true;
     enableSpotifyApi: boolean = true;
 }
+
+export class SpotifyAuthState {
+    oauthActivated: boolean = false;
+    loggedIn: boolean = false;
+}

@@ -12,7 +12,8 @@ import {
     CodyConfig,
     PaginationItem,
     PlayerContext,
-    TrackStatus
+    TrackStatus,
+    SpotifyAuthState
 } from "./models";
 import { MusicPlayerState } from "./playerstate";
 import { AudioStat } from "./audiostat";
@@ -587,6 +588,15 @@ export function transferSpotifyDevice(device_id: string, play: boolean) {
  */
 export function getUserProfile(): Promise<SpotifyUser> {
     return userProfile.getUserProfile();
+}
+
+/**
+ * Helper API to return whether or not the user is logged in to their spotify account or not.
+ * It's not fool proof as it only determines if there are any devices found or not.
+ * {oauthActivated, loggedIn}
+ */
+export function spotifyAuthState(): Promise<SpotifyAuthState> {
+    return userProfile.spotifyAuthState();
 }
 
 /**

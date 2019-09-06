@@ -366,6 +366,13 @@ transferSpotifyDevice(device_id: string, play: boolean)
 getUserProfile(): Promise<SpotifyUser>
 
 /**
+ * Helper API to return whether or not the user is logged in to their spotify account or not.
+ * It's not fool proof as it only determines if there are any devices found or not.
+ * {oauthActivated, loggedIn}
+ */
+spotifyAuthState(): Promise<SpotifyAuthState>
+
+/**
  * Initiate the play command for a specific player
  * @param player {spotify|spotify-web|itunes}
  * @param options { uris, device_id }
