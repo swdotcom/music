@@ -84,7 +84,8 @@ export class MusicClient {
         // try from itunes
         // search?term=${terms}&limit=3
         let terms = songName ? `${artist} ${songName}` : artist;
-        const api = `search?term=${terms}`;
+        terms = terms.trim();
+        const api = `search?term=${encodeURIComponent(terms)}`;
         return itunesSearchClient
             .get(api)
             .then(resp => {

@@ -1,7 +1,7 @@
 const expect = require("chai").expect;
 import * as CodyMusic from "../../index";
 import { TestUtil } from "../util";
-import { PlayerName, PlaylistItem } from "../../lib/models";
+import { PlayerName, PlaylistItem, Track } from "../../lib/models";
 import { UserProfile, SpotifyUser } from "../../lib/profile";
 import { create } from "domain";
 
@@ -121,5 +121,10 @@ describe("spotify playlist tests", () => {
 
         // now it should be null
         expect(isEmtpy).to.equal(true);
+    });
+
+    it("Get spotify top tracks", async () => {
+        const topTracks: Track[] = await CodyMusic.getTopSpotifyTracks();
+        expect(topTracks.length).to.not.equal(0);
     });
 });

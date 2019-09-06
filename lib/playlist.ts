@@ -558,6 +558,33 @@ export class Playlist {
         return codyResp;
     }
 
+    async getTopSpotifyTracks() {
+        let tracks: Track[] = [];
+
+        const api = `/v1/me/top/tracks`;
+
+        // add to the api to prevent the querystring from escaping the comma
+        const qsOptions = {
+            time_range: "medium_term",
+            limit: 50
+        };
+
+        let response = await musicClient.spotifyApiGet(api, qsOptions);
+
+        // check if the token needs to be refreshed
+        if (response.statusText === "EXPIRED") {
+            // refresh the token
+            await musicClient.refreshSpotifyToken();
+            // try again
+            response = await musicClient.spotifyApiGet(api, qsOptions);
+        }
+        if (musicUtil.isResponseOk(response)) {
+            tracks = response.data.items;
+        }
+
+        return tracks;
+    }
+
     buildTrack(spotifyTrack: any) {
         let artists: string[] = [];
         if (spotifyTrack.artists) {

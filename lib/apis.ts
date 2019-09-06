@@ -942,6 +942,13 @@ export function getSpotifyGenre(artist: string): Promise<string> {
 }
 
 /**
+ * Returns the recent top tracks Spotify for a user.
+ */
+export function getTopSpotifyTracks(): Promise<Track[]> {
+    return playlist.getTopSpotifyTracks();
+}
+
+/**
  * Returns the audio features of the given track IDs
  * @param ids these are the track ids (sans spotify:track)
  */
