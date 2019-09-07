@@ -1,5 +1,5 @@
 import { MusicStore } from "./store";
-import { PlayerName, Track, TrackStatus } from "./models";
+import { PlayerName, Track, TrackStatus, PlayerType } from "./models";
 
 const cp = require("child_process");
 
@@ -239,6 +239,44 @@ export class MusicUtil {
         const cmd = args.join(" ");
 
         return this.execCmd(cmd);
+    }
+
+    copySpotifyTrackToCodyTrack(spotifyTrack: any): Track {
+        let track: Track;
+        if (spotifyTrack) {
+            // delete some attributes that are currently not needed
+            if (spotifyTrack.album) {
+                delete spotifyTrack.album.available_markets;
+                delete spotifyTrack.album.external_urls;
+            }
+            if (spotifyTrack.available_markets) {
+                delete spotifyTrack.available_markets;
+            }
+
+            if (spotifyTrack.external_urls) {
+                delete spotifyTrack.external_urls;
+            }
+
+            if (spotifyTrack.external_ids) {
+                delete spotifyTrack.external_ids;
+            }
+
+            // pull out the artist info into a more readable set of attributes
+            this.extractAristFromSpotifyTrack(spotifyTrack);
+
+            track = spotifyTrack;
+
+            if (spotifyTrack.duration_ms) {
+                track.duration = spotifyTrack.duration_ms;
+            }
+        } else {
+            track = new Track();
+        }
+
+        track.type = "spotify";
+        track.playerType = PlayerType.WebSpotify;
+
+        return track;
     }
 
     buildQueryString(obj: any, encodeVals: boolean = true) {

@@ -582,6 +582,12 @@ export class Playlist {
             tracks = response.data.items;
         }
 
+        if (tracks && tracks.length > 0) {
+            tracks = tracks.map(track => {
+                return musicUtil.copySpotifyTrackToCodyTrack(track);
+            });
+        }
+
         return tracks;
     }
 

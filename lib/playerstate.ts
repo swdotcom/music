@@ -185,7 +185,7 @@ export class MusicPlayerState {
         }
 
         if (response && response.status === 200 && response.data) {
-            track = this.copySpotifyTrackToCodyTrack(response.data);
+            track = musicUtil.copySpotifyTrackToCodyTrack(response.data);
 
             // get the arist data
             if (includeArtistData && track.artists) {
@@ -293,7 +293,7 @@ export class MusicPlayerState {
             response.data &&
             response.data.item
         ) {
-            track = this.copySpotifyTrackToCodyTrack(response.data.item);
+            track = musicUtil.copySpotifyTrackToCodyTrack(response.data.item);
         } else {
             track = new Track();
         }
@@ -342,7 +342,7 @@ export class MusicPlayerState {
         ) {
             for (let i = 0; i < response.data.items.length; i++) {
                 let spotifyTrack = response.data.items[i].track;
-                const track: Track = this.copySpotifyTrackToCodyTrack(
+                const track: Track = musicUtil.copySpotifyTrackToCodyTrack(
                     spotifyTrack
                 );
                 tracks.push(track);
@@ -558,44 +558,6 @@ export class MusicPlayerState {
             );
         }
         return musicUtil.launchWebUrl("https://open.spotify.com/browse");
-    }
-
-    copySpotifyTrackToCodyTrack(spotifyTrack: any): Track {
-        let track: Track;
-        if (spotifyTrack) {
-            // delete some attributes that are currently not needed
-            if (spotifyTrack.album) {
-                delete spotifyTrack.album.available_markets;
-                delete spotifyTrack.album.external_urls;
-            }
-            if (spotifyTrack.available_markets) {
-                delete spotifyTrack.available_markets;
-            }
-
-            if (spotifyTrack.external_urls) {
-                delete spotifyTrack.external_urls;
-            }
-
-            if (spotifyTrack.external_ids) {
-                delete spotifyTrack.external_ids;
-            }
-
-            // pull out the artist info into a more readable set of attributes
-            musicUtil.extractAristFromSpotifyTrack(spotifyTrack);
-
-            track = spotifyTrack;
-
-            if (spotifyTrack.duration_ms) {
-                track.duration = spotifyTrack.duration_ms;
-            }
-        } else {
-            track = new Track();
-        }
-
-        track.type = "spotify";
-        track.playerType = PlayerType.WebSpotify;
-
-        return track;
     }
 
     updateSpotifyLoved(loved: boolean) {
