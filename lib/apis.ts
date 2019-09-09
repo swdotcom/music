@@ -470,6 +470,16 @@ export async function getSavedTracks(
 }
 
 /**
+ * Returns a playlist by ID
+ * @param playlist_id ID is preferred, but we'll transform a URI to an ID
+ */
+export async function getSpotifyPlaylist(
+    playlist_id: string
+): Promise<PlaylistItem> {
+    return playlist.getSpotifyPlaylist(playlist_id);
+}
+
+/**
  * Returns the tracks that are found by the given playlist name
  * - currently spofity-web support only
  * @param player {spotify-web}

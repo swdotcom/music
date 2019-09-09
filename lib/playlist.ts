@@ -182,6 +182,33 @@ export class Playlist {
         return playlists;
     }
 
+    async getSpotifyPlaylist(playlist_id: string): Promise<PlaylistItem> {
+        let playlistItem: PlaylistItem = new PlaylistItem();
+
+        // make sure the ID is not the URI
+        playlist_id = musicUtil.createSpotifyIdFromUri(playlist_id);
+
+        const api = `/v1/playlists/${playlist_id}`;
+
+        let codyResp: CodyResponse = await musicClient.spotifyApiGet(api, {});
+
+        // check if the token needs to be refreshed
+        if (codyResp.statusText === "EXPIRED") {
+            // refresh the token
+            await musicClient.refreshSpotifyToken();
+            // try again
+            codyResp = await musicClient.spotifyApiGet(api, {});
+        }
+
+        if (musicUtil.isResponseOk(codyResp)) {
+            playlistItem = {
+                ...codyResp.data
+            };
+        }
+
+        return playlistItem;
+    }
+
     async getPlaylistTracks(playlist_id: string, qsOptions: any = {}) {
         if (!qsOptions.limit) {
             // maximum is 100 at a time

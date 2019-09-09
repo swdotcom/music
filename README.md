@@ -283,10 +283,14 @@ getSpotifyLikedSongs(
  * @param player
  * @param qsOptions
  */
-getSavedTracks(
-    player: PlayerName,
-    qsOptions: any = {}
-): Promise<Track[]>
+getSavedTracks(player: PlayerName, qsOptions: any = {}): Promise<Track[]>
+
+
+/**
+ * Returns a playlist by ID
+ * @param playlist_id ID is preferred, but we'll transform a URI to an ID
+ */
+getSpotifyPlaylist(playlist_id: string): Promise<PlaylistItem>
 
 /**
  * Returns the tracks that are found by the given playlist name

@@ -127,4 +127,12 @@ describe("spotify playlist tests", () => {
         const topTracks: Track[] = await CodyMusic.getTopSpotifyTracks();
         expect(topTracks.length).to.not.equal(0);
     });
+
+    it("Get a Playlist by ID", async () => {
+        const playlistItem: PlaylistItem = await CodyMusic.getSpotifyPlaylist(
+            "6jCkTED0V5NEuM8sKbGG1Z"
+        );
+
+        expect(playlistItem.name).to.not.equal(null);
+    });
 });
