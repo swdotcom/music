@@ -1,5 +1,11 @@
 import { MusicStore } from "./store";
-import { PlayerName, Track, TrackStatus, PlayerType } from "./models";
+import {
+    PlayerName,
+    Track,
+    TrackStatus,
+    PlayerType,
+    CodyResponse
+} from "./models";
 
 const cp = require("child_process");
 
@@ -30,6 +36,18 @@ export class MusicUtil {
 
     isResponseOk(resp: any) {
         if (resp && resp.status === 200) {
+            return true;
+        }
+        return false;
+    }
+
+    isItemsResponseOk(codyResp: CodyResponse) {
+        if (
+            codyResp &&
+            codyResp.status === 200 &&
+            codyResp.data &&
+            codyResp.data.items
+        ) {
             return true;
         }
         return false;

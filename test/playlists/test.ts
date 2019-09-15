@@ -50,15 +50,9 @@ describe("spotify playlist tests", () => {
         expect(result.status).to.equal(200);
     });
 
-    xit("return spotify playlists", done => {
-        CodyMusic.getPlaylists(PlayerName.SpotifyWeb).then(
-            (result: PlaylistItem[]) => {
-                expect(result.length).to.not.equal(0);
-                const playlistItem: PlaylistItem = result[0];
-                expect(playlistItem.tracks.total).to.not.equal(0);
-                done();
-            }
-        );
+    it("return spotify playlists", async () => {
+        const playlists = await CodyMusic.getPlaylists(PlayerName.SpotifyWeb);
+        expect(playlists.length).to.not.equal(0);
     });
 
     xit("return spotify playlist names", done => {

@@ -143,43 +143,85 @@ export class Playlist {
         }
 
         if (musicStore.spotifyUserId) {
-            if (!qsOptions.limit) {
-                qsOptions["limit"] = 50;
-            } else if (qsOptions.limit < 1) {
-                qsOptions.limit = 1;
-            }
-            if (!qsOptions.offset) {
-                qsOptions["offset"] = 0;
-            }
-
-            const api = `/v1/users/${musicStore.spotifyUserId}/playlists`;
-            let codyResp: CodyResponse = await musicClient.spotifyApiGet(
-                api,
-                qsOptions
+            const fetchAll = qsOptions.all ? true : false;
+            let limit = qsOptions.limit ? qsOptions.limit : 50;
+            limit = limit < 1 ? 1 : limit;
+            let offset = qsOptions.offset ? qsOptions.offset : 0;
+            let codyResp = await this.getPlaylistsForUser(
+                musicStore.spotifyUserId,
+                limit,
+                offset
             );
-            // check if the token needs to be refreshed
-            if (codyResp.statusText === "EXPIRED") {
-                // refresh the token
-                await musicClient.refreshSpotifyToken();
-                // try again
-                codyResp = await musicClient.spotifyApiGet(api, qsOptions);
-            }
-            if (
-                codyResp &&
-                codyResp.status === 200 &&
-                codyResp.data &&
-                codyResp.data.items
-            ) {
+
+            if (musicUtil.isItemsResponseOk(codyResp)) {
                 playlists = codyResp.data.items;
                 // ensure the playerType is set
                 playlists.map((playlist: PlaylistItem) => {
                     playlist.playerType = PlayerType.WebSpotify;
                     playlist.type = "playlist";
                 });
+
+                // check if we need to fetch every playlist
+                if (fetchAll) {
+                    let threshold =
+                        codyResp.data.limit * (codyResp.data.offset + 1);
+                    let total = codyResp.data.total;
+
+                    while (total > threshold) {
+                        // update the next offset and fetch the next set
+                        offset = threshold;
+
+                        codyResp = await this.getPlaylistsForUser(
+                            musicStore.spotifyUserId,
+                            limit,
+                            offset
+                        );
+
+                        if (musicUtil.isItemsResponseOk(codyResp)) {
+                            playlists = codyResp.data.items;
+                            // ensure the playerType is set
+                            playlists.map((playlist: PlaylistItem) => {
+                                playlist.playerType = PlayerType.WebSpotify;
+                                playlist.type = "playlist";
+                            });
+                        }
+                        threshold =
+                            codyResp.data.limit * (codyResp.data.offset + 1);
+                        total = codyResp.data.total;
+                    }
+                }
             }
         }
 
         return playlists;
+    }
+
+    async getPlaylistsForUser(
+        spotifyUserId: string,
+        limit: number,
+        offset: number
+    ): Promise<CodyResponse> {
+        limit = limit || 50;
+        offset = offset || 0;
+        const qsOptions = {
+            limit,
+            offset
+        };
+
+        const api = `/v1/users/${spotifyUserId}/playlists`;
+        let codyResp: CodyResponse = await musicClient.spotifyApiGet(
+            api,
+            qsOptions
+        );
+        // check if the token needs to be refreshed
+        if (codyResp.statusText === "EXPIRED") {
+            // refresh the token
+            await musicClient.refreshSpotifyToken();
+            // try again
+            codyResp = await musicClient.spotifyApiGet(api, qsOptions);
+        }
+
+        return codyResp;
     }
 
     async getSpotifyPlaylist(playlist_id: string): Promise<PlaylistItem> {
