@@ -508,7 +508,7 @@ removeFromSpotifyLiked(
 /**
  * Returns the playlists for a given player
  * @param player {spotify|spotify-web|itunes}
- * @param (optional) {limit, offset}
+ * @param (optional) {limit, offset, all}
  */
 getPlaylists(
     player: PlayerName,

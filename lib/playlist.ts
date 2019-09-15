@@ -163,8 +163,7 @@ export class Playlist {
 
                 // check if we need to fetch every playlist
                 if (fetchAll) {
-                    let threshold =
-                        codyResp.data.limit * (codyResp.data.offset + 1);
+                    let threshold = codyResp.data.limit + codyResp.data.offset;
                     let total = codyResp.data.total;
 
                     while (total > threshold) {
@@ -185,8 +184,7 @@ export class Playlist {
                                 playlist.type = "playlist";
                             });
                         }
-                        threshold =
-                            codyResp.data.limit * (codyResp.data.offset + 1);
+                        threshold = codyResp.data.limit + codyResp.data.offset;
                         total = codyResp.data.total;
                     }
                 }
