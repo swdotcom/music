@@ -1,4 +1,7 @@
 import { CodyConfig } from "./models";
+import { MusicUtil } from "./util";
+
+const musicUtil = new MusicUtil();
 
 export class MusicStore {
     private _spotifyAccessToken: string = "";
@@ -146,6 +149,9 @@ export class MusicStore {
     }
 
     get itunesDesktopEnabled(): any {
+        if (this._itunesDesktopEnabled && !musicUtil.isMac()) {
+            this._itunesDesktopEnabled = false;
+        }
         return this._itunesDesktopEnabled;
     }
 

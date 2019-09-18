@@ -1,4 +1,3 @@
-import { MusicStore } from "./store";
 import {
     PlayerName,
     Track,
@@ -9,13 +8,7 @@ import {
 
 const cp = require("child_process");
 
-const musicStore = MusicStore.getInstance();
-
 export class MusicUtil {
-    credentialByKey(key: string): any {
-        return musicStore.credentialByKey(key);
-    }
-
     isLinux() {
         return this.isWindows() || this.isMac() ? false : true;
     }

@@ -168,10 +168,23 @@ searchArtists(keywords: string, limit: number = 50)
 isItunesAccessGranted()
 
 /**
+ * Returns false if cody music has been configured to to disable it
+ * or if it's the OS is not Mac,
+ * otherwise it's set to true by default
+ */
+isItunesDesktopEnabled()
+
+/**
  * Get the Spotify accessToken provided via through the setConfig api
  * @returns {string} the spotify access token string
  */
 getSpotifyAccessToken()
+
+/**
+ * Returns false if cody music has been configured to to disable it,
+ * otherwise it's set to true by default
+ */
+isSpotifyDesktopEnabled()
 
 /**
  * Checks if the Spotify desktop or web player is running or not
