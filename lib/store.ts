@@ -28,27 +28,13 @@ export class MusicStore {
     }
 
     setConfig(config: CodyConfig) {
-        if (config.spotifyAccessToken) {
-            this.spotifyAccessToken = config.spotifyAccessToken;
-        }
-        if (config.spotifyClientId) {
-            this.spotifyClientId = config.spotifyClientId;
-        }
-        if (config.spotifyClientSecret) {
-            this.spotifyClientSecret = config.spotifyClientSecret;
-        }
-        if (config.spotifyRefreshToken) {
-            this.spotifyRefreshToken = config.spotifyRefreshToken;
-        }
-        if (config.enableItunesDesktop) {
-            this.itunesDesktopEnabled = config.enableItunesDesktop;
-        }
-        if (config.enableSpotifyDesktop) {
-            this.spotifyDesktopEnabled = config.enableSpotifyDesktop;
-        }
-        if (config.enableSpotifyApi) {
-            this.spotifyApiEnabled = config.enableSpotifyApi;
-        }
+        this.spotifyAccessToken = config.spotifyAccessToken;
+        this.spotifyClientId = config.spotifyClientId;
+        this.spotifyClientSecret = config.spotifyClientSecret;
+        this.spotifyRefreshToken = config.spotifyRefreshToken;
+        this.itunesDesktopEnabled = config.enableItunesDesktop;
+        this.spotifyDesktopEnabled = config.enableSpotifyDesktop;
+        this.spotifyApiEnabled = config.enableSpotifyApi;
     }
 
     setCredentials(creds: any) {
