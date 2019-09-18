@@ -240,7 +240,10 @@ export async function getRunningTrack(): Promise<Track> {
 
     let itunesDesktopTrack = null;
     // itunes desktop try
-    if (musicStore.itunesDesktopEnabled && musicStore.itunesAccessGranted) {
+    if (
+        musicStore.itunesDesktopTrackingEnabled &&
+        musicStore.itunesAccessGranted
+    ) {
         // still no track or it's paused, try itunes desktop
         const itunesDesktopRunning = await isPlayerRunning(
             PlayerName.ItunesDesktop
