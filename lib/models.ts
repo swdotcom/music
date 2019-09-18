@@ -172,6 +172,7 @@ export class CodyConfig {
     spotifyClientSecret: string = "";
     spotifyClientId: string = "";
     enableItunesDesktop: boolean = true;
+    enableItunesDesktopSongTracking: boolean = true;
     enableSpotifyDesktop: boolean = true;
     enableSpotifyApi: boolean = true;
 }

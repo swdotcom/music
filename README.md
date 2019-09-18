@@ -168,11 +168,23 @@ searchArtists(keywords: string, limit: number = 50)
 isItunesAccessGranted()
 
 /**
+ * Set this if you would like a general flag itunes is not supported,
+ * but you will also need to set isItunesDesktopSongTrackingEnabled
+ * to the same value if you want to ensure it's not returning itunes songs.
+ *
  * Returns false if cody music has been configured to to disable it
  * or if it's the OS is not Mac,
  * otherwise it's set to true by default
  */
 isItunesDesktopEnabled()
+
+/**
+ * This will allow or disallow song tracking.
+ * Returns false if cody music has been configured to to disable it
+ * or if it's the OS is not Mac,
+ * otherwise it's set to true by default
+ */
+isItunesDesktopSongTrackingEnabled()
 
 /**
  * Get the Spotify accessToken provided via through the setConfig api

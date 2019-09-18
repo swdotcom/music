@@ -84,6 +84,15 @@ export function isItunesDesktopEnabled() {
 }
 
 /**
+ * Returns false if cody music has been configured to to disable it
+ * or if it's the OS is not Mac,
+ * otherwise it's set to true by default
+ */
+export function isItunesDesktopSongTrackingEnabled() {
+    return musicStore.itunesDesktopTrackingEnabled;
+}
+
+/**
  * Get the Spotify accessToken provided via through the setConfig api
  * @returns {string} the spotify access token string
  */

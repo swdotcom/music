@@ -12,6 +12,7 @@ export class MusicStore {
     private _spotifyClientId: string = "";
     private _spotifyUserId: string = "";
     private _itunesDesktopEnabled: boolean = true;
+    private _itunesDesktopTrackingEnabled: boolean = true;
     private _spotifyDesktopEnabled: boolean = true;
     private _spotifyApiEnabled: boolean = true;
     private _itunesAccessGranted: boolean = true;
@@ -33,6 +34,8 @@ export class MusicStore {
         this.spotifyClientSecret = config.spotifyClientSecret;
         this.spotifyRefreshToken = config.spotifyRefreshToken;
         this.itunesDesktopEnabled = config.enableItunesDesktop;
+        this.itunesDesktopTrackingEnabled =
+            config.enableItunesDesktopSongTracking;
         this.spotifyDesktopEnabled = config.enableSpotifyDesktop;
         this.spotifyApiEnabled = config.enableSpotifyApi;
     }
@@ -139,6 +142,17 @@ export class MusicStore {
             this._itunesDesktopEnabled = false;
         }
         return this._itunesDesktopEnabled;
+    }
+
+    get itunesDesktopTrackingEnabled(): any {
+        if (this._itunesDesktopTrackingEnabled && !musicUtil.isMac()) {
+            this._itunesDesktopTrackingEnabled = false;
+        }
+        return this._itunesDesktopTrackingEnabled;
+    }
+
+    set itunesDesktopTrackingEnabled(newItunesDesktopTrackingEnabled) {
+        this._itunesDesktopTrackingEnabled = newItunesDesktopTrackingEnabled;
     }
 
     set itunesDesktopEnabled(newitunesDesktopEnabled) {
