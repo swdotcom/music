@@ -343,7 +343,9 @@ export class MusicController {
 
     playSpotifyDesktopTrack(trackId: string = "", playlistId: string = "") {
         trackId = musicUtil.createUriFromTrackId(trackId);
-        playlistId = musicUtil.createPlaylistUriFromPlaylistId(playlistId);
+        if (playlistId) {
+            playlistId = musicUtil.createPlaylistUriFromPlaylistId(playlistId);
+        }
 
         if (playlistId) {
             this.playTrackInContext(PlayerName.SpotifyDesktop, [
