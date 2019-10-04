@@ -81,34 +81,44 @@ export class MusicClient {
         artist: string,
         songName: string = ""
     ): Promise<string> {
+        let genre = "";
+
         // try from itunes
         // search?term=${terms}&limit=3
         let terms = songName ? `${artist} ${songName}` : artist;
         terms = terms.trim();
-        const api = `search?term=${encodeURIComponent(terms)}`;
-        return itunesSearchClient
-            .get(api)
-            .then(resp => {
-                let secondaryGenreName = "";
-                if (resp.data && resp.data.resultCount > 0) {
-                    for (let i = 0; i < resp.data.resultCount; i++) {
-                        let result = resp.data.results[i];
-                        if (result.kind === "song" && result.primaryGenreName) {
-                            return result.primaryGenreName;
-                        } else if (result.primaryGenreName) {
-                            secondaryGenreName = result.primaryGenreName;
-                        }
-                    }
-                }
-                return secondaryGenreName;
-            })
-            .catch(err => {
-                console.error(
-                    "Unable to retrieve genre from itunes search: ",
-                    err.message
-                );
+        let api = `search?term=${encodeURIComponent(terms)}`;
+        let resp = await itunesSearchClient.get(api).catch(err => {
+            return "";
+        });
+        if (resp) {
+            genre = await this.findNameFromItunesResponse(resp);
+        } else {
+            // try without the artist, just the song name
+            api = `search?term=${encodeURIComponent(songName)}`;
+            resp = await itunesSearchClient.get(api).catch(err => {
                 return "";
             });
+            if (resp) {
+                genre = await this.findNameFromItunesResponse(resp);
+            }
+        }
+        return genre;
+    }
+
+    findNameFromItunesResponse(resp: any) {
+        let genre = "";
+        if (resp.data && resp.data.resultCount > 0) {
+            for (let i = 0; i < resp.data.resultCount; i++) {
+                let result = resp.data.results[i];
+                if (result.kind === "song" && result.primaryGenreName) {
+                    return result.primaryGenreName;
+                } else if (result.primaryGenreName) {
+                    genre = result.primaryGenreName;
+                }
+            }
+        }
+        return genre;
     }
 
     /**
