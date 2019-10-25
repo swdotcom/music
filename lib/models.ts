@@ -60,6 +60,7 @@ export class Track {
     volume: number = 0;
     state: TrackStatus = TrackStatus.NotAssigned;
     error: string = "";
+    progress_ms: number = 0;
     features: SpotifyAudioFeature = new SpotifyAudioFeature();
 }
 

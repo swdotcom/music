@@ -186,6 +186,9 @@ export class MusicPlayerState {
 
         if (response && response.status === 200 && response.data) {
             track = musicUtil.copySpotifyTrackToCodyTrack(response.data);
+            track.progress_ms = response.data.progress_ms
+                ? response.data.progress_ms
+                : 0;
 
             // get the arist data
             if (includeArtistData && track.artists) {
@@ -294,6 +297,9 @@ export class MusicPlayerState {
             response.data.item
         ) {
             track = musicUtil.copySpotifyTrackToCodyTrack(response.data.item);
+            track.progress_ms = response.data.progress_ms
+                ? response.data.progress_ms
+                : 0;
         } else {
             track = new Track();
         }
