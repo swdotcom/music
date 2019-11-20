@@ -156,7 +156,7 @@ export class Playlist {
             if (musicUtil.isItemsResponseOk(codyResp)) {
                 playlists = codyResp.data.items;
                 // ensure the playerType is set
-                playlists.map((playlist: PlaylistItem) => {
+                playlists.forEach((playlist: PlaylistItem) => {
                     playlist.playerType = PlayerType.WebSpotify;
                     playlist.type = "playlist";
                 });
@@ -177,12 +177,17 @@ export class Playlist {
                         );
 
                         if (musicUtil.isItemsResponseOk(codyResp)) {
-                            playlists = codyResp.data.items;
+                            const additionalItems = codyResp.data.items;
                             // ensure the playerType is set
-                            playlists.map((playlist: PlaylistItem) => {
-                                playlist.playerType = PlayerType.WebSpotify;
-                                playlist.type = "playlist";
-                            });
+                            additionalItems.forEach(
+                                (playlist: PlaylistItem) => {
+                                    playlist.playerType = PlayerType.WebSpotify;
+                                    playlist.type = "playlist";
+
+                                    // add to the outgoing playlist
+                                    playlists.push(playlist);
+                                }
+                            );
                         }
                         threshold = codyResp.data.limit + codyResp.data.offset;
                         total = codyResp.data.total;
