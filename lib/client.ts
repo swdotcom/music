@@ -83,10 +83,17 @@ export class MusicClient {
     ): Promise<string> {
         let genre = "";
 
+        let terms = "";
+        if (songName && artist) {
+            terms = `${artist.trim()} ${songName.trim()}`;
+        } else if (songName) {
+            terms = `${songName.trim()}`;
+        } else if (artist) {
+            terms = `${artist.trim()}`;
+        }
+
         // try from itunes
         // search?term=${terms}&limit=3
-        let terms = songName ? `${artist} ${songName}` : artist;
-        terms = terms.trim();
         let api = `search?term=${encodeURIComponent(terms)}`;
         let resp = await itunesSearchClient.get(api).catch(err => {
             return "";
