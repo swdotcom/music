@@ -152,6 +152,8 @@ export class Playlist {
             await userProfile.getUserProfile();
         }
 
+        const playlistMap: any = {};
+
         if (musicStore.spotifyUserId) {
             const spotifyUserId = musicStore.spotifyUserId;
             const fetchAll = qsOptions.all ? true : false;
@@ -164,8 +166,6 @@ export class Playlist {
                 offset
             );
 
-            const playlistMap: any = {};
-
             if (musicUtil.isItemsResponseOk(codyResp)) {
                 let playlistItems = codyResp.data.items;
                 // ensure the playerType is set
@@ -173,17 +173,21 @@ export class Playlist {
                     playlist.playerType = PlayerType.WebSpotify;
                     playlist.type = "playlist";
 
-                    if (playlistMap[playlist.name]) {
+                    const name = playlist.name;
+                    if (playlistMap[name]) {
                         // add to the duplicates
                         const existingPlaylist: PlaylistItem =
-                            playlistMap[playlist.name];
-                        existingPlaylist.duplicateIds.push(playlist.id);
+                            playlistMap[name];
+                        if (!existingPlaylist.duplicateIds) {
+                            existingPlaylist["duplicateIds"] = [];
+                        }
+                        existingPlaylist["duplicateIds"].push(playlist.id);
                         // add to the user playlist names
                         userToPlaylistNames[spotifyUserId][
                             name
                         ] = existingPlaylist;
                     } else {
-                        playlistMap[playlist.name] = playlist;
+                        playlistMap[name] = playlist;
                     }
                 });
 
@@ -209,11 +213,15 @@ export class Playlist {
                                 playlist.playerType = PlayerType.WebSpotify;
                                 playlist.type = "playlist";
 
-                                if (playlistMap[playlist.name]) {
+                                const name = playlist.name;
+                                if (playlistMap[name]) {
                                     // add to the duplicates
                                     const existingPlaylist: PlaylistItem =
-                                        playlistMap[playlist.name];
-                                    existingPlaylist.duplicateIds.push(
+                                        playlistMap[name];
+                                    if (!existingPlaylist.duplicateIds) {
+                                        existingPlaylist["duplicateIds"] = [];
+                                    }
+                                    existingPlaylist["duplicateIds"].push(
                                         playlist.id
                                     );
                                     // add to the user playlist names
@@ -221,7 +229,7 @@ export class Playlist {
                                         name
                                     ] = existingPlaylist;
                                 } else {
-                                    playlistMap[playlist.name] = playlist;
+                                    playlistMap[name] = playlist;
                                 }
                             });
                         }
@@ -230,6 +238,12 @@ export class Playlist {
                     }
                 }
             }
+        }
+
+        if (playlistMap) {
+            Object.keys(playlistMap).forEach(key => {
+                playlists.push(playlistMap[key]);
+            });
         }
 
         return playlists;
