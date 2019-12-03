@@ -148,6 +148,7 @@ export class PlaylistTrackInfo {
 export class PlaylistItem {
     name: string = "";
     id: string = "";
+    uri: string = "";
     playlistTypeId: number = 0;
     collaborative: boolean = false;
     public: boolean = true;
@@ -165,6 +166,8 @@ export class PlaylistItem {
     played_count: number = 0;
     popularity: number = 0;
     artist: string = "";
+    owner: any = {};
+    duplicateIds: string[] = [];
 }
 
 export class CodyConfig {

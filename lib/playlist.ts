@@ -16,6 +16,16 @@ const musicStore = MusicStore.getInstance();
 const userProfile = UserProfile.getInstance();
 const musicUtil = new MusicUtil();
 
+// delete duplicate music time playlists matching the following names:
+// "My AI Top 40", "Custom Top 40", "AI-generated Custom Top 40"
+const codyPlaylistNames = [
+    "My AI Top 40",
+    "Custom Top 40",
+    "AI-generated Custom Top 40"
+];
+
+const userToPlaylistNames: any = {};
+
 export class Playlist {
     private static instance: Playlist;
     private constructor() {
@@ -143,22 +153,38 @@ export class Playlist {
         }
 
         if (musicStore.spotifyUserId) {
+            const spotifyUserId = musicStore.spotifyUserId;
             const fetchAll = qsOptions.all ? true : false;
             let limit = qsOptions.limit ? qsOptions.limit : 50;
             limit = limit < 1 ? 1 : limit;
             let offset = qsOptions.offset ? qsOptions.offset : 0;
             let codyResp = await this.getPlaylistsForUser(
-                musicStore.spotifyUserId,
+                spotifyUserId,
                 limit,
                 offset
             );
 
+            const playlistMap: any = {};
+
             if (musicUtil.isItemsResponseOk(codyResp)) {
-                playlists = codyResp.data.items;
+                let playlistItems = codyResp.data.items;
                 // ensure the playerType is set
-                playlists.forEach((playlist: PlaylistItem) => {
+                playlistItems.forEach((playlist: PlaylistItem) => {
                     playlist.playerType = PlayerType.WebSpotify;
                     playlist.type = "playlist";
+
+                    if (playlistMap[playlist.name]) {
+                        // add to the duplicates
+                        const existingPlaylist: PlaylistItem =
+                            playlistMap[playlist.name];
+                        existingPlaylist.duplicateIds.push(playlist.id);
+                        // add to the user playlist names
+                        userToPlaylistNames[spotifyUserId][
+                            name
+                        ] = existingPlaylist;
+                    } else {
+                        playlistMap[playlist.name] = playlist;
+                    }
                 });
 
                 // check if we need to fetch every playlist
@@ -177,17 +203,27 @@ export class Playlist {
                         );
 
                         if (musicUtil.isItemsResponseOk(codyResp)) {
-                            const additionalItems = codyResp.data.items;
+                            playlistItems = codyResp.data.items;
                             // ensure the playerType is set
-                            additionalItems.forEach(
-                                (playlist: PlaylistItem) => {
-                                    playlist.playerType = PlayerType.WebSpotify;
-                                    playlist.type = "playlist";
+                            playlistItems.forEach((playlist: PlaylistItem) => {
+                                playlist.playerType = PlayerType.WebSpotify;
+                                playlist.type = "playlist";
 
-                                    // add to the outgoing playlist
-                                    playlists.push(playlist);
+                                if (playlistMap[playlist.name]) {
+                                    // add to the duplicates
+                                    const existingPlaylist: PlaylistItem =
+                                        playlistMap[playlist.name];
+                                    existingPlaylist.duplicateIds.push(
+                                        playlist.id
+                                    );
+                                    // add to the user playlist names
+                                    userToPlaylistNames[spotifyUserId][
+                                        name
+                                    ] = existingPlaylist;
+                                } else {
+                                    playlistMap[playlist.name] = playlist;
                                 }
-                            );
+                            });
                         }
                         threshold = codyResp.data.limit + codyResp.data.offset;
                         total = codyResp.data.total;
@@ -348,7 +384,17 @@ export class Playlist {
             await userProfile.getUserProfile();
         }
 
-        if (musicStore.spotifyUserId) {
+        const spotifyUserId = musicStore.spotifyUserId;
+        // check if it's already in the playlist
+        if (userToPlaylistNames[spotifyUserId][name]) {
+            const existingPlaylist = userToPlaylistNames[spotifyUserId][name];
+            // it already exists, return this ID
+            if (existingPlaylist) {
+                return existingPlaylist;
+            }
+        }
+
+        if (spotifyUserId) {
             /**
              * --data "{\"name\":\"A New Playlist\", \"public\":false}
              */
@@ -357,7 +403,7 @@ export class Playlist {
                 public: isPublic,
                 description
             };
-            const api = `/v1/users/${musicStore.spotifyUserId}/playlists`;
+            const api = `/v1/users/${spotifyUserId}/playlists`;
             return await musicClient.spotifyApiPost(
                 api,
                 {},

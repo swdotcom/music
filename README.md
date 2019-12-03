@@ -562,8 +562,9 @@ launchPlayer(playerName: PlayerName, options: any = {})
  * It will also launch Spotify if it is not already available by checking the device Ids.
  * @param trackId (optional) If it's not supplied then the playlistId must be provided
  * @param playlistId (optional) If it's not supplied then the trackId must be provided
+ * @param playerName (optional) SpotifyWeb or SpotifyDesktop
  */
-launchAndPlaySpotifyTrack(trackId: string = "", playlistId: string = "")
+launchAndPlaySpotifyTrack(trackId: string = "", playlistId: string = "", playerName: string = PlayerName.SpotifyWeb)
 
 /**
  * Plays a Spotify Mac Desktop track within a playlist.

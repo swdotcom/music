@@ -431,7 +431,8 @@ export class MusicPlayerState {
 
     async launchAndPlaySpotifyTrack(
         trackId: string = "",
-        playlistId: string = ""
+        playlistId: string = "",
+        playerName: PlayerName = PlayerName.SpotifyWeb
     ) {
         // check if there's any spotify devices
         const spotifyDevices: PlayerDevice[] = await this.getSpotifyDevices(
@@ -442,7 +443,7 @@ export class MusicPlayerState {
             // no spotify devices found, lets launch the web player with the track
 
             // launch it
-            await this.launchWebPlayer(PlayerName.SpotifyWeb);
+            await this.launchWebPlayer(playerName);
 
             // now select it from within the playlist within 2 seconds
             await setTimeout(() => {

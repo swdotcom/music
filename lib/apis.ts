@@ -931,12 +931,18 @@ export function launchPlayer(playerName: PlayerName, options: any = {}) {
  * It will also launch Spotify if it is not already available by checking the device Ids.
  * @param trackId (optional) If it's not supplied then the playlistId must be provided
  * @param playlistId (optional) If it's not supplied then the trackId must be provided
+ * @param playerName (optional) SpotifyWeb or SpotifyDesktop
  */
 export function launchAndPlaySpotifyTrack(
     trackId: string = "",
-    playlistId: string = ""
+    playlistId: string = "",
+    playerName: PlayerName = PlayerName.SpotifyWeb
 ) {
-    return musicPlayerCtr.launchAndPlaySpotifyTrack(trackId, playlistId);
+    return musicPlayerCtr.launchAndPlaySpotifyTrack(
+        trackId,
+        playlistId,
+        playerName
+    );
 }
 
 /**
