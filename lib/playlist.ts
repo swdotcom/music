@@ -16,7 +16,7 @@ const musicStore = MusicStore.getInstance();
 const userProfile = UserProfile.getInstance();
 const musicUtil = new MusicUtil();
 
-// delete duplicate music time playlists matching the following names:
+// duplicate music time playlists names:
 // "My AI Top 40", "My Custom Top 40", "Custom Top 40", "AI-generated Custom Top 40", "Software Top 40"
 const codyPlaylistNames = [
     "My AI Top 40",
