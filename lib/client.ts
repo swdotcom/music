@@ -169,7 +169,7 @@ export class MusicClient {
                 }
             })
             .catch(err => {
-                console.log("err: ", JSON.stringify(err, null, 2));
+                console.log("refresh token error: ", err.message);
                 if (err.response) {
                     return {
                         status: "failed",

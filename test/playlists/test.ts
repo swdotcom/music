@@ -47,11 +47,9 @@ describe("spotify playlist tests", () => {
             "cody-favs",
             false /*isPublic*/
         );
-        console.log("result: ", result);
         expect(result.data.id).to.not.equal("");
         const playlist_id = result.data.id;
         result = await CodyMusic.playSpotifyPlaylist(playlist_id);
-        console.log("result of playing the playlist: ", result);
         result = await CodyMusic.deletePlaylist(playlist_id);
         expect(result.status).to.equal(200);
     });
