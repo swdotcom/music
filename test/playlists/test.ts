@@ -1,7 +1,12 @@
 const expect = require("chai").expect;
 import * as CodyMusic from "../../index";
 import { TestUtil } from "../util";
-import { PlayerName, PlaylistItem, Track } from "../../lib/models";
+import {
+    PlayerName,
+    PlaylistItem,
+    Track,
+    CodyResponse
+} from "../../lib/models";
 import { UserProfile, SpotifyUser } from "../../lib/profile";
 import { create } from "domain";
 
@@ -38,10 +43,11 @@ describe("spotify playlist tests", () => {
     });
 
     xit("create a spotify playlist", async () => {
-        let result = await CodyMusic.createPlaylist(
+        let result: CodyResponse = await CodyMusic.createPlaylist(
             "cody-favs",
             false /*isPublic*/
         );
+        console.log("result: ", result);
         expect(result.data.id).to.not.equal("");
         const playlist_id = result.data.id;
         result = await CodyMusic.playSpotifyPlaylist(playlist_id);

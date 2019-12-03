@@ -24,7 +24,7 @@ const codyPlaylistNames = [
     "AI-generated Custom Top 40"
 ];
 
-const userToPlaylistNames: any = {};
+let userPlaylists: PlaylistItem[] = [];
 
 export class Playlist {
     private static instance: Playlist;
@@ -147,6 +147,7 @@ export class Playlist {
     }
 
     async getPlaylists(qsOptions: any = {}): Promise<PlaylistItem[]> {
+        userPlaylists = [];
         let playlists: PlaylistItem[] = [];
         if (!musicStore.spotifyUserId) {
             await userProfile.getUserProfile();
@@ -182,10 +183,6 @@ export class Playlist {
                             existingPlaylist["duplicateIds"] = [];
                         }
                         existingPlaylist["duplicateIds"].push(playlist.id);
-                        // add to the user playlist names
-                        userToPlaylistNames[spotifyUserId][
-                            name
-                        ] = existingPlaylist;
                     } else {
                         playlistMap[name] = playlist;
                     }
@@ -224,10 +221,6 @@ export class Playlist {
                                     existingPlaylist["duplicateIds"].push(
                                         playlist.id
                                     );
-                                    // add to the user playlist names
-                                    userToPlaylistNames[spotifyUserId][
-                                        name
-                                    ] = existingPlaylist;
                                 } else {
                                     playlistMap[name] = playlist;
                                 }
@@ -242,7 +235,9 @@ export class Playlist {
 
         if (playlistMap) {
             Object.keys(playlistMap).forEach(key => {
-                playlists.push(playlistMap[key]);
+                const item = playlistMap[key];
+                playlists.push(item);
+                userPlaylists.push(item);
             });
         }
 
@@ -392,7 +387,7 @@ export class Playlist {
         name: string,
         isPublic: boolean,
         description: string = ""
-    ) {
+    ): Promise<CodyResponse> {
         // get the profile if we don't have it
         if (!musicStore.spotifyUserId) {
             await userProfile.getUserProfile();
@@ -400,12 +395,16 @@ export class Playlist {
 
         const spotifyUserId = musicStore.spotifyUserId;
         // check if it's already in the playlist
-        if (userToPlaylistNames[spotifyUserId][name]) {
-            const existingPlaylist = userToPlaylistNames[spotifyUserId][name];
-            // it already exists, return this ID
-            if (existingPlaylist) {
-                return existingPlaylist;
-            }
+        const existingPlaylist = userPlaylists.length
+            ? userPlaylists.filter((n: PlaylistItem) => n.name === name)
+            : null;
+        if (existingPlaylist) {
+            // already exists, return it
+            const failedCreate: CodyResponse = new CodyResponse();
+            failedCreate.status = 500;
+            failedCreate.state = CodyResponseType.Failed;
+            failedCreate.message = "Playlist with that name already exists";
+            return failedCreate;
         }
 
         if (spotifyUserId) {

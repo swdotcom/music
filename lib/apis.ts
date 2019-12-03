@@ -1013,7 +1013,7 @@ export function createPlaylist(
     name: string,
     isPublic: boolean,
     description: string = ""
-) {
+): Promise<CodyResponse> {
     return playlist.createPlaylist(name, isPublic, description);
 }
 
