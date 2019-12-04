@@ -2,8 +2,10 @@ import axios, { AxiosInstance } from "axios";
 import { MusicStore } from "./store";
 import { CodyResponse, CodyResponseType } from "./models";
 const querystring = require("querystring");
+const natural = require("natural");
 
 const musicStore = MusicStore.getInstance();
+const tokenizer = new natural.WordTokenizer();
 export const SPOTIFY_ROOT_API = "https://api.spotify.com";
 
 const spotifyClient: AxiosInstance = axios.create({
@@ -39,6 +41,110 @@ export class MusicClient {
         return MusicClient.instance;
     }
 
+    buildGenreMap(map: any, token: string) {
+        let tokenRegex = new RegExp("\\b" + token + "\\b", "ig");
+
+        const existingKeys = Object.keys(map);
+        let foundMatch = false;
+
+        if (existingKeys && existingKeys.length) {
+            for (let i = 0; i < existingKeys.length; i++) {
+                const key = existingKeys[i];
+                let matched = key.match(tokenRegex);
+
+                if (!matched) {
+                    // try the other way
+                    const inverseRegex = new RegExp("\\b" + key + "\\b", "ig");
+                    matched = token.match(inverseRegex);
+                    if (matched) {
+                        // delete the other one and use the new one
+                        const existingCount = map[key].count;
+                        map[token] = {
+                            count: existingCount + 1,
+                            genre: token
+                        };
+                        foundMatch = true;
+                        break;
+                    }
+                } else {
+                    // increment the count
+                    map[key].count += 1;
+                    foundMatch = true;
+                }
+            }
+        }
+
+        if (!foundMatch) {
+            // add it to the map
+            map[token] = { count: 1, genre: token };
+        }
+        return map;
+    }
+
+    getHighestFrequencySpotifyGenre(genreList: any[]): string {
+        let selectedGenre = "";
+
+        if (!genreList || genreList.length === 0) {
+            // there are no genre items, return empty
+            return selectedGenre;
+        }
+
+        let map: any = {};
+
+        for (let y = 0; y < genreList.length; y++) {
+            let genre: string = genreList[y];
+
+            genre = genre ? genre.trim() : "";
+            if (!genre) {
+                continue;
+            }
+
+            // split the individual tokens from each genre
+            const tokens = genre.split(" ");
+
+            // also add single words
+            for (let z = 0; z < tokens.length; z++) {
+                let token = tokens[z] ? tokens[z].trim() : "";
+                if (!token) {
+                    continue;
+                }
+
+                map = this.buildGenreMap(map, token);
+            }
+
+            // const tokens = tokenizer.tokenize(genre);
+            // const token = tokens.join(" ").toLowerCase();
+            map = this.buildGenreMap(map, genre);
+        }
+
+        // get the one with the highest count (sort desc)
+        if (Object.keys(map).length) {
+            genreList = [];
+            Object.keys(map).forEach(key => {
+                genreList.push(map[key]);
+            });
+            selectedGenre = genreList.sort(
+                (a: any, b: any) => b.count - a.count
+            )[0].genre;
+        }
+
+        return selectedGenre;
+    }
+
+    getGenreFromItems(items: []) {
+        let genre = "";
+        for (let i = 0; i < items.length; i++) {
+            const item: any = items[i];
+            if (item && item.genres && item.genres.length > 0) {
+                genre = this.getHighestFrequencySpotifyGenre(item.genres);
+                if (genre) {
+                    break;
+                }
+            }
+        }
+        return genre;
+    }
+
     async getGenreFromSpotify(artist: string): Promise<any> {
         if (!musicStore.spotifyAccessToken) {
             return this.throwNoSpotifyTokenInfoError();
@@ -54,17 +160,13 @@ export class MusicClient {
             .get(api)
             .then(resp => {
                 let genre = "";
-                if (resp.data && resp.data.artists && resp.data.artists.items) {
-                    const items = resp.data.artists.items;
-                    if (items && items.length > 0) {
-                        for (let i = 0; i < items.length; i++) {
-                            const item = items[i];
-                            if (item && item.genres && item.genres.length > 0) {
-                                genre = item.genres.join(", ");
-                                break;
-                            }
-                        }
-                    }
+                if (
+                    resp.data &&
+                    resp.data.artists &&
+                    resp.data.artists.items &&
+                    resp.data.artists.items.length
+                ) {
+                    genre = this.getGenreFromItems(resp.data.artists.items);
                 }
                 return {
                     status: "success",

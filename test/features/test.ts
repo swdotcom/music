@@ -18,29 +18,6 @@ describe("feature api tests", () => {
         done();
     });
 
-    it("Fetch genre from itunes using artist and song", done => {
-        CodyMusic.getGenre("Hozier", "Movement - Single").then(
-            (result: any) => {
-                expect(result).to.not.equal("");
-                done();
-            }
-        );
-    });
-
-    it("Fetch genre from itunes using artist", done => {
-        CodyMusic.getGenre("Hozier").then((result: any) => {
-            expect(result).to.not.equal("");
-            done();
-        });
-    });
-
-    it("Fetch genre from spotify using artist", done => {
-        CodyMusic.getSpotifyGenre("Alec Benjamin").then((result: any) => {
-            expect(result).to.not.equal("");
-            done();
-        });
-    });
-
     it("Fetch spotify audio features", done => {
         const spotifyTrackIdOne = "0i0wnv9UoFdZ5MfuFGQzMy";
         const spotifyTrackIdTwo = "4ut5G4rgB1ClpMTMfjoIuy";
