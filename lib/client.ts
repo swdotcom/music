@@ -95,38 +95,60 @@ export class MusicClient {
             genre = genre ? genre.trim() : "";
             if (genre) {
                 map[genre] = { rank: 0, genre };
-            }
-        });
-
-        genreList.forEach((genre: string) => {
-            genre = genre ? genre.trim() : "";
-            if (genre) {
-                // now split the words
                 const tokens = genre.split(" ");
+
                 tokens.forEach((token: string) => {
                     token = token ? token.trim() : "";
-                    if (token) {
-                        let tokenRegex = new RegExp(
-                            "\\b" + token + "\\b",
-                            "ig"
-                        );
-                        const existingKeys = Object.keys(map);
-                        for (let i = 0; i < existingKeys.length; i++) {
-                            const key = existingKeys[i];
-                            if (key === token || key === genre) {
-                                continue;
-                            }
-                            let matched = key.match(tokenRegex);
-
-                            if (matched) {
-                                // increment the count
-                                map[key].rank += 1;
-                            }
-                        }
+                    if (!map[token]) {
+                        map[token] = { rank: 0, genre: token };
+                    } else {
+                        map[token].rank += 1;
                     }
                 });
             }
         });
+
+        const hasKeys = Object.keys(map).length ? true : false;
+
+        if (hasKeys) {
+            genreList.forEach((genre: string) => {
+                genre = genre ? genre.trim() : "";
+                if (genre) {
+                    // now split the words
+                    const tokens = genre.split(" ");
+                    tokens.forEach((token: string) => {
+                        token = token ? token.trim() : "";
+                        if (token) {
+                            let tokenRegex = new RegExp(
+                                "\\b" + token + "\\b",
+                                "ig"
+                            );
+
+                            Object.keys(map).forEach(key => {
+                                if (key !== token && key !== genre) {
+                                    if (key.match(tokenRegex)) {
+                                        // increment the count
+                                        map[key].rank += 1;
+                                    }
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+
+            Object.keys(map).forEach(key => {
+                // check to see if this key pattern matches other keys
+                Object.keys(map).forEach(subKey => {
+                    if (subKey !== key) {
+                        let regex = new RegExp("\\b" + key + "\\b", "ig");
+                        if (subKey.match(regex)) {
+                            map[key].rank += 1;
+                        }
+                    }
+                });
+            });
+        }
 
         // get the one with the highest rank (sort desc)
         if (Object.keys(map).length) {
