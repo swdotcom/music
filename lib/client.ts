@@ -19,6 +19,45 @@ const itunesSearchClient: AxiosInstance = axios.create({
     baseURL: "https://itunes.apple.com"
 });
 
+const spotifyGenres = [
+    "top",
+    "summer",
+    "pop",
+    "mood",
+    "electronic dance edm",
+    "decades",
+    "hip hop hip-hop",
+    "chill",
+    "workout",
+    "party",
+    "focus",
+    "sleep",
+    "pride",
+    "rock",
+    "dinner",
+    "jazz",
+    "r&b rnb rhythm",
+    "romance",
+    "soul",
+    "indie",
+    "gaming",
+    "classical",
+    "metal heavy",
+    "latin",
+    "kids & family",
+    "reggae",
+    "blues",
+    "funk",
+    "punk",
+    "country",
+    "folk acoustic",
+    "desi",
+    "arab",
+    "afro",
+    "travel",
+    "k-pop"
+];
+
 /**
  * Spotify Error Cases
  * When performing an action that is restricted,
@@ -41,46 +80,6 @@ export class MusicClient {
         return MusicClient.instance;
     }
 
-    buildGenreMap(map: any, token: string) {
-        let tokenRegex = new RegExp("\\b" + token + "\\b", "ig");
-
-        const existingKeys = Object.keys(map);
-        let foundMatch = false;
-
-        if (existingKeys && existingKeys.length) {
-            for (let i = 0; i < existingKeys.length; i++) {
-                const key = existingKeys[i];
-                let matched = key.match(tokenRegex);
-
-                if (!matched) {
-                    // try the other way
-                    const inverseRegex = new RegExp("\\b" + key + "\\b", "ig");
-                    matched = token.match(inverseRegex);
-                    if (matched) {
-                        // delete the other one and use the new one
-                        const existingCount = map[key].count;
-                        map[token] = {
-                            count: existingCount + 1,
-                            genre: token
-                        };
-                        foundMatch = true;
-                        break;
-                    }
-                } else {
-                    // increment the count
-                    map[key].count += 1;
-                    foundMatch = true;
-                }
-            }
-        }
-
-        if (!foundMatch) {
-            // add it to the map
-            map[token] = { count: 1, genre: token };
-        }
-        return map;
-    }
-
     getHighestFrequencySpotifyGenre(genreList: any[]): string {
         let selectedGenre = "";
 
@@ -91,41 +90,68 @@ export class MusicClient {
 
         let map: any = {};
 
-        for (let y = 0; y < genreList.length; y++) {
-            let genre: string = genreList[y];
-
+        // create a mapping of the originals
+        genreList.forEach((genre: string) => {
             genre = genre ? genre.trim() : "";
-            if (!genre) {
-                continue;
+            if (genre) {
+                map[genre] = { rank: 0, genre };
             }
+        });
 
-            // split the individual tokens from each genre
-            const tokens = genre.split(" ");
+        genreList.forEach((genre: string) => {
+            genre = genre ? genre.trim() : "";
+            if (genre) {
+                // now split the words
+                const tokens = genre.split(" ");
+                tokens.forEach((token: string) => {
+                    token = token ? token.trim() : "";
+                    if (token) {
+                        let tokenRegex = new RegExp(
+                            "\\b" + token + "\\b",
+                            "ig"
+                        );
+                        const existingKeys = Object.keys(map);
+                        for (let i = 0; i < existingKeys.length; i++) {
+                            const key = existingKeys[i];
+                            if (key === token || key === genre) {
+                                continue;
+                            }
+                            let matched = key.match(tokenRegex);
 
-            // also add single words
-            for (let z = 0; z < tokens.length; z++) {
-                let token = tokens[z] ? tokens[z].trim() : "";
-                if (!token) {
-                    continue;
-                }
-
-                map = this.buildGenreMap(map, token);
+                            if (matched) {
+                                // increment the count
+                                map[key].rank += 1;
+                            }
+                        }
+                    }
+                });
             }
+        });
 
-            // const tokens = tokenizer.tokenize(genre);
-            // const token = tokens.join(" ").toLowerCase();
-            map = this.buildGenreMap(map, genre);
-        }
-
-        // get the one with the highest count (sort desc)
+        // get the one with the highest rank (sort desc)
         if (Object.keys(map).length) {
             genreList = [];
             Object.keys(map).forEach(key => {
                 genreList.push(map[key]);
             });
-            selectedGenre = genreList.sort(
-                (a: any, b: any) => b.count - a.count
-            )[0].genre;
+            genreList = genreList.sort((a: any, b: any) => b.rank - a.rank);
+            // stop if the rank starts to descend and we haven't found anything
+            let initialCount = genreList[0].rank;
+            for (let i = 0; i < genreList.length; i++) {
+                const obj: any = genreList[i];
+                if (spotifyGenres.includes(obj.genre)) {
+                    selectedGenre = obj.genre;
+                    break;
+                }
+                if (obj.rank < initialCount) {
+                    break;
+                }
+            }
+
+            // if nothing returned, return the 1st one
+            if (!selectedGenre) {
+                selectedGenre = genreList[0].genre;
+            }
         }
 
         return selectedGenre;
