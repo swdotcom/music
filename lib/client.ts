@@ -85,6 +85,10 @@ export class MusicClient {
     }
 
     getHighestFrequencySpotifyGenre(genreList: any[]): string {
+        genreList = ["pop rock"];
+        if (musicStore.debug) {
+            console.log("Genre List: ", genreList);
+        }
         let selectedGenre = "";
 
         if (!genreList || genreList.length === 0) {
@@ -158,6 +162,10 @@ export class MusicClient {
                     }
                 });
             });
+        }
+
+        if (musicStore.debug) {
+            console.log("GENRE RESULT: ", JSON.stringify(map, null, 2));
         }
 
         // get the one with the highest rank (sort desc)

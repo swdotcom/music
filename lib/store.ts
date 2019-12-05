@@ -16,6 +16,7 @@ export class MusicStore {
     private _spotifyDesktopEnabled: boolean = true;
     private _spotifyApiEnabled: boolean = true;
     private _itunesAccessGranted: boolean = true;
+    private _debug: boolean = false;
 
     private static instance: MusicStore;
     private constructor() {
@@ -50,6 +51,8 @@ export class MusicStore {
                 this.spotifyRefreshToken = creds[key];
             } else if (key === "accessToken") {
                 this.spotifyAccessToken = creds[key];
+            } else if (key === "debug") {
+                this.debug = creds[key];
             }
         });
     }
@@ -63,6 +66,8 @@ export class MusicStore {
             return this.spotifyRefreshToken;
         } else if (key === "spotifyAccessToken") {
             return this.spotifyAccessToken;
+        } else if (key === "debug") {
+            return this.debug;
         }
         return null;
     }
@@ -173,5 +178,13 @@ export class MusicStore {
 
     set spotifyApiEnabled(newspotifyApiEnabled) {
         this._spotifyApiEnabled = newspotifyApiEnabled;
+    }
+
+    get debug(): boolean {
+        return this._debug;
+    }
+
+    set debug(isDebug: boolean) {
+        this._debug = isDebug;
     }
 }

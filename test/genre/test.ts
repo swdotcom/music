@@ -12,7 +12,8 @@ describe("genre tests", () => {
             refreshToken: data.refreshToken,
             clientSecret: data.clientSecret,
             clientId: data.clientId,
-            accessToken: data.accessToken
+            accessToken: data.accessToken,
+            debug: true
         });
 
         done();
