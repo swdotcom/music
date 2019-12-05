@@ -85,7 +85,6 @@ export class MusicClient {
     }
 
     getHighestFrequencySpotifyGenre(genreList: any[]): string {
-        genreList = ["pop rock"];
         if (musicStore.debug) {
             console.log("Genre List: ", genreList);
         }
