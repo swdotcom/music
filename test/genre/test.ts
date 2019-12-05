@@ -39,6 +39,7 @@ describe("genre tests", () => {
         // artist: The National
         // genre: chamber pop folk-pop indie folk indie pop indie rock modern rock stomp and holler
         CodyMusic.getSpotifyGenre("The National").then((result: any) => {
+            console.log("GENRE: ", result);
             expect(result).to.not.equal("");
             done();
         });
@@ -49,6 +50,7 @@ describe("genre tests", () => {
         // artist: Isaiah Rashad
         // genre: chamber pop folk-pop indie folk indie pop indie rock modern rock stomp and holler
         CodyMusic.getSpotifyGenre("Isaiah Rashad").then((result: any) => {
+            console.log("GENRE: ", result);
             expect(result).to.not.equal("");
             done();
         });

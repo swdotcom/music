@@ -24,9 +24,11 @@ const spotifyGenres = [
     "summer",
     "pop",
     "mood",
-    "electronic dance edm",
+    "electronic dance",
+    "edm",
     "decades",
-    "hip hop hip-hop",
+    "hip hop",
+    "hip-hop",
     "chill",
     "workout",
     "party",
@@ -36,13 +38,14 @@ const spotifyGenres = [
     "rock",
     "dinner",
     "jazz",
-    "r&b rnb rhythm",
+    "r&b",
+    "rhythm",
     "romance",
     "soul",
     "indie",
     "gaming",
     "classical",
-    "metal heavy",
+    "heavy metal",
     "latin",
     "kids & family",
     "reggae",
@@ -50,7 +53,8 @@ const spotifyGenres = [
     "funk",
     "punk",
     "country",
-    "folk acoustic",
+    "folk",
+    "acoustic",
     "desi",
     "arab",
     "afro",
@@ -92,17 +96,18 @@ export class MusicClient {
 
         // create a mapping of the originals
         genreList.forEach((genre: string) => {
-            genre = genre ? genre.trim() : "";
+            genre = genre ? genre.trim().toLowerCase() : "";
             if (genre) {
+                // creates a mapping of the orig i.e. {"hip hop": {rank: 0, genre: "hip hop"}}
                 map[genre] = { rank: 0, genre };
                 const tokens = genre.split(" ");
 
+                // now create single token mapping i.e. {rock: {rank: 0, genre: "rock"}}
                 tokens.forEach((token: string) => {
                     token = token ? token.trim() : "";
+
                     if (!map[token]) {
                         map[token] = { rank: 0, genre: token };
-                    } else {
-                        map[token].rank += 1;
                     }
                 });
             }
@@ -111,15 +116,17 @@ export class MusicClient {
         const hasKeys = Object.keys(map).length ? true : false;
 
         if (hasKeys) {
+            // this will increment the rank so we can sort them in descending order
+            // to find the highest ranking genre
             genreList.forEach((genre: string) => {
-                genre = genre ? genre.trim() : "";
+                genre = genre ? genre.trim().toLowerCase() : "";
                 if (genre) {
                     // now split the words
                     const tokens = genre.split(" ");
                     tokens.forEach((token: string) => {
                         token = token ? token.trim() : "";
                         if (token) {
-                            let tokenRegex = new RegExp(
+                            const tokenRegex = new RegExp(
                                 "\\b" + token + "\\b",
                                 "ig"
                             );
@@ -137,9 +144,12 @@ export class MusicClient {
                 }
             });
 
+            // Now go over every key to see if it's tokens(s)
+            // are found in another key's set of keywords
             Object.keys(map).forEach(key => {
                 // check to see if this key pattern matches other keys
                 Object.keys(map).forEach(subKey => {
+                    // but don't match itself
                     if (subKey !== key) {
                         let regex = new RegExp("\\b" + key + "\\b", "ig");
                         if (subKey.match(regex)) {
