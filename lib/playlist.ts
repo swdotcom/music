@@ -387,10 +387,10 @@ export class Playlist {
 
         const spotifyUserId = musicStore.spotifyUserId;
         // check if it's already in the playlist
-        const existingPlaylist = userPlaylists.length
+        const existingPlaylist: PlaylistItem[] = userPlaylists.length
             ? userPlaylists.filter((n: PlaylistItem) => n.name === name)
-            : null;
-        if (existingPlaylist) {
+            : [];
+        if (existingPlaylist.length > 0) {
             // already exists, return it
             const failedCreate: CodyResponse = new CodyResponse();
             failedCreate.status = 500;

@@ -12,11 +12,12 @@ Cody Music is an open source package designed to help you perform Mac iTunes and
 -   Fetching Spotify audio features
 -   Playlists
     (create, delete, fetch playlist tracks, replace playlist tracks)
--   Genre search
+-   Genre search (Recently updated to return highest frequency Spotify Genre)
 -   Fetching Spotify devices
 -   Access token refresh retry
 -   Track recommendations from Spotify
 -   Add and remove to the Liked playlist
+-   Prevents adding duplicate playlists by name
 
 ## iTunes API support
 
