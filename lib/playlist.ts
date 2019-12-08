@@ -395,7 +395,7 @@ export class Playlist {
             const failedCreate: CodyResponse = new CodyResponse();
             failedCreate.status = 500;
             failedCreate.state = CodyResponseType.Failed;
-            failedCreate.message = "Playlist with that name already exists";
+            failedCreate.message = `The playlist '${name}' already exists`;
             return failedCreate;
         }
 
