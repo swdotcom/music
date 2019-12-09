@@ -56,4 +56,15 @@ describe("genre tests", () => {
             done();
         });
     });
+
+    it("Fetch Spotify Artist", done => {
+        // song: Soliloquy
+        // artist: Isaiah Rashad
+        // genre: chamber pop folk-pop indie folk indie pop indie rock modern rock stomp and holler
+        CodyMusic.getSpotifyGenre("Kamiyada+").then((result: any) => {
+            console.log("GENRE: ", result);
+            expect(result).to.not.equal("");
+            done();
+        });
+    });
 });

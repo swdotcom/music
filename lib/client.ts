@@ -28,6 +28,7 @@ const spotifyGenres = [
     "edm",
     "decades",
     "hip hop",
+    "rap",
     "hip-hop",
     "chill",
     "workout",
