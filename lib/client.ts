@@ -274,18 +274,19 @@ export class MusicClient {
     ): Promise<string> {
         let genre = await this.fetchItunesGenre(artist, song);
         // try cleaning up the song name
-        if (!genre && song && song.indexOf("-") !== -1) {
+        if (!genre && song) {
             // i.e. Ted Ganung, song: The After Hours - Original Mix
             // should be: Ted Ganung, song: The After Hours
             // get the 1st part of the song
-            song = song.split("-")[0].trim();
-            genre = await this.fetchItunesGenre(artist, song);
-        }
-
-        if (!genre && song && song.indexOf(",") !== -1) {
-            // if the song still has punctuation like a comma, split that
-            // get the 1st part of the song
-            song = song.split(",")[0].trim();
+            if (song.indexOf("-") !== -1) {
+                song = song.split("-")[0].trim();
+            }
+            if (song.indexOf(",") !== -1) {
+                song = song.split(",")[0].trim();
+            }
+            if (song.indexOf("(") > 0) {
+                song = song.split("(")[0].trim();
+            }
             genre = await this.fetchItunesGenre(artist, song);
         }
 
@@ -308,11 +309,20 @@ export class MusicClient {
         } else if (artist) {
             terms = `${artist.trim()}`;
         }
-        const api = `search?term=${encodeURIComponent(terms)}`;
-        const resp = await itunesSearchClient.get(api).catch(err => {
+        let api = `search?term=${encodeURIComponent(terms)}`;
+        let resp = await itunesSearchClient.get(api).catch(err => {
             return "";
         });
-        return await this.findNameFromItunesResponse(resp);
+        let genre = await this.findNameFromItunesResponse(resp);
+        if (!genre) {
+            // try it without encoding
+            api = `search?term=${terms}`;
+            resp = await itunesSearchClient.get(api).catch(err => {
+                return "";
+            });
+            genre = await this.findNameFromItunesResponse(resp);
+        }
+        return genre;
     }
 
     findNameFromItunesResponse(resp: any) {
