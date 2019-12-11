@@ -600,6 +600,11 @@ getGenre(
 getSpotifyGenre(artist: string): Promise<string>
 
 /**
+ * Returns the highest frequency single genre from a list
+ **/
+getHighestFrequencySpotifyGenre(genreList: string[]): string
+
+/**
  * Returns the spotify genre for a provided arguments
  * @param spotifyArtistId {string} is required (uri or id is fine)
  */
