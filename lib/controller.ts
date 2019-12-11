@@ -585,27 +585,46 @@ export class MusicController {
 
     public async getGenre(
         artist: string,
-        songName: string = ""
+        songName: string = "",
+        spotifyArtistId: string = ""
     ): Promise<string> {
         let genre = await musicClient.getGenreFromItunes(artist, songName);
         if (!genre || genre === "") {
-            genre = await this.getGenreFromSpotify(artist);
+            genre = await this.getGenreFromSpotify(artist, spotifyArtistId);
         }
 
         return genre;
     }
 
-    public async getGenreFromSpotify(artist: string): Promise<string> {
-        let response = await musicClient.getGenreFromSpotify(artist);
+    public async getGenreFromSpotify(
+        artist: string,
+        spotifyArtistId: string = ""
+    ): Promise<string> {
+        let response = null;
+        let genre = "";
+
+        if (spotifyArtistId) {
+            // make sure it's just the ID part
+            spotifyArtistId = musicUtil.createSpotifyIdFromUri(spotifyArtistId);
+        }
+        response = await musicClient.getGenreFromSpotify(
+            artist,
+            spotifyArtistId
+        );
         // check if the token needs to be refreshed
         if (response.statusText === "EXPIRED") {
             // refresh the token
             await musicClient.refreshSpotifyToken();
             // try again
-            response = await musicClient.getGenreFromSpotify(artist);
+            response = await musicClient.getGenreFromSpotify(
+                artist,
+                spotifyArtistId
+            );
         }
 
-        return response.data;
+        genre = response.data;
+
+        return genre;
     }
 
     /**

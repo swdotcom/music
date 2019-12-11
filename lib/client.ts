@@ -211,13 +211,24 @@ export class MusicClient {
         return genre;
     }
 
-    async getGenreFromSpotify(artist: string): Promise<any> {
+    async getGenreFromSpotify(
+        artist: string,
+        artistId: string = ""
+    ): Promise<any> {
         if (!musicStore.spotifyAccessToken) {
             return this.throwNoSpotifyTokenInfoError();
         }
-        const qParam = encodeURIComponent(`artist:${artist}`);
-        const qryStr = `q=${qParam}&type=artist&limit=1`;
-        const api = `/v1/search?${qryStr}`;
+        let api = "";
+
+        if (artistId) {
+            // GET https://api.spotify.com/v1/artists/{id}
+            api = `/v1/artists/${artistId}`;
+        } else {
+            // use the search api
+            const qParam = encodeURIComponent(`artist:${artist}`);
+            const qryStr = `q=${qParam}&type=artist&limit=1`;
+            api = `/v1/search?${qryStr}`;
+        }
 
         spotifyClient.defaults.headers.common[
             "Authorization"
@@ -226,13 +237,25 @@ export class MusicClient {
             .get(api)
             .then(resp => {
                 let genre = "";
-                if (
-                    resp.data &&
-                    resp.data.artists &&
-                    resp.data.artists.items &&
-                    resp.data.artists.items.length
-                ) {
-                    genre = this.getGenreFromItems(resp.data.artists.items);
+                if (resp && resp.data) {
+                    if (artistId) {
+                        // fetching by the artistId returns a flat object
+                        // {genres: [...], ...}
+                        genre = this.getHighestFrequencySpotifyGenre(
+                            resp.data.genres
+                        );
+                    } else {
+                        if (
+                            resp.data &&
+                            resp.data.artists &&
+                            resp.data.artists.items &&
+                            resp.data.artists.items.length
+                        ) {
+                            genre = this.getGenreFromItems(
+                                resp.data.artists.items
+                            );
+                        }
+                    }
                 }
                 return {
                     status: "success",
@@ -247,38 +270,49 @@ export class MusicClient {
 
     async getGenreFromItunes(
         artist: string,
-        songName: string = ""
+        song: string = ""
     ): Promise<string> {
-        let genre = "";
+        let genre = await this.fetchItunesGenre(artist, song);
+        // try cleaning up the song name
+        if (!genre && song && song.indexOf("-") !== -1) {
+            // i.e. Ted Ganung, song: The After Hours - Original Mix
+            // should be: Ted Ganung, song: The After Hours
+            // get the 1st part of the song
+            song = song.split("-")[0].trim();
+            genre = await this.fetchItunesGenre(artist, song);
+        }
 
+        if (!genre && song && song.indexOf(",") !== -1) {
+            // if the song still has punctuation like a comma, split that
+            // get the 1st part of the song
+            song = song.split(",")[0].trim();
+            genre = await this.fetchItunesGenre(artist, song);
+        }
+
+        if (!genre && artist && artist.indexOf(",") !== -1) {
+            // try cleaning up the artist
+            // split up the artist names
+            artist = artist.split(",")[0].trim();
+            genre = await this.fetchItunesGenre(artist, song);
+        }
+
+        return genre;
+    }
+
+    async fetchItunesGenre(artist: string, song: string) {
         let terms = "";
-        if (songName && artist) {
-            terms = `${artist.trim()} ${songName.trim()}`;
-        } else if (songName) {
-            terms = `${songName.trim()}`;
+        if (song && artist) {
+            terms = `${artist.trim()} ${song.trim()}`;
+        } else if (song) {
+            terms = `${song.trim()}`;
         } else if (artist) {
             terms = `${artist.trim()}`;
         }
-
-        // try from itunes
-        // search?term=${terms}&limit=3
-        let api = `search?term=${encodeURIComponent(terms)}`;
-        let resp = await itunesSearchClient.get(api).catch(err => {
+        const api = `search?term=${encodeURIComponent(terms)}`;
+        const resp = await itunesSearchClient.get(api).catch(err => {
             return "";
         });
-        if (resp) {
-            genre = await this.findNameFromItunesResponse(resp);
-        } else {
-            // try without the artist, just the song name
-            api = `search?term=${encodeURIComponent(songName)}`;
-            resp = await itunesSearchClient.get(api).catch(err => {
-                return "";
-            });
-            if (resp) {
-                genre = await this.findNameFromItunesResponse(resp);
-            }
-        }
-        return genre;
+        return await this.findNameFromItunesResponse(resp);
     }
 
     findNameFromItunesResponse(resp: any) {

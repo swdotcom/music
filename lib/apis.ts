@@ -970,20 +970,33 @@ export function getSpotifyDevices(): Promise<PlayerDevice[]> {
  * Returns the genre for a provided arguments
  * @param artist {string} is required
  * @param songName {string} is optional
+ * @param spotifyArtistId {string} is optional
  */
 export function getGenre(
     artist: string,
-    songName: string = ""
+    songName: string = "",
+    spotifyArtistId: string = ""
 ): Promise<string> {
-    return musicCtr.getGenre(artist, songName);
+    return musicCtr.getGenre(artist, songName, spotifyArtistId);
 }
 
 /**
  * Returns the spotify genre for a provided arguments
  * @param artist {string} is required
+ * @param spotifyArtistId {string} is optional
  */
 export function getSpotifyGenre(artist: string): Promise<string> {
     return musicCtr.getGenreFromSpotify(artist);
+}
+
+/**
+ * Returns the spotify genre for a provided arguments
+ * @param spotifyArtistId {string} is required
+ */
+export function getSpotifyGenreByArtistId(
+    spotifyArtistId: string
+): Promise<string> {
+    return musicCtr.getGenreFromSpotify("" /*artist name*/, spotifyArtistId);
 }
 
 /**

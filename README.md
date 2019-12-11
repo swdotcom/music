@@ -585,10 +585,12 @@ getSpotifyDevices(): Promise<PlayerDevice[]>
  * Returns the genre for a provided arguments
  * @param artist {string} is required
  * @param songName {string} is optional
+ * @param spotifyArtistId {string} is optional (uri or id is fine)
  */
 getGenre(
     artist: string,
-    songName: string = ""
+    songName: string = "",
+    spotifyArtistId: string = ""
 ): Promise<string>
 
 /**
@@ -596,6 +598,12 @@ getGenre(
  * @param artist {string} is required
  */
 getSpotifyGenre(artist: string): Promise<string>
+
+/**
+ * Returns the spotify genre for a provided arguments
+ * @param spotifyArtistId {string} is required (uri or id is fine)
+ */
+getSpotifyGenreByArtistId(spotifyArtistId: string): Promise<string> {
 
 /**
  * Returns the recent top tracks Spotify for a user.
