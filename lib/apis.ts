@@ -999,6 +999,10 @@ export function getSpotifyGenreByArtistId(
     return musicCtr.getGenreFromSpotify("" /*artist name*/, spotifyArtistId);
 }
 
+export function getHighestFrequencySpotifyGenre(genreList: string[]): string {
+    return musicCtr.getHighestFrequencySpotifyGenre(genreList);
+}
+
 /**
  * Returns the recent top tracks Spotify for a user.
  */

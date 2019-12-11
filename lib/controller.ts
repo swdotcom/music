@@ -596,6 +596,10 @@ export class MusicController {
         return genre;
     }
 
+    public getHighestFrequencySpotifyGenre(genreList: string[]) {
+        return musicClient.getHighestFrequencySpotifyGenre(genreList);
+    }
+
     public async getGenreFromSpotify(
         artist: string,
         spotifyArtistId: string = ""
