@@ -359,24 +359,42 @@ export class MusicPlayerState {
     }
 
     async getRecommendationsForTracks(
-        trackIds: string[],
+        seed_tracks: string[] = [],
         limit: number = 40,
         market: string = "",
-        min_popularity: number = 20
+        min_popularity: number = 20,
+        seed_genres: string[] = [],
+        seed_artists: string[] = []
     ) {
         let tracks: Track[] = [];
 
         // change the trackIds to non-uri ids
-        trackIds = musicUtil.createTrackIdsFromUris(trackIds);
+        seed_tracks = musicUtil.createTrackIdsFromUris(seed_tracks);
+        // the create trackIds will create normal artist ids as well
+        seed_artists = musicUtil.createTrackIdsFromUris(seed_artists);
         // it can only take up to 5, remove the rest
-        if (trackIds.length > 5) {
-            trackIds.length = 5;
+        if (seed_tracks.length > 5) {
+            seed_tracks.length = 5;
+        }
+        if (seed_genres.length > 5) {
+            seed_genres.length = 5;
+        }
+        if (seed_artists.length > 5) {
+            seed_artists.length = 5;
         }
         const qsOptions: any = {
-            seed_tracks: trackIds.join(","),
             limit,
-            min_popularity
+            min_popularity,
         };
+        if (seed_genres.length) {
+            qsOptions["seed_genres"] = seed_genres.join(",");
+        }
+        if (seed_tracks.length) {
+            qsOptions["seed_tracks"] = seed_tracks.join(",");
+        }
+        if (seed_artists.length) {
+            qsOptions["seed_artists"] = seed_artists.join(",");
+        }
         if (market) {
             qsOptions["market"] = market;
         }

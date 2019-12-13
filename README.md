@@ -227,10 +227,12 @@ hasActiveTrack(): Promise<boolean>
 
 /**
  * Returns the recommended tracks for the
- * @param trackIds (required) 1 or more
+ * @param trackIds (optional) track IDs or URIs (5 max)
  * @param limit (optional) will default to 40 if not specified
  * @param market (optional) will default to none if not specified
  * @param min_popularity (optional) will default to a min or 20
+ * @param seed_genres (optional) the supported spotify genres (5 max)
+ * @param seed_genres (optional) artist IDs or URIs (5 max)
  */
 getRecommendationsForTracks(
     trackIds: string[],
