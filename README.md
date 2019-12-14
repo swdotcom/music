@@ -231,15 +231,22 @@ hasActiveTrack(): Promise<boolean>
  * @param limit (optional) will default to 40 if not specified
  * @param market (optional) will default to none if not specified
  * @param min_popularity (optional) will default to a min or 20
+ * @param target_popularity (optional) will default to 100
  * @param seed_genres (optional) the supported spotify genres (5 max)
  * @param seed_genres (optional) artist IDs or URIs (5 max)
+ * @param features (optional) supports the tunable track attributes using min_*, max_*, and target_*
+ *   i.e. {max_valence: 0.3, target_valence: 0.1}
  */
 getRecommendationsForTracks(
-    trackIds: string[],
+    trackIds: string[] = [],
     limit: number = 40,
     market: string = "",
-    min_popularity: number = 20
-): Promise<Track[]>
+    min_popularity: number = 20,
+    target_popularity: number = 100,
+    seed_genres: string[] = [],
+    seed_artists: string[] = [],
+    features: any = {}
+): Promise<Track[]> {
 
 /**
  * Returns the currently running track.

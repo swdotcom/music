@@ -84,7 +84,11 @@ describe("track recommendation tests", () => {
             ["4ut5G4rgB1ClpMTMfjoIuy"],
             limit,
             "US",
-            2
+            2,
+            10,
+            [],
+            [],
+            {min_valence: 0.9, target_energy: 0.8}
         );
 
         let names = recommendedTracks.map(track => {

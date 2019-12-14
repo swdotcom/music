@@ -363,8 +363,10 @@ export class MusicPlayerState {
         limit: number = 40,
         market: string = "",
         min_popularity: number = 20,
+        target_popularity: number = 90,
         seed_genres: string[] = [],
-        seed_artists: string[] = []
+        seed_artists: string[] = [],
+        features: any = {}
     ) {
         let tracks: Track[] = [];
 
@@ -385,6 +387,7 @@ export class MusicPlayerState {
         const qsOptions: any = {
             limit,
             min_popularity,
+            target_popularity
         };
         if (seed_genres.length) {
             qsOptions["seed_genres"] = seed_genres.join(",");
@@ -397,6 +400,12 @@ export class MusicPlayerState {
         }
         if (market) {
             qsOptions["market"] = market;
+        }
+        const featureKeys = Object.keys(features);
+        if (featureKeys.length) {
+            featureKeys.forEach(key => {
+                qsOptions[key] = features[key];
+            });
         }
         const api = `/v1/recommendations`;
 
