@@ -16,7 +16,7 @@ const musicStore = MusicStore.getInstance();
 const userProfile = UserProfile.getInstance();
 const musicUtil = new MusicUtil();
 
-let userPlaylists: PlaylistItem[] = [];
+let playlists: PlaylistItem[] = [];
 
 export class Playlist {
     private static instance: Playlist;
@@ -139,8 +139,7 @@ export class Playlist {
     }
 
     async getPlaylists(qsOptions: any = {}): Promise<PlaylistItem[]> {
-        userPlaylists = [];
-        let playlists: PlaylistItem[] = [];
+        playlists = [];
         if (!musicStore.spotifyUserId) {
             await userProfile.getUserProfile();
         }
@@ -166,18 +165,7 @@ export class Playlist {
                     playlist.playerType = PlayerType.WebSpotify;
                     playlist.type = "playlist";
 
-                    const name = playlist.name;
-                    if (playlistMap[name]) {
-                        // add to the duplicates
-                        const existingPlaylist: PlaylistItem =
-                            playlistMap[name];
-                        if (!existingPlaylist.duplicateIds) {
-                            existingPlaylist["duplicateIds"] = [];
-                        }
-                        existingPlaylist["duplicateIds"].push(playlist.id);
-                    } else {
-                        playlistMap[name] = playlist;
-                    }
+                    playlists.push(playlist);
                 });
 
                 // check if we need to fetch every playlist
@@ -201,21 +189,7 @@ export class Playlist {
                             playlistItems.forEach((playlist: PlaylistItem) => {
                                 playlist.playerType = PlayerType.WebSpotify;
                                 playlist.type = "playlist";
-
-                                const name = playlist.name;
-                                if (playlistMap[name]) {
-                                    // add to the duplicates
-                                    const existingPlaylist: PlaylistItem =
-                                        playlistMap[name];
-                                    if (!existingPlaylist.duplicateIds) {
-                                        existingPlaylist["duplicateIds"] = [];
-                                    }
-                                    existingPlaylist["duplicateIds"].push(
-                                        playlist.id
-                                    );
-                                } else {
-                                    playlistMap[name] = playlist;
-                                }
+                                playlists.push(playlist);
                             });
                         }
                         threshold = codyResp.data.limit + codyResp.data.offset;
@@ -223,14 +197,6 @@ export class Playlist {
                     }
                 }
             }
-        }
-
-        if (playlistMap) {
-            Object.keys(playlistMap).forEach(key => {
-                const item = playlistMap[key];
-                playlists.push(item);
-                userPlaylists.push(item);
-            });
         }
 
         return playlists;
@@ -361,9 +327,9 @@ export class Playlist {
 
     async getPlaylistNames(qsOptions: any = {}): Promise<string[]> {
         let names: string[] = [];
-        let playlists = await this.getPlaylists(qsOptions);
-        if (playlists) {
-            names = playlists.map((playlistItem: PlaylistItem) => {
+        let playlistNames = await this.getPlaylists(qsOptions);
+        if (playlistNames) {
+            names = playlistNames.map((playlistItem: PlaylistItem) => {
                 return playlistItem.name;
             });
         }
@@ -387,8 +353,8 @@ export class Playlist {
 
         const spotifyUserId = musicStore.spotifyUserId;
         // check if it's already in the playlist
-        const existingPlaylist: PlaylistItem[] = userPlaylists.length
-            ? userPlaylists.filter((n: PlaylistItem) => n.name === name)
+        const existingPlaylist: PlaylistItem[] = playlists.length
+            ? playlists.filter((n: PlaylistItem) => n.name === name)
             : [];
         if (existingPlaylist.length > 0) {
             // already exists, return it
