@@ -271,7 +271,7 @@ export class Playlist {
         // fields to return for the present moment
         // TODO: allow options to update this
         qsOptions["fields"] =
-            "href,limit,next,offset,previous,total,items(track(name,id,album(id,name),artists))";
+            "href,limit,next,offset,previous,total,items(track(name,id,album(id,name),artists,popularity))";
 
         const api = `/v1/playlists/${playlist_id}/tracks`;
         let codyResp = await musicClient.spotifyApiGet(api, qsOptions);
