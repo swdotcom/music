@@ -648,7 +648,13 @@ createPlaylist(
  * Deletes a playlist of a given playlist ID.
  * @param playlist_id
  */
-deletePlaylist(playlist_id: string)
+deletePlaylist(playlist_id: string): CodyResponse
+
+/**
+ * Follow a playlist of a given playlist ID.
+ * @param playlist_id (uri or id)
+ */
+followPlaylist(playlist_id: string): CodyResponse
 
 /**
  * Replace tracks of a given playlist. This will wipe out

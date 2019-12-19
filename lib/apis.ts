@@ -1053,10 +1053,18 @@ export function createPlaylist(
 
 /**
  * Deletes a playlist of a given playlist ID.
- * @param playlist_id
+ * @param playlist_id (uri or id)
  */
-export function deletePlaylist(playlist_id: string) {
+export function deletePlaylist(playlist_id: string): Promise<CodyResponse> {
     return playlist.deletePlaylist(playlist_id);
+}
+
+/**
+ * Follow a playlist of a given playlist ID.
+ * @param playlist_id (uri or id)
+ */
+export function followPlaylist(playlist_id: string): Promise<CodyResponse> {
+    return playlist.followPlaylist(playlist_id);
 }
 
 /**

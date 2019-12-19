@@ -389,7 +389,8 @@ export class Playlist {
         return failedCreate;
     }
 
-    async deletePlaylist(playlist_id: string) {
+    async deletePlaylist(playlist_id: string): Promise<CodyResponse> {
+        playlist_id = musicUtil.createSpotifyIdFromUri(playlist_id);
         const api = `/v1/playlists/${playlist_id}/followers`;
         let codyResp = await musicClient.spotifyApiDelete(api, {}, {});
 
@@ -678,6 +679,26 @@ export class Playlist {
         }
 
         return tracks;
+    }
+
+    /**
+     * follow a playlist
+     * @param playlist_id
+     */
+    async followPlaylist(playlist_id: string): Promise<CodyResponse> {
+        playlist_id = musicUtil.createSpotifyIdFromUri(playlist_id);
+        const api = `/v1/playlists/${playlist_id}/followers`;
+        let codyResp = await musicClient.spotifyApiPut(api, {}, {});
+
+        // check if the token needs to be refreshed
+        if (codyResp.statusText === "EXPIRED") {
+            // refresh the token
+            await musicClient.refreshSpotifyToken();
+            // try again
+            codyResp = await musicClient.spotifyApiPut(api, {}, {});
+        }
+
+        return codyResp;
     }
 
     buildTrack(spotifyTrack: any) {
