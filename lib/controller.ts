@@ -136,10 +136,13 @@ export class MusicController {
     }
 
     async startPlayer(player: string, options: any = {}) {
-        if (!musicUtil.isMac()) {
-            return "";
+        if (musicUtil.isWindows()) {
+            return await this.startWindowsPlayer(player, options);
         }
+        return await this.startMacPlayer(player, options);
+    }
 
+    async startMacPlayer(player: string, options: any = {}) {
         player = musicUtil.getPlayerName(player);
         let quietly = true;
         if (
@@ -151,6 +154,15 @@ export class MusicController {
         }
 
         const command = quietly ? `open -a ${player} -gj` : `open -a ${player}`;
+        let result = await musicUtil.execCmd(command);
+        if (result === null || result === undefined || result === "") {
+            result = "ok";
+        }
+        return result;
+    }
+
+    async startWindowsPlayer(player: string, options: any = {}) {
+        const command = "cmd /c spotify.exe";
         let result = await musicUtil.execCmd(command);
         if (result === null || result === undefined || result === "") {
             result = "ok";
