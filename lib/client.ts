@@ -103,7 +103,7 @@ export class MusicClient {
             genre = genre ? genre.trim().toLowerCase() : "";
             if (genre) {
                 // creates a mapping of the orig i.e. {"hip hop": {rank: 0, genre: "hip hop"}}
-                map[genre] = { rank: 0, genre };
+                map[genre] = { rank: 0, genre, original: true };
                 const tokens = genre.split(" ");
 
                 // now create single token mapping i.e. {rock: {rank: 0, genre: "rock"}}
@@ -111,7 +111,7 @@ export class MusicClient {
                     token = token ? token.trim() : "";
 
                     if (!map[token]) {
-                        map[token] = { rank: 0, genre: token };
+                        map[token] = { rank: 0, genre: token, original: false };
                     }
                 });
             }
@@ -170,10 +170,14 @@ export class MusicClient {
 
         // get the one with the highest rank (sort desc)
         if (Object.keys(map).length) {
+            // remove the ones that are not original
             genreList = [];
             Object.keys(map).forEach(key => {
                 genreList.push(map[key]);
             });
+            // remove the ones that are not original
+            genreList = genreList.filter((a: any) => a.original === true);
+            // sort by rank
             genreList = genreList.sort((a: any, b: any) => b.rank - a.rank);
             // stop if the rank starts to descend and we haven't found anything
             let initialCount = genreList[0].rank;
