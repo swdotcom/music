@@ -18,6 +18,7 @@ Cody Music is an open source package designed to help you perform Mac iTunes and
 -   Track recommendations from Spotify
 -   Add and remove to the Liked playlist
 -   Prevents adding duplicate playlists by name
+-   Follow or unfollow a playlist
 
 ## iTunes API support
 

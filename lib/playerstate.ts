@@ -211,13 +211,17 @@ export class MusicPlayerState {
             if (!track.genre && includeGenre) {
                 // first check if we have an artist in artists
                 // artists[0].genres[0]
+
                 let genre = "";
                 if (
                     track.artists &&
                     track.artists.length > 0 &&
                     track.artists[0].genres
                 ) {
-                    genre = track.artists[0].genres.join(" ");
+                    // make sure we use the highest frequency genre
+                    genre = musicClient.getHighestFrequencySpotifyGenre(
+                        track.artists[0].genres
+                    );
                 }
                 if (!genre) {
                     // get the genre
