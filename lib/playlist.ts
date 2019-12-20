@@ -531,39 +531,39 @@ export class Playlist {
         return searchResult;
     }
 
-    async removeTracksFromPlaylist(playlist_id: string, track_ids: string[]) {
-        let codyResp = new CodyResponse();
-        if (!track_ids) {
-            codyResp.status = 500;
-            codyResp.state = CodyResponseType.Failed;
-            codyResp.message = "No track URIs provided to add to playlist";
-            return codyResp;
-        }
-        playlist_id = musicUtil.createSpotifyIdFromUri(playlist_id);
-        const uris = musicUtil.createUrisFromTrackIds(track_ids);
-        const uriList = uris.map(uri => {
-            return { uri };
-        });
+    // async removeTracksFromPlaylist(playlist_id: string, track_ids: string[]) {
+    //     let codyResp = new CodyResponse();
+    //     if (!track_ids) {
+    //         codyResp.status = 500;
+    //         codyResp.state = CodyResponseType.Failed;
+    //         codyResp.message = "No track URIs provided to add to playlist";
+    //         return codyResp;
+    //     }
+    //     playlist_id = musicUtil.createSpotifyIdFromUri(playlist_id);
+    //     const uris = musicUtil.createUrisFromTrackIds(track_ids);
+    //     const uriList = uris.map(uri => {
+    //         return { uri };
+    //     });
 
-        let payload = {
-            tracks: uriList
-        };
-        // example:
-        // { "tracks": [{ "uri": "spotify:track:4iV5W9uYEdYUVa79Axb7Rh" },{ "uri": "spotify:track:1301WleyT98MSxVHPZCA6M" }] }
+    //     let payload = {
+    //         tracks: uriList
+    //     };
+    //     // example:
+    //     // { "tracks": [{ "uri": "spotify:track:4iV5W9uYEdYUVa79Axb7Rh" },{ "uri": "spotify:track:1301WleyT98MSxVHPZCA6M" }] }
 
-        const api = `/v1/playlists/${playlist_id}/tracks`;
-        codyResp = await musicClient.spotifyApiPost(api, {}, payload);
+    //     const api = `/v1/playlists/${playlist_id}/tracks`;
+    //     codyResp = await musicClient.spotifyApiDelete(api, {}, payload);
 
-        // check if the token needs to be refreshed
-        if (codyResp.statusText === "EXPIRED") {
-            // refresh the token
-            await musicClient.refreshSpotifyToken();
-            // try again
-            codyResp = await musicClient.spotifyApiPost(api, {}, payload);
-        }
+    //     // check if the token needs to be refreshed
+    //     if (codyResp.statusText === "EXPIRED") {
+    //         // refresh the token
+    //         await musicClient.refreshSpotifyToken();
+    //         // try again
+    //         codyResp = await musicClient.spotifyApiDelete(api, {}, payload);
+    //     }
 
-        return codyResp;
-    }
+    //     return codyResp;
+    // }
 
     /**
      * Add tracks to a given playlist
@@ -645,43 +645,43 @@ export class Playlist {
      * @param playlist_id
      * @param trackIds
      */
-    // async removeTracksFromPlaylist(
-    //     playlist_id: string,
-    //     track_ids: string[]
-    // ): Promise<CodyResponse> {
-    //     playlist_id = musicUtil.createSpotifyIdFromUri(playlist_id);
-    //     let codyResp = new CodyResponse();
-    //     if (!track_ids) {
-    //         codyResp.status = 500;
-    //         codyResp.state = CodyResponseType.Failed;
-    //         codyResp.message = "No track URIs provided to remove from playlist";
-    //         return codyResp;
-    //     }
-    //     const tracks = musicUtil.createUrisFromTrackIds(
-    //         track_ids,
-    //         true /*addUriObj*/
-    //     );
+    async removeTracksFromPlaylist(
+        playlist_id: string,
+        track_ids: string[]
+    ): Promise<CodyResponse> {
+        playlist_id = musicUtil.createSpotifyIdFromUri(playlist_id);
+        let codyResp = new CodyResponse();
+        if (!track_ids) {
+            codyResp.status = 500;
+            codyResp.state = CodyResponseType.Failed;
+            codyResp.message = "No track URIs provided to remove from playlist";
+            return codyResp;
+        }
+        const tracks = musicUtil.createUrisFromTrackIds(
+            track_ids,
+            true /*addUriObj*/
+        );
 
-    //     codyResp = await musicClient.spotifyApiDelete(
-    //         `/v1/playlists/${playlist_id}/tracks`,
-    //         {},
-    //         { tracks }
-    //     );
+        codyResp = await musicClient.spotifyApiDelete(
+            `/v1/playlists/${playlist_id}/tracks`,
+            {},
+            { tracks }
+        );
 
-    //     // check if the token needs to be refreshed
-    //     if (codyResp.statusText === "EXPIRED") {
-    //         // refresh the token
-    //         await musicClient.refreshSpotifyToken();
-    //         // try again
-    //         codyResp = await musicClient.spotifyApiDelete(
-    //             `/v1/playlists/${playlist_id}/tracks`,
-    //             {},
-    //             { tracks }
-    //         );
-    //     }
+        // check if the token needs to be refreshed
+        if (codyResp.statusText === "EXPIRED") {
+            // refresh the token
+            await musicClient.refreshSpotifyToken();
+            // try again
+            codyResp = await musicClient.spotifyApiDelete(
+                `/v1/playlists/${playlist_id}/tracks`,
+                {},
+                { tracks }
+            );
+        }
 
-    //     return codyResp;
-    // }
+        return codyResp;
+    }
 
     async getTopSpotifyTracks() {
         let tracks: Track[] = [];
