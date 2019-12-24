@@ -2,10 +2,8 @@ import axios, { AxiosInstance } from "axios";
 import { MusicStore } from "./store";
 import { CodyResponse, CodyResponseType } from "./models";
 const querystring = require("querystring");
-const natural = require("natural");
 
 const musicStore = MusicStore.getInstance();
-const tokenizer = new natural.WordTokenizer();
 export const SPOTIFY_ROOT_API = "https://api.spotify.com";
 
 const spotifyClient: AxiosInstance = axios.create({
@@ -19,6 +17,7 @@ const itunesSearchClient: AxiosInstance = axios.create({
     baseURL: "https://itunes.apple.com"
 });
 
+// genres
 const spotifyGenres = [
     "top",
     "summer",

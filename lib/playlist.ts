@@ -375,11 +375,22 @@ export class Playlist {
                 description
             };
             const api = `/v1/users/${spotifyUserId}/playlists`;
-            return await musicClient.spotifyApiPost(
+            const resp: CodyResponse = await musicClient.spotifyApiPost(
                 api,
                 {},
                 JSON.stringify(payload)
             );
+            if (resp && resp.state === CodyResponseType.Success) {
+                // fetch this playlist to add it to "playlists"
+                const playlistId = resp.data.id;
+                const createdPlaylistItem: PlaylistItem = await this.getSpotifyPlaylist(
+                    playlistId
+                );
+                if (createdPlaylistItem) {
+                    playlists.push(createdPlaylistItem);
+                }
+            }
+            return resp;
         }
 
         const failedCreate: CodyResponse = new CodyResponse();
@@ -530,40 +541,6 @@ export class Playlist {
 
         return searchResult;
     }
-
-    // async removeTracksFromPlaylist(playlist_id: string, track_ids: string[]) {
-    //     let codyResp = new CodyResponse();
-    //     if (!track_ids) {
-    //         codyResp.status = 500;
-    //         codyResp.state = CodyResponseType.Failed;
-    //         codyResp.message = "No track URIs provided to add to playlist";
-    //         return codyResp;
-    //     }
-    //     playlist_id = musicUtil.createSpotifyIdFromUri(playlist_id);
-    //     const uris = musicUtil.createUrisFromTrackIds(track_ids);
-    //     const uriList = uris.map(uri => {
-    //         return { uri };
-    //     });
-
-    //     let payload = {
-    //         tracks: uriList
-    //     };
-    //     // example:
-    //     // { "tracks": [{ "uri": "spotify:track:4iV5W9uYEdYUVa79Axb7Rh" },{ "uri": "spotify:track:1301WleyT98MSxVHPZCA6M" }] }
-
-    //     const api = `/v1/playlists/${playlist_id}/tracks`;
-    //     codyResp = await musicClient.spotifyApiDelete(api, {}, payload);
-
-    //     // check if the token needs to be refreshed
-    //     if (codyResp.statusText === "EXPIRED") {
-    //         // refresh the token
-    //         await musicClient.refreshSpotifyToken();
-    //         // try again
-    //         codyResp = await musicClient.spotifyApiDelete(api, {}, payload);
-    //     }
-
-    //     return codyResp;
-    // }
 
     /**
      * Add tracks to a given playlist

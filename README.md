@@ -1,6 +1,6 @@
 # cody-music
 
-Cody Music is an open source package designed to help you perform Mac iTunes and Spotify Web API playback functionality.
+Cody Music is an open source package designed to help you perform Mac iTunes and Spotify Web API playback functionality
 
 ## Player control support
 
