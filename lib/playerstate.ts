@@ -78,9 +78,7 @@ export class MusicPlayerState {
         } ]
         }
      */
-    async getSpotifyDevices(
-        skipCache: boolean = false
-    ): Promise<PlayerDevice[]> {
+    async getSpotifyDevices(): Promise<PlayerDevice[]> {
         const api = "/v1/me/player/devices";
         let response = await musicClient.spotifyApiGet(api);
 
@@ -92,11 +90,10 @@ export class MusicPlayerState {
             response = await musicClient.spotifyApiGet(api);
         }
         let devices = [];
-        if (response.data && response.status === 200 && response.data.devices) {
+        if (response.data && response.data.devices) {
             devices = response.data.devices;
         }
 
-        // cache these results for a minute
         return devices || [];
     }
 
@@ -466,9 +463,7 @@ export class MusicPlayerState {
         playerName: PlayerName = PlayerName.SpotifyWeb
     ) {
         // check if there's any spotify devices
-        const spotifyDevices: PlayerDevice[] = await this.getSpotifyDevices(
-            true
-        );
+        const spotifyDevices: PlayerDevice[] = await this.getSpotifyDevices();
 
         if (!spotifyDevices || spotifyDevices.length === 0) {
             // no spotify devices found, lets launch the web player with the track
@@ -508,9 +503,7 @@ export class MusicPlayerState {
         if (playlistId === SPOTIFY_LIKED_SONGS_PLAYLIST_NAME) {
             playlistId = "";
         }
-        const spotifyDevices: PlayerDevice[] = await this.getSpotifyDevices(
-            false
-        );
+        const spotifyDevices: PlayerDevice[] = await this.getSpotifyDevices();
         const deviceId = spotifyDevices.length > 0 ? spotifyDevices[0].id : "";
         let options: any = {};
         if (deviceId) {

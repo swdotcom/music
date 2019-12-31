@@ -976,7 +976,7 @@ export function playSpotifyMacDesktopTrack(
  * @returns {Promise<PlayerDevice[]>}
  */
 export function getSpotifyDevices(): Promise<PlayerDevice[]> {
-    return musicPlayerCtr.getSpotifyDevices(true /*skipCache*/);
+    return musicPlayerCtr.getSpotifyDevices();
 }
 
 /**

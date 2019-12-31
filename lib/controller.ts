@@ -73,7 +73,8 @@ export class MusicController {
         playlistTrackCounts: {
             file: "get_playlist_count.{0}.applescript",
             requiresArgv: false
-        }
+        },
+        activate: 'tell application "{0}" to activate'
     };
 
     private static instance: MusicController;
@@ -146,10 +147,17 @@ export class MusicController {
             }
             return winResult;
         }
+        if (
+            player === PlayerName.SpotifyDesktop ||
+            player === PlayerName.ItunesDesktop
+        ) {
+            return this.run(player, "activate");
+        }
         return await this.startMacPlayer(player, options);
     }
 
     async startMacPlayer(player: string, options: any = {}) {
+        console.log("starting mac player");
         player = musicUtil.getPlayerName(player);
         let quietly = true;
         if (
