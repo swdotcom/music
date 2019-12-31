@@ -137,7 +137,13 @@ export class MusicController {
 
     async startPlayer(player: string, options: any = {}) {
         if (musicUtil.isWindows()) {
-            return await this.startWindowsPlayer(player, options);
+            let winResult = await this.startWindowsPlayer("cmd /c spotify.exe");
+            if (winResult && winResult.error) {
+                // try using the %APPDATA%/Spotify/Spotify.exe command
+                return await this.startWindowsPlayer(
+                    "%APPDATA%/Spotify/Spotify.exe"
+                );
+            }
         }
         return await this.startMacPlayer(player, options);
     }
@@ -161,8 +167,7 @@ export class MusicController {
         return result;
     }
 
-    async startWindowsPlayer(player: string, options: any = {}) {
-        const command = "cmd /c spotify.exe";
+    async startWindowsPlayer(command: string) {
         let result = await musicUtil.execCmd(command);
         if (result === null || result === undefined || result === "") {
             result = "ok";
