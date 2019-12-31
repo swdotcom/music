@@ -140,10 +140,11 @@ export class MusicController {
             let winResult = await this.startWindowsPlayer("cmd /c spotify.exe");
             if (winResult && winResult.error) {
                 // try using the %APPDATA%/Spotify/Spotify.exe command
-                return await this.startWindowsPlayer(
+                winResult = await this.startWindowsPlayer(
                     "%APPDATA%/Spotify/Spotify.exe"
                 );
             }
+            return winResult;
         }
         return await this.startMacPlayer(player, options);
     }
