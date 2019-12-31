@@ -137,27 +137,31 @@ export class MusicController {
     }
 
     async startPlayer(player: string, options: any = {}) {
+        let launchResult: any = "ok";
         if (musicUtil.isWindows()) {
-            let winResult = await this.startWindowsPlayer("cmd /c spotify.exe");
-            if (winResult && winResult.error) {
+            launchResult = await this.startWindowsPlayer("cmd /c spotify.exe");
+            if (launchResult && launchResult.error) {
                 // try using the %APPDATA%/Spotify/Spotify.exe command
-                winResult = await this.startWindowsPlayer(
+                launchResult = await this.startWindowsPlayer(
                     "%APPDATA%/Spotify/Spotify.exe"
                 );
             }
-            return winResult;
+            return launchResult;
         }
         if (
             player === PlayerName.SpotifyDesktop ||
             player === PlayerName.ItunesDesktop
         ) {
-            return this.run(player, "activate");
+            launchResult = await this.run(player, "activate");
+            if (launchResult && launchResult.error) {
+                // try launching with the start command
+                return await this.startMacPlayer(player, options);
+            }
         }
         return await this.startMacPlayer(player, options);
     }
 
     async startMacPlayer(player: string, options: any = {}) {
-        console.log("starting mac player");
         player = musicUtil.getPlayerName(player);
         let quietly = true;
         if (
