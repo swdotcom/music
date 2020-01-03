@@ -476,17 +476,15 @@ export class MusicPlayerState {
                 this.playSpotifyTrackFromPlaylist(
                     trackId,
                     musicStore.spotifyUserId,
-                    playlistId,
-                    5 /* checkTrackStateAndTryAgain */
+                    playlistId
                 );
-            }, 2000);
+            }, 5000);
         } else {
             // a device is found, play using the device
             await this.playSpotifyTrackFromPlaylist(
                 trackId,
                 musicStore.spotifyUserId,
-                playlistId,
-                2 /* checkTrackStateAndTryAgain */
+                playlistId
             );
         }
     }
@@ -494,8 +492,7 @@ export class MusicPlayerState {
     async playSpotifyTrackFromPlaylist(
         trackId: string,
         spotifyUserId: string,
-        playlistId: string = "",
-        checkTrackStateAndTryAgainCount: number = 0
+        playlistId: string = ""
     ) {
         const spotifyUserUri = musicUtil.createSpotifyUserUriFromId(
             spotifyUserId
@@ -536,36 +533,6 @@ export class MusicPlayerState {
                 trackId,
                 deviceId
             );
-        }
-
-        //
-        // Make sure the track is running.
-        //
-
-        if (checkTrackStateAndTryAgainCount > 0) {
-            const track: Track = await this.getSpotifyWebCurrentTrack();
-
-            if (musicUtil.isTrackPlaying(track)) {
-                return;
-            }
-
-            checkTrackStateAndTryAgainCount--;
-
-            // try again, 1.5 seconds
-            setTimeout(async () => {
-                const track: Track = await this.getSpotifyWebCurrentTrack();
-
-                if (musicUtil.isTrackPlaying(track)) {
-                    return;
-                }
-
-                this.playSpotifyTrackFromPlaylist(
-                    trackId,
-                    spotifyUserId,
-                    playlistId,
-                    checkTrackStateAndTryAgainCount
-                );
-            }, 1500);
         }
     }
 
