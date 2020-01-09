@@ -9,7 +9,8 @@ import {
     PlayerContext,
     TrackStatus,
     Artist,
-    PlayerName
+    PlayerName,
+    CodyResponse
 } from "./models";
 import { AudioStat } from "./audiostat";
 
@@ -427,6 +428,23 @@ export class MusicPlayerState {
         }
 
         return tracks;
+    }
+
+    async updateRepeatMode(setToOn: boolean): Promise<CodyResponse> {
+        const state = setToOn ? "track" : "off";
+
+        const api = `/v1/me/player/repeat`;
+        let codyResp = await musicClient.spotifyApiPut(api, { state }, {});
+
+        // check if the token needs to be refreshed
+        if (codyResp.statusText === "EXPIRED") {
+            // refresh the token
+            await musicClient.refreshSpotifyToken();
+            // try again
+            codyResp = await musicClient.spotifyApiPut(api, { state }, {});
+        }
+
+        return codyResp;
     }
 
     async getSpotifyPlayerContext(): Promise<PlayerContext> {

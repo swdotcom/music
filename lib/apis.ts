@@ -739,8 +739,15 @@ export function previous(player: PlayerName, options: any = {}) {
  * @param options
  */
 export function setRepeat(player: PlayerName, repeat: boolean) {
-    let repeatParam = repeat ? "repeatOn" : "repeatOff";
-    return musicCtr.run(player, repeatParam);
+    if (
+        player === PlayerName.SpotifyWeb ||
+        (player === PlayerName.SpotifyDesktop && musicUtil.isWindows())
+    ) {
+        musicPlayerCtr.updateRepeatMode(repeat);
+    } else {
+        let repeatParam = repeat ? "repeatOn" : "repeatOff";
+        return musicCtr.run(player, repeatParam);
+    }
 }
 
 /**
