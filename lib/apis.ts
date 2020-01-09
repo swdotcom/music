@@ -161,7 +161,7 @@ export async function hasActiveTrack(): Promise<boolean> {
 }
 
 /**
- * Returns the recommended tracks for the
+ * Returns the recommended tracks.
  * @param trackIds (optional) track IDs or URIs (5 max)
  * @param limit (optional) will default to 40 if not specified
  * @param market (optional) will default to none if not specified
