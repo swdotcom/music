@@ -1,73 +1,32 @@
-export class CacheUtil {
-    private cache: any = {};
+const NodeCache = require("node-cache");
 
-    private static instance: CacheUtil;
+export class CacheManager {
+    private static instance: CacheManager;
+    private myCache: any = null;
+
     private constructor() {
-        // every 10 minutes check if we should expire any of the cache items
-        setInterval(() => {
-            this.checkCacheItemExpiration();
-        }, 1000 * 60 * 10);
+        // default cache of 2 minutes
+        this.myCache = new NodeCache({ stdTTL: 120 });
     }
 
-    static getInstance() {
-        if (!CacheUtil.instance) {
-            CacheUtil.instance = new CacheUtil();
+    static getInstance(): CacheManager {
+        if (!CacheManager.instance) {
+            CacheManager.instance = new CacheManager();
         }
-        return CacheUtil.instance;
+
+        return CacheManager.instance;
     }
 
-    isCacheExpired(key: string) {
-        const data = this.cache[key];
-        const now = new Date().getTime();
-        if (!data) {
-            return true;
+    get(key: string) {
+        return this.myCache.get(key);
+    }
+
+    set(key: string, value: any, ttl: number = -1) {
+        if (ttl > 0) {
+            this.myCache.set(key, value, ttl);
         } else {
-            // check to see if the data for this cache key has expired
-            const millisThreshold = data.expireInSeconds * 1000;
-            const ellapsedMillis = now - data.millisTime;
-            if (ellapsedMillis > millisThreshold) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    getItem(key: string) {
-        if (this.cache[key] && !this.isCacheExpired(key)) {
-            const val = JSON.parse(this.cache[key].value);
-            return val;
-        }
-        return null;
-    }
-
-    setItem(key: string, value: any, expireInSeconds: number) {
-        const now = new Date().getTime();
-        this.cache[key] = {
-            value: JSON.stringify(value),
-            expireInSeconds,
-            millisTime: now
-        };
-    }
-
-    deleteItem(key: string) {
-        if (this.cache[key]) {
-            this.cache[key] = null;
-        }
-    }
-
-    resetCache() {
-        this.cache = {};
-    }
-
-    // logic to check if we should expire the cache
-    checkCacheItemExpiration() {
-        if (this.cache) {
-            Object.keys(this.cache).forEach(key => {
-                if (this.isCacheExpired(key)) {
-                    // delete the cache
-                    this.deleteItem(key);
-                }
-            });
+            // use the standard cache ttl
+            this.myCache.set(key, value);
         }
     }
 }

@@ -10,13 +10,14 @@ import {
 import { MusicStore } from "./store";
 import { UserProfile } from "./profile";
 import { MusicUtil } from "./util";
+import { CacheManager } from "./cache";
 
 const musicClient = MusicClient.getInstance();
 const musicStore = MusicStore.getInstance();
 const userProfile = UserProfile.getInstance();
 const musicUtil = new MusicUtil();
 
-let playlists: PlaylistItem[] = [];
+const cacheMgr: CacheManager = CacheManager.getInstance();
 
 export class Playlist {
     private static instance: Playlist;
@@ -139,7 +140,8 @@ export class Playlist {
     }
 
     async getPlaylists(qsOptions: any = {}): Promise<PlaylistItem[]> {
-        playlists = [];
+        let playlists: PlaylistItem[] = [];
+
         if (!musicStore.spotifyUserId) {
             await userProfile.getUserProfile();
         }
@@ -352,6 +354,13 @@ export class Playlist {
         }
 
         const spotifyUserId = musicStore.spotifyUserId;
+
+        let playlists: PlaylistItem[] = cacheMgr.get("playlists");
+        if (!playlists) {
+            // fetch the playlists again
+            playlists = await this.getPlaylists();
+        }
+
         // check if it's already in the playlist
         const existingPlaylist: PlaylistItem[] = playlists.length
             ? playlists.filter((n: PlaylistItem) => n.name === name)

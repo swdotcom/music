@@ -125,6 +125,8 @@ describe("player control tests", () => {
             "spotify:track:0i0wnv9UoFdZ5MfuFGQzMy"
         );
 
+        console.log(`track: ${JSON.stringify(myTrack)}`);
+
         console.log(`requested ${limit} recommendations`);
         console.log("seed track: ", myTrack.name);
         console.log("recommended tracks: ", names.join(", "));

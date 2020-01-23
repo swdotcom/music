@@ -260,9 +260,6 @@ export class MusicUtil {
                 delete spotifyTrack.album.available_markets;
                 delete spotifyTrack.album.external_urls;
             }
-            if (spotifyTrack.available_markets) {
-                delete spotifyTrack.available_markets;
-            }
 
             if (spotifyTrack.external_urls) {
                 delete spotifyTrack.external_urls;
