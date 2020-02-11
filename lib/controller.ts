@@ -481,14 +481,19 @@ export class MusicController {
             );
         }
 
+        // "offset": {"position": 5}
         if (options.offset) {
-            payload["offset"] = options.offset;
+            // payload["offset"] = options.offset;
+            payload["offset"] = { position: options.offset };
         }
 
         if (options.context_uri) {
             payload["context_uri"] = options.context_uri;
         }
 
+        // change the offset to the 1st uri if the
+        // context uri is also used
+        // context_uri refers to: album or playlist object
         if (payload.context_uri && payload.uris) {
             if (payload.offset) {
                 payload["offset"] = {
