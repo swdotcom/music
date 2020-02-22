@@ -366,6 +366,27 @@ export async function getSpotifyTrackById(
 }
 
 /**
+ * Returns tracks by the given spotify track ids
+ * @param ids
+ * @param includeFullArtistData (optional - if true it will return full artist info)
+ * @package includeAudioFeaturesData (optional)
+ * @param includeGenre (optional)
+ */
+export async function getSpotifyTracks(
+    ids: string[],
+    includeFullArtistData: boolean = false,
+    includeAudioFeaturesData: boolean = false,
+    includeGenre: boolean = false
+): Promise<Track[]> {
+    return musicPlayerCtr.getSpotifyTracks(
+        ids,
+        includeFullArtistData,
+        includeAudioFeaturesData,
+        includeGenre
+    );
+}
+
+/**
  * Returns the track of a given player {spotify|spotify-web|itunes}
  * - Spotify does not return a "genre"
  * - duration is in milliseconds

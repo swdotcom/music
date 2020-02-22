@@ -162,6 +162,112 @@ export class MusicPlayerState {
         return trackInfo;
     }
 
+    async getSpotifyTracks(
+        ids: string[],
+        includeArtistData: boolean = false,
+        includeAudioFeaturesData: boolean = false,
+        includeGenre: boolean = false
+    ): Promise<Track[]> {
+        const finalIds: string[] = [];
+        ids.forEach(id => {
+            finalIds.push(musicUtil.createSpotifyIdFromUri(id));
+        });
+        const tracks: Track[] = [];
+        const api = `/v1/tracks`;
+        const qsOptions = { ids: finalIds.join(",") };
+
+        let response = await musicClient.spotifyApiGet(api, qsOptions);
+
+        // check if the token needs to be refreshed
+        if (response.statusText === "EXPIRED") {
+            // refresh the token
+            await musicClient.refreshSpotifyToken();
+            // try again
+            response = await musicClient.spotifyApiGet(api);
+        }
+
+        if (response && response.status === 200 && response.data) {
+            for (const trackData in response.data.tracks) {
+                const track: Track = musicUtil.copySpotifyTrackToCodyTrack(
+                    trackData
+                );
+                track.progress_ms = response.data.progress_ms
+                    ? response.data.progress_ms
+                    : 0;
+
+                // get the arist data
+                if (includeArtistData && track.artists) {
+                    let artists: Artist[] = [];
+
+                    for (let i = 0; i < track.artists.length; i++) {
+                        const artist = track.artists[i];
+                        const artistData: Artist = await this.getSpotifyArtistById(
+                            artist.id
+                        );
+                        artists.push(artistData);
+                    }
+                    if (artists.length > 0) {
+                        track.artists = artists;
+                    } else {
+                        track.artists = [];
+                    }
+                }
+
+                if (!track.genre && includeGenre) {
+                    // first check if we have an artist in artists
+                    // artists[0].genres[0]
+
+                    let genre = "";
+                    if (
+                        track.artists &&
+                        track.artists.length > 0 &&
+                        track.artists[0].genres
+                    ) {
+                        // make sure we use the highest frequency genre
+                        genre = musicClient.getHighestFrequencySpotifyGenre(
+                            track.artists[0].genres
+                        );
+                    }
+                    if (!genre) {
+                        // get the genre
+                        genre = await musicController.getGenre(
+                            track.artist,
+                            track.name
+                        );
+                    }
+                    if (genre) {
+                        track.genre = genre;
+                    }
+                }
+
+                tracks.push(track);
+            }
+
+            // get the features
+            if (includeAudioFeaturesData) {
+                const spotifyAudioFeatures = await audioStat.getSpotifyAudioFeatures(
+                    ids
+                );
+                if (spotifyAudioFeatures && spotifyAudioFeatures.length > 0) {
+                    // "id": "4JpKVNYnVcJ8tuMKjAj50A",
+                    // "uri": "spotify:track:4JpKVNYnVcJ8tuMKjAj50A",
+                    // track.features = spotifyAudioFeatures[0];
+                    for (let i = 0; i < spotifyAudioFeatures.length; i++) {
+                        const uri: string = spotifyAudioFeatures[i].uri;
+                        const foundTrack = tracks.find(
+                            (t: Track) => t.uri === uri
+                        );
+                        if (foundTrack) {
+                            foundTrack.features = spotifyAudioFeatures[i];
+                        }
+                    }
+                }
+            }
+        }
+
+        return tracks;
+    }
+
     async getSpotifyTrackById(
         id: string,
         includeArtistData: boolean = false,
