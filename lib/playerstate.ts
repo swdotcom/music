@@ -172,7 +172,7 @@ export class MusicPlayerState {
         ids.forEach(id => {
             finalIds.push(musicUtil.createSpotifyIdFromUri(id));
         });
-        const tracks: Track[] = [];
+        const tracksToReturn: Track[] = [];
         const api = `/v1/tracks`;
         const qsOptions = { ids: finalIds.join(",") };
 
@@ -203,10 +203,15 @@ export class MusicPlayerState {
 
                     for (let i = 0; i < track.artists.length; i++) {
                         const artist = track.artists[i];
-                        const artistData: Artist = await this.getSpotifyArtistById(
-                            artist.id
-                        );
-                        artists.push(artistData);
+                        try {
+                            const artistData: Artist = await this.getSpotifyArtistById(
+                                artist.id
+                            );
+                            artists.push(artistData);
+                        } catch (e) {
+                            // just use the current artists info
+                            artists.push(artist);
+                        }
                     }
                     if (artists.length > 0) {
                         track.artists = artists;
@@ -242,7 +247,7 @@ export class MusicPlayerState {
                     }
                 }
 
-                tracks.push(track);
+                tracksToReturn.push(track);
             }
 
             // get the features
@@ -256,7 +261,7 @@ export class MusicPlayerState {
                     // track.features = spotifyAudioFeatures[0];
                     for (let i = 0; i < spotifyAudioFeatures.length; i++) {
                         const uri: string = spotifyAudioFeatures[i].uri;
-                        const foundTrack = tracks.find(
+                        const foundTrack = tracksToReturn.find(
                             (t: Track) => t.uri === uri
                         );
                         if (foundTrack) {
@@ -267,7 +272,7 @@ export class MusicPlayerState {
             }
         }
 
-        return tracks;
+        return tracksToReturn;
     }
 
     async getSpotifyTrackById(
