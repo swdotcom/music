@@ -187,7 +187,9 @@ export class MusicPlayerState {
         }
 
         if (response && response.status === 200 && response.data) {
-            for (const trackData in response.data.tracks) {
+            const tracks: any[] = response.data.tracks || [];
+            for (let x = 0; x < tracks.length; x++) {
+                const trackData = tracks[x];
                 const track: Track = musicUtil.copySpotifyTrackToCodyTrack(
                     trackData
                 );
