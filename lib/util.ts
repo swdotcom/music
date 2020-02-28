@@ -210,6 +210,16 @@ export class MusicUtil {
         return uri;
     }
 
+    createSpotifyIdsFromUris(uris: string[]) {
+        const ids: string[] = [];
+        if (uris && uris.length) {
+            uris.forEach(uri => {
+                ids.push(this.createSpotifyIdFromUri(uri));
+            });
+        }
+        return ids;
+    }
+
     extractAristFromSpotifyTrack(track: any) {
         if (!track) {
             return;

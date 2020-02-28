@@ -187,6 +187,7 @@ export class MusicPlayerState {
         }
 
         if (response && response.status === 200 && response.data) {
+            let artistIdMap: any = {};
             const tracks: any[] = response.data.tracks || [];
             for (let x = 0; x < tracks.length; x++) {
                 const trackData = tracks[x];
@@ -197,28 +198,35 @@ export class MusicPlayerState {
                     ? response.data.progress_ms
                     : 0;
 
-                // get the arist data
-                if (includeArtistData && track.artists) {
-                    let artists: Artist[] = [];
-
+                if (includeArtistData) {
                     for (let i = 0; i < track.artists.length; i++) {
-                        const artist = track.artists[i];
-                        try {
-                            const artistData: Artist = await this.getSpotifyArtistById(
-                                artist.id
-                            );
-                            artists.push(artistData);
-                        } catch (e) {
-                            // just use the current artists info
-                            artists.push(artist);
-                        }
-                    }
-                    if (artists.length > 0) {
-                        track.artists = artists;
-                    } else {
-                        track.artists = [];
+                        const artist: any = track.artists[i];
+                        artistIdMap[artist.id] = artist.id;
                     }
                 }
+
+                // // get the arist data
+                // if (includeArtistData && track.artists) {
+                //     let artists: Artist[] = [];
+
+                //     for (let i = 0; i < track.artists.length; i++) {
+                //         const artist = track.artists[i];
+                //         try {
+                //             const artistData: Artist = await this.getSpotifyArtistById(
+                //                 artist.id
+                //             );
+                //             artists.push(artistData);
+                //         } catch (e) {
+                //             // just use the current artists info
+                //             artists.push(artist);
+                //         }
+                //     }
+                //     if (artists.length > 0) {
+                //         track.artists = artists;
+                //     } else {
+                //         track.artists = [];
+                //     }
+                // }
 
                 if (!track.genre && includeGenre) {
                     // first check if we have an artist in artists
@@ -248,6 +256,35 @@ export class MusicPlayerState {
                 }
 
                 tracksToReturn.push(track);
+            }
+
+            let artists: any[] = [];
+            if (includeArtistData) {
+                let artistIds = Object.keys(artistIdMap).map(key => {
+                    return key;
+                });
+                if (artistIds.length > 50) {
+                    // we can't go over 50
+                    artistIds = artistIds.splice(0, 50);
+                }
+                artists = await this.getSpotifyArtistsByIds(artistIds);
+                if (artists && artists.length > 0) {
+                    // go through the tracks and update the artist with the fully populated one
+                    tracksToReturn.forEach((t: Track) => {
+                        const trackArtistIds: string[] = t.artists.map(
+                            (artist: any) => {
+                                return artist.id;
+                            }
+                        );
+                        const artistsForTrack: any[] = artists.filter(
+                            (n: any) => trackArtistIds.includes(n.id)
+                        );
+                        if (artistsForTrack && artistsForTrack.length) {
+                            // replace the artists
+                            t.artists = artistsForTrack;
+                        }
+                    });
+                }
             }
 
             // get the features
@@ -360,6 +397,33 @@ export class MusicPlayerState {
         }
 
         return track;
+    }
+
+    async getSpotifyArtistsByIds(ids: string[]): Promise<Artist[]> {
+        let artists: Artist[] = [];
+
+        ids = musicUtil.createSpotifyIdsFromUris(ids);
+
+        // check the cache first
+
+        let api = `/v1/artists`;
+        const qParam = { ids };
+
+        let response = await musicClient.spotifyApiGet(api, qParam);
+
+        // check if the token needs to be refreshed
+        if (response.statusText === "EXPIRED") {
+            // refresh the token
+            await musicClient.refreshSpotifyToken();
+            // try again
+            response = await musicClient.spotifyApiGet(api);
+        }
+
+        if (response && response.status === 200 && response.data) {
+            artists = response.data.artists || [];
+        }
+
+        return artists;
     }
 
     async getSpotifyArtistById(id: string): Promise<Artist> {
