@@ -212,13 +212,32 @@ export class MusicPlayerState {
                 let artistIds = Object.keys(artistIdMap).map(key => {
                     return key;
                 });
-                if (artistIds.length > 50) {
-                    // we can't go over 50
-                    artistIds = artistIds.splice(0, 50);
+
+                // fetch the artists all at once or in batches
+                let artists: any[] = [];
+                if (artistIds) {
+                    // spotify's limit is 50, so batch if it's greater than 50
+                    if (artistIds.length > 50) {
+                        const maxArtists = 50;
+                        let offset = 0;
+                        let maxlen = artistIds.length / maxArtists;
+                        if (maxlen % 1 !== 0) {
+                            maxlen += 1;
+                        }
+                        for (let idx = 0; idx < maxlen; idx++) {
+                            artistIds = artistIds.splice(offset, 50);
+                            const batchedArtists = await this.getSpotifyArtistsByIds(
+                                artistIds
+                            );
+                            if (batchedArtists) {
+                                artists.push(...batchedArtists);
+                            }
+                            offset += maxArtists;
+                        }
+                    } else {
+                        artists = await this.getSpotifyArtistsByIds(artistIds);
+                    }
                 }
-                const artists: any[] = await this.getSpotifyArtistsByIds(
-                    artistIds
-                );
 
                 if (artists && artists.length > 0) {
                     // go through the tracks and update the artist with the fully populated one
@@ -238,8 +257,6 @@ export class MusicPlayerState {
 
                         if (!t.genre && includeGenre) {
                             // first check if we have an artist in artists
-                            // artists[0].genres[0]
-
                             let genre = "";
                             if (
                                 t.artists &&
