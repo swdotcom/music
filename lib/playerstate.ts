@@ -205,60 +205,9 @@ export class MusicPlayerState {
                     }
                 }
 
-                // // get the arist data
-                // if (includeArtistData && track.artists) {
-                //     let artists: Artist[] = [];
-
-                //     for (let i = 0; i < track.artists.length; i++) {
-                //         const artist = track.artists[i];
-                //         try {
-                //             const artistData: Artist = await this.getSpotifyArtistById(
-                //                 artist.id
-                //             );
-                //             artists.push(artistData);
-                //         } catch (e) {
-                //             // just use the current artists info
-                //             artists.push(artist);
-                //         }
-                //     }
-                //     if (artists.length > 0) {
-                //         track.artists = artists;
-                //     } else {
-                //         track.artists = [];
-                //     }
-                // }
-
-                if (!track.genre && includeGenre) {
-                    // first check if we have an artist in artists
-                    // artists[0].genres[0]
-
-                    let genre = "";
-                    if (
-                        track.artists &&
-                        track.artists.length > 0 &&
-                        track.artists[0].genres
-                    ) {
-                        // make sure we use the highest frequency genre
-                        genre = musicClient.getHighestFrequencySpotifyGenre(
-                            track.artists[0].genres
-                        );
-                    }
-                    if (!genre) {
-                        // get the genre
-                        genre = await musicController.getGenre(
-                            track.artist,
-                            track.name
-                        );
-                    }
-                    if (genre) {
-                        track.genre = genre;
-                    }
-                }
-
                 tracksToReturn.push(track);
             }
 
-            let artists: any[] = [];
             if (includeArtistData) {
                 let artistIds = Object.keys(artistIdMap).map(key => {
                     return key;
@@ -267,10 +216,13 @@ export class MusicPlayerState {
                     // we can't go over 50
                     artistIds = artistIds.splice(0, 50);
                 }
-                artists = await this.getSpotifyArtistsByIds(artistIds);
+                const artists: any[] = await this.getSpotifyArtistsByIds(
+                    artistIds
+                );
+
                 if (artists && artists.length > 0) {
                     // go through the tracks and update the artist with the fully populated one
-                    tracksToReturn.forEach((t: Track) => {
+                    tracksToReturn.forEach(async (t: Track) => {
                         const trackArtistIds: string[] = t.artists.map(
                             (artist: any) => {
                                 return artist.id;
@@ -282,6 +234,33 @@ export class MusicPlayerState {
                         if (artistsForTrack && artistsForTrack.length) {
                             // replace the artists
                             t.artists = artistsForTrack;
+                        }
+
+                        if (!t.genre && includeGenre) {
+                            // first check if we have an artist in artists
+                            // artists[0].genres[0]
+
+                            let genre = "";
+                            if (
+                                t.artists &&
+                                t.artists.length > 0 &&
+                                t.artists[0].genres
+                            ) {
+                                // make sure we use the highest frequency genre
+                                genre = musicClient.getHighestFrequencySpotifyGenre(
+                                    t.artists[0].genres
+                                );
+                            }
+                            if (!genre) {
+                                // get the genre
+                                genre = await musicController.getGenre(
+                                    t.artist,
+                                    t.name
+                                );
+                            }
+                            if (genre) {
+                                t.genre = genre;
+                            }
                         }
                     });
                 }
