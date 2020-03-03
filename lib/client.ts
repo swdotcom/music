@@ -1,6 +1,7 @@
 import axios, { AxiosInstance } from "axios";
 import { MusicStore } from "./store";
 import { CodyResponse, CodyResponseType } from "./models";
+import { join } from "path";
 const querystring = require("querystring");
 
 const musicStore = MusicStore.getInstance();
@@ -275,7 +276,9 @@ export class MusicClient {
         artist: string,
         song: string = ""
     ): Promise<string> {
-        let genre = await this.fetchItunesGenre(artist, song);
+        let genre = await this.fetchItunesGenre(artist, song).catch(e => {
+            return "";
+        });
         // try cleaning up the song name
         if (!genre && song) {
             // i.e. Ted Ganung, song: The After Hours - Original Mix
@@ -290,14 +293,19 @@ export class MusicClient {
             if (song.indexOf("(") > 0) {
                 song = song.split("(")[0].trim();
             }
-            genre = await this.fetchItunesGenre(artist, song);
+            genre = await this.fetchItunesGenre(artist, song).catch(e => {
+                return "";
+            });
         }
 
         if (!genre && artist && artist.indexOf(",") !== -1) {
             // try cleaning up the artist
             // split up the artist names
             artist = artist.split(",")[0].trim();
-            genre = await this.fetchItunesGenre(artist, song);
+
+            genre = await this.fetchItunesGenre(artist, song).catch(e => {
+                return "";
+            });
         }
 
         return genre;

@@ -241,7 +241,8 @@ export class MusicPlayerState {
 
                 if (artists && artists.length > 0) {
                     // go through the tracks and update the artist with the fully populated one
-                    tracksToReturn.forEach(async (t: Track) => {
+                    for (let z = 0; z < tracksToReturn.length; z++) {
+                        const t: Track = tracksToReturn[z];
                         const trackArtistIds: string[] = t.artists.map(
                             (artist: any) => {
                                 return artist.id;
@@ -264,30 +265,40 @@ export class MusicPlayerState {
                                 t.artists[0].genres
                             ) {
                                 // make sure we use the highest frequency genre
-                                genre = musicClient.getHighestFrequencySpotifyGenre(
-                                    t.artists[0].genres
-                                );
+                                try {
+                                    genre = musicClient.getHighestFrequencySpotifyGenre(
+                                        t.artists[0].genres
+                                    );
+                                } catch (e) {
+                                    //
+                                }
                             }
                             if (!genre) {
                                 // get the genre
-                                genre = await musicController.getGenre(
-                                    t.artist,
-                                    t.name
-                                );
+                                try {
+                                    genre = await musicController.getGenre(
+                                        t.artist,
+                                        t.name
+                                    );
+                                } catch (e) {
+                                    //
+                                }
                             }
                             if (genre) {
                                 t.genre = genre;
                             }
                         }
-                    });
+                    }
                 }
             }
 
             // get the features
             if (includeAudioFeaturesData) {
-                const spotifyAudioFeatures = await audioStat.getSpotifyAudioFeatures(
-                    ids
-                );
+                const spotifyAudioFeatures = await audioStat
+                    .getSpotifyAudioFeatures(ids)
+                    .catch(e => {
+                        return null;
+                    });
                 if (spotifyAudioFeatures && spotifyAudioFeatures.length > 0) {
                     // "id": "4JpKVNYnVcJ8tuMKjAj50A",
                     // "uri": "spotify:track:4JpKVNYnVcJ8tuMKjAj50A",

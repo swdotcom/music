@@ -625,7 +625,12 @@ export class MusicController {
     ): Promise<string> {
         let genre = await musicClient.getGenreFromItunes(artist, songName);
         if (!genre || genre === "") {
-            genre = await this.getGenreFromSpotify(artist, spotifyArtistId);
+            genre = await this.getGenreFromSpotify(
+                artist,
+                spotifyArtistId
+            ).catch(e => {
+                return "";
+            });
         }
 
         return genre;
