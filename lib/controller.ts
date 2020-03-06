@@ -145,6 +145,20 @@ export class MusicController {
                 launchResult = await this.startWindowsPlayer(
                     "%APPDATA%/Spotify/Spotify.exe"
                 );
+                if (launchResult && launchResult.error) {
+                    // try it with START
+                    launchResult = await this.startWindowsPlayer(
+                        "START SPOTIFY"
+                    );
+                    if (launchResult && launchResult.error) {
+                        launchResult = await this.startWindowsPlayer("spotify");
+                        if (launchResult && launchResult.error) {
+                            launchResult = await this.startWindowsPlayer(
+                                "spotify.exe"
+                            );
+                        }
+                    }
+                }
             }
             return launchResult;
         }
@@ -482,7 +496,7 @@ export class MusicController {
         }
 
         // "offset": {"position": 5}
-        if (options.offset) {
+        if (options.offset !== undefined && options.offset !== null) {
             // payload["offset"] = options.offset;
             payload["offset"] = { position: options.offset };
         }
@@ -495,7 +509,7 @@ export class MusicController {
         // context uri is also used
         // context_uri refers to: album or playlist object
         if (payload.context_uri && payload.uris) {
-            if (payload.offset) {
+            if (options.offset !== undefined && options.offset !== null) {
                 payload["offset"] = {
                     ...payload.offset,
                     uri: payload.uris[0]

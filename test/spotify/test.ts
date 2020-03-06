@@ -3,6 +3,7 @@ import * as CodyMusic from "../../index";
 import { MusicUtil } from "../../lib/util";
 import { MusicController } from "../../lib/controller";
 import { TestUtil } from "../util";
+import { Track } from "../../lib/models";
 
 const testUtil = new TestUtil();
 
@@ -96,6 +97,9 @@ describe("player control tests", () => {
 
                 expect(songName).to.not.equal(null);
                 expect(songName).to.not.equal("");
+
+                const runningTrack: Track = await CodyMusic.getRunningTrack();
+                console.log("running track from the desktop: ", runningTrack);
 
                 result = await CodyMusic.getState(
                     CodyMusic.PlayerName.SpotifyWeb
