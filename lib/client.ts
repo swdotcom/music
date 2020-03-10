@@ -237,6 +237,7 @@ export class MusicClient {
         spotifyClient.defaults.headers.common[
             "Authorization"
         ] = `Bearer ${musicStore.spotifyAccessToken}`;
+        console.log(`GET ${api}`);
         return spotifyClient
             .get(api)
             .then(resp => {
@@ -426,6 +427,7 @@ export class MusicClient {
             "Authorization"
         ] = `Bearer ${accessToken}`;
 
+        console.log(`GET ${api}`);
         return spotifyClient
             .get(api)
             .then((resp: any) => {
@@ -449,6 +451,8 @@ export class MusicClient {
         spotifyClient.defaults.headers.common[
             "Authorization"
         ] = `Bearer ${musicStore.spotifyAccessToken}`;
+
+        console.log(`PUT ${api}`);
         return spotifyClient
             .put(api, payload)
             .then((resp: any) => {
@@ -472,6 +476,8 @@ export class MusicClient {
         spotifyClient.defaults.headers.common[
             "Authorization"
         ] = `Bearer ${musicStore.spotifyAccessToken}`;
+
+        console.log(`POST ${api}`);
         return spotifyClient
             .post(api, payload)
             .then((resp: any) => {
@@ -497,6 +503,8 @@ export class MusicClient {
         spotifyClient.defaults.headers.common[
             "Authorization"
         ] = `Bearer ${musicStore.spotifyAccessToken}`;
+
+        console.log(`DELETE ${api}`);
         return spotifyClient
             .delete(api, payload)
             .then((resp: any) => {
