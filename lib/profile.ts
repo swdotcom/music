@@ -2,10 +2,12 @@ import { MusicClient } from "./client";
 import { MusicStore } from "./store";
 import { MusicPlayerState } from "./playerstate";
 import { SpotifyAuthState } from "./models";
+import { CacheManager } from "./cache";
 
 const musicClient = MusicClient.getInstance();
 const musicPlayerCtr = MusicPlayerState.getInstance();
 const musicStore = MusicStore.getInstance();
+const cacheMgr = CacheManager.getInstance();
 
 export class SpotifyUser {
     birthdate: string = ""; // format YYYY-MM-DD
@@ -38,7 +40,11 @@ export class UserProfile {
     }
 
     async getUserProfile(): Promise<SpotifyUser> {
-        let spotifyUser: SpotifyUser = new SpotifyUser();
+        let userProfile: SpotifyUser = cacheMgr.get("user-profile");
+        if (userProfile) {
+            return userProfile;
+        }
+        userProfile = new SpotifyUser();
         let api = "/v1/me";
         let response = await musicClient.spotifyApiGet(api);
 
@@ -51,11 +57,12 @@ export class UserProfile {
         }
 
         if (response && response.status === 200 && response.data) {
-            spotifyUser = response.data;
-            musicStore.spotifyUserId = spotifyUser.id;
+            userProfile = response.data;
+            cacheMgr.set("user-profile", userProfile, 60 * 10);
+            musicStore.spotifyUserId = userProfile.id;
         }
 
-        return spotifyUser;
+        return userProfile;
     }
 
     async spotifyAuthState(): Promise<SpotifyAuthState> {
