@@ -204,7 +204,7 @@ export async function getRecommendationsForTracks(
  * @returns {Promise<Track>}
  **/
 export async function getRunningTrack(): Promise<Track> {
-    const spotifyDevices = await getSpotifyDevices();
+    const spotifyDevices = await musicPlayerCtr.getSpotifyDevices();
     let spotifyWebTrack = null;
 
     // spotify web try
@@ -1004,7 +1004,7 @@ export function playSpotifyMacDesktopTrack(
  * @returns {Promise<PlayerDevice[]>}
  */
 export function getSpotifyDevices(): Promise<PlayerDevice[]> {
-    return musicPlayerCtr.getSpotifyDevices();
+    return musicPlayerCtr.getSpotifyDevices(true);
 }
 
 /**

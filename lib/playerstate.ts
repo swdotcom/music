@@ -12,6 +12,7 @@ import {
     PlayerName,
     CodyResponse
 } from "./models";
+import { CacheManager } from "./cache";
 import { AudioStat } from "./audiostat";
 
 const musicStore = MusicStore.getInstance();
@@ -19,6 +20,7 @@ const musicClient = MusicClient.getInstance();
 const audioStat = AudioStat.getInstance();
 const musicController = MusicController.getInstance();
 const musicUtil = new MusicUtil();
+const cacheMgr = CacheManager.getInstance();
 
 export const SPOTIFY_LIKED_SONGS_PLAYLIST_NAME = "Liked Songs";
 
@@ -79,7 +81,13 @@ export class MusicPlayerState {
         } ]
         }
      */
-    async getSpotifyDevices(): Promise<PlayerDevice[]> {
+    async getSpotifyDevices(
+        clearCache: boolean = false
+    ): Promise<PlayerDevice[]> {
+        let devices = cacheMgr.get("spotify-devices");
+        if (!clearCache && devices && devices.length) {
+            return devices;
+        }
         const api = "/v1/me/player/devices";
         let response = await musicClient.spotifyApiGet(api);
 
@@ -90,9 +98,14 @@ export class MusicPlayerState {
             // try again
             response = await musicClient.spotifyApiGet(api);
         }
-        let devices = [];
+        devices = [];
         if (response.data && response.data.devices) {
             devices = response.data.devices;
+        }
+
+        if (devices && devices.length) {
+            // 10 minutes
+            cacheMgr.set("spotify-devices", devices, 60 * 10);
         }
 
         return devices || [];
@@ -482,30 +495,36 @@ export class MusicPlayerState {
             response.data &&
             response.data.item
         ) {
+            const data = response.data;
             track = musicUtil.copySpotifyTrackToCodyTrack(response.data.item);
             track.progress_ms = response.data.progress_ms
                 ? response.data.progress_ms
                 : 0;
-        } else {
-            track = new Track();
-        }
-
-        // initialize it with not assigned
-        if (track) {
-            track["state"] = TrackStatus.NotAssigned;
-        }
-        if (track && track.uri) {
-            if (track.uri.includes("spotify:ad:")) {
+            // set whether this track is playing or not
+            /**
+             * data: {
+                context:null
+                currently_playing_type:"track"
+                is_playing:true
+                item:Object {album: Object, artists: Array(1), available_markets: Array(79), …}
+                progress_ms:153583
+                timestamp:1583797755729
+            }
+            */
+            const isPlaying =
+                data.is_playing !== undefined && data.is_playing !== null
+                    ? data.is_playing
+                    : false;
+            if (track.uri && track.uri.includes("spotify:ad:")) {
                 track.state = TrackStatus.Advertisement;
             } else {
-                let context: PlayerContext = await this.getSpotifyPlayerContext();
-                // is_playing
-                if (context && context.is_playing) {
-                    track["state"] = TrackStatus.Playing;
-                } else {
-                    track["state"] = TrackStatus.Paused;
-                }
+                track.state = isPlaying
+                    ? TrackStatus.Playing
+                    : TrackStatus.Paused;
             }
+        } else {
+            track = new Track();
+            track.state = TrackStatus.NotAssigned;
         }
 
         return track;
