@@ -1,7 +1,7 @@
 import axios, { AxiosInstance } from "axios";
 import { MusicStore } from "./store";
 import { CodyResponse, CodyResponseType } from "./models";
-import { join } from "path";
+const moment = require("moment-timezone");
 const querystring = require("querystring");
 
 const musicStore = MusicStore.getInstance();
@@ -237,7 +237,7 @@ export class MusicClient {
         spotifyClient.defaults.headers.common[
             "Authorization"
         ] = `Bearer ${musicStore.spotifyAccessToken}`;
-        console.log(`GET ${api}`);
+        console.log(`GET ${api} - ${moment().format()}`);
         return spotifyClient
             .get(api)
             .then(resp => {
@@ -418,7 +418,6 @@ export class MusicClient {
         }
         api = this.addQueryStringToApi(api, qsOptions);
 
-        // console.log(`GET API: ${api}`);
         const accessToken = optionalAccessToken
             ? optionalAccessToken
             : musicStore.spotifyAccessToken;
@@ -427,7 +426,7 @@ export class MusicClient {
             "Authorization"
         ] = `Bearer ${accessToken}`;
 
-        console.log(`GET ${api}`);
+        console.log(`GET ${api} - ${moment().format()}`);
         return spotifyClient
             .get(api)
             .then((resp: any) => {
@@ -452,7 +451,7 @@ export class MusicClient {
             "Authorization"
         ] = `Bearer ${musicStore.spotifyAccessToken}`;
 
-        console.log(`PUT ${api}`);
+        console.log(`PUT ${api} - ${moment().format()}`);
         return spotifyClient
             .put(api, payload)
             .then((resp: any) => {
@@ -477,7 +476,7 @@ export class MusicClient {
             "Authorization"
         ] = `Bearer ${musicStore.spotifyAccessToken}`;
 
-        console.log(`POST ${api}`);
+        console.log(`POST ${api} - ${moment().format()}`);
         return spotifyClient
             .post(api, payload)
             .then((resp: any) => {
@@ -498,13 +497,11 @@ export class MusicClient {
         }
         api = this.addQueryStringToApi(api, qsOptions);
 
-        // console.log("DELETE API: ", api);
-
         spotifyClient.defaults.headers.common[
             "Authorization"
         ] = `Bearer ${musicStore.spotifyAccessToken}`;
 
-        console.log(`DELETE ${api}`);
+        console.log(`DELETE ${api} - ${moment().format()}`);
         return spotifyClient
             .delete(api, payload)
             .then((resp: any) => {

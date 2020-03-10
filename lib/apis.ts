@@ -204,27 +204,22 @@ export async function getRecommendationsForTracks(
  * @returns {Promise<Track>}
  **/
 export async function getRunningTrack(): Promise<Track> {
-    const spotifyDevices = await musicPlayerCtr.getSpotifyDevices();
     let spotifyWebTrack = null;
 
     // spotify web try
-    if (spotifyDevices.length > 0) {
-        // 1st try spotify web
-        if (musicStore.spotifyApiEnabled) {
-            spotifyWebTrack = await getTrack(PlayerName.SpotifyWeb);
-            // check if the spotify track is running (playing or paused)
-            let spotifyWebTrackRunning = musicUtil.isTrackRunning(
-                spotifyWebTrack
-            );
+    // 1st try spotify web
+    if (musicStore.spotifyApiEnabled) {
+        spotifyWebTrack = await getTrack(PlayerName.SpotifyWeb);
+        // check if the spotify track is running (playing or paused)
+        let spotifyWebTrackRunning = musicUtil.isTrackRunning(spotifyWebTrack);
 
-            // if it's playing then return it
-            if (
-                spotifyWebTrackRunning &&
-                spotifyWebTrack.state === TrackStatus.Playing
-            ) {
-                // spotify web track is running. it's the highest priority track
-                return spotifyWebTrack;
-            }
+        // if it's playing then return it
+        if (
+            spotifyWebTrackRunning &&
+            spotifyWebTrack.state === TrackStatus.Playing
+        ) {
+            // spotify web track is running. it's the highest priority track
+            return spotifyWebTrack;
         }
     }
 
@@ -1004,6 +999,7 @@ export function playSpotifyMacDesktopTrack(
  * @returns {Promise<PlayerDevice[]>}
  */
 export function getSpotifyDevices(): Promise<PlayerDevice[]> {
+    console.log(`getSpotifyDevices()`);
     return musicPlayerCtr.getSpotifyDevices(true);
 }
 
