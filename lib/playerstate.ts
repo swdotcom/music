@@ -84,12 +84,15 @@ export class MusicPlayerState {
     async getSpotifyDevices(
         clearCache: boolean = false
     ): Promise<PlayerDevice[]> {
+        if (clearCache) {
+            cacheMgr.set("spotify-devices", null);
+        }
         const accessToken = musicStore.spotifyAccessToken;
         if (!accessToken) {
             return [];
         }
         let devices = cacheMgr.get("spotify-devices");
-        if (!clearCache && devices && devices.length) {
+        if (devices && devices.length) {
             return devices;
         }
         const api = "/v1/me/player/devices";
