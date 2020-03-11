@@ -411,7 +411,7 @@ export async function getTrack(player: PlayerName): Promise<Track> {
         }
     }
 
-    if (!track || musicUtil.isEmptyObj(track)) {
+    if (!track) {
         track = new Track();
     } else if (track && !track["playerType"]) {
         if (player === PlayerName.SpotifyWeb) {

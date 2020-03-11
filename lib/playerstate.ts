@@ -531,6 +531,7 @@ export class MusicPlayerState {
         } else {
             track = new Track();
             track.state = TrackStatus.NotAssigned;
+            track.httpStatus = response.status;
         }
 
         return track;
