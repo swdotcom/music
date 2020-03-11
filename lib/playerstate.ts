@@ -656,7 +656,10 @@ export class MusicPlayerState {
         return codyResp;
     }
 
-    async getSpotifyPlayerContext(): Promise<PlayerContext> {
+    async getSpotifyPlayerContext(clearCache: boolean): Promise<PlayerContext> {
+        if (clearCache) {
+            cacheMgr.set("player-context", null);
+        }
         let playerContext: PlayerContext = cacheMgr.get("player-context");
         if (playerContext) {
             return playerContext;

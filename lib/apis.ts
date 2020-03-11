@@ -336,7 +336,7 @@ export async function getSpotifyRecentlyPlayedTracks(
  * Info about the device, is playing state, etc.
  */
 export async function getSpotifyPlayerContext(): Promise<PlayerContext> {
-    return musicPlayerCtr.getSpotifyPlayerContext();
+    return musicPlayerCtr.getSpotifyPlayerContext(true);
 }
 
 /**
