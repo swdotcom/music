@@ -59,7 +59,6 @@ export class MusicPlayerState {
     async isSpotifyWebRunning(): Promise<boolean> {
         let accessToken = musicStore.spotifyAccessToken;
         if (accessToken) {
-            console.log("isSpotifyWebRunning()");
             let spotifyDevices: PlayerDevice[] = await this.getSpotifyDevices();
             if (spotifyDevices.length > 0) {
                 return true;
@@ -109,8 +108,7 @@ export class MusicPlayerState {
         }
 
         if (devices && devices.length) {
-            // 10 minutes
-            cacheMgr.set("spotify-devices", devices, 60 * 10);
+            cacheMgr.set("spotify-devices", devices);
         }
 
         return devices || [];
@@ -656,7 +654,12 @@ export class MusicPlayerState {
     }
 
     async getSpotifyPlayerContext(): Promise<PlayerContext> {
-        let playerContext: PlayerContext = new PlayerContext();
+        let playerContext: PlayerContext = cacheMgr.get("player-context");
+        if (playerContext) {
+            return playerContext;
+        }
+
+        playerContext = new PlayerContext();
         let api = "/v1/me/player";
         let response = await musicClient.spotifyApiGet(api);
 
@@ -679,6 +682,10 @@ export class MusicPlayerState {
             response.data.item["playerType"] = PlayerType.WebSpotify;
             musicUtil.extractAristFromSpotifyTrack(response.data.item);
             playerContext = response.data;
+            if (playerContext && playerContext.device) {
+                // 15 second cache
+                cacheMgr.set("player-context", playerContext, 15);
+            }
         }
         return playerContext;
     }
@@ -689,7 +696,6 @@ export class MusicPlayerState {
         playerName: PlayerName = PlayerName.SpotifyWeb
     ) {
         // check if there's any spotify devices
-        console.log("launchAndPlaySpotifyTrack()");
         const spotifyDevices: PlayerDevice[] = await this.getSpotifyDevices();
 
         if (!spotifyDevices || spotifyDevices.length === 0) {
@@ -727,7 +733,6 @@ export class MusicPlayerState {
         if (playlistId === SPOTIFY_LIKED_SONGS_PLAYLIST_NAME) {
             playlistId = "";
         }
-        console.log("playSpotifyTrackFromPlaylist()");
         const spotifyDevices: PlayerDevice[] = await this.getSpotifyDevices();
         const deviceId = spotifyDevices.length > 0 ? spotifyDevices[0].id : "";
         let options: any = {};

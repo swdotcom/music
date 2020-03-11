@@ -67,7 +67,6 @@ export class UserProfile {
 
     async spotifyAuthState(): Promise<SpotifyAuthState> {
         // check if they have oauth activated
-        console.log("spotifyAuthState()");
         const oauthActivated = musicStore.spotifyAccessToken ? true : false;
 
         // they have a spotify access token, check devices

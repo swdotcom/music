@@ -999,7 +999,6 @@ export function playSpotifyMacDesktopTrack(
  * @returns {Promise<PlayerDevice[]>}
  */
 export function getSpotifyDevices(): Promise<PlayerDevice[]> {
-    console.log(`getSpotifyDevices()`);
     return musicPlayerCtr.getSpotifyDevices(true);
 }
 
