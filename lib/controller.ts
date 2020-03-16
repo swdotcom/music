@@ -146,16 +146,26 @@ export class MusicController {
                     "%APPDATA%/Spotify/Spotify.exe"
                 );
                 if (launchResult && launchResult.error) {
-                    // try it with START
+                    // try with roaming/spotify
                     launchResult = await this.startWindowsPlayer(
-                        "START SPOTIFY"
+                        "%APPDATA%/Roaming/Spotify/Spotify.exe"
                     );
                     if (launchResult && launchResult.error) {
-                        launchResult = await this.startWindowsPlayer("spotify");
+                        // try it with START
+                        launchResult = await this.startWindowsPlayer(
+                            "START SPOTIFY"
+                        );
                         if (launchResult && launchResult.error) {
+                            // try with just spotify
                             launchResult = await this.startWindowsPlayer(
-                                "spotify.exe"
+                                "spotify"
                             );
+                            if (launchResult && launchResult.error) {
+                                // try with spotify exe
+                                launchResult = await this.startWindowsPlayer(
+                                    "spotify.exe"
+                                );
+                            }
                         }
                     }
                 }
