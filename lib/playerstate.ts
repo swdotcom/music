@@ -795,7 +795,7 @@ export class MusicPlayerState {
                 `https://open.spotify.com/playlist/${playlistId}`
             );
         }
-        return musicUtil.launchWebUrl("https://open.spotify.com/browse");
+        return musicUtil.launchWebUrl("https://open.spotify.com");
     }
 
     updateSpotifyLoved(loved: boolean) {

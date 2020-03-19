@@ -2,7 +2,7 @@ import { MusicUtil } from "./util";
 import { MusicClient } from "./client";
 import { PlayerName } from "./models";
 import { MusicStore } from "./store";
-
+const os = require("os");
 const musicClient = MusicClient.getInstance();
 const musicUtil = new MusicUtil();
 
@@ -165,6 +165,13 @@ export class MusicController {
                                 launchResult = await this.startWindowsPlayer(
                                     "spotify.exe"
                                 );
+                                if (launchResult && launchResult.error) {
+                                    const homedir = os.homedir();
+                                    const cmd = `${homedir}/AppData/Roaming/Spotify/Spotify.exe`;
+                                    launchResult = await this.startWindowsPlayer(
+                                        cmd
+                                    );
+                                }
                             }
                         }
                     }

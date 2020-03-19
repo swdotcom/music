@@ -1,6 +1,6 @@
 {
     "name": "cody-music",
-    "version": "2.9.5",
+    "version": "2.9.7",
     "description": "mac osx spotify and itunes music player controller, spotify audio features, itunes and spotify genre, and playlist control",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -65,6 +65,7 @@
         "axios": "^0.19.0",
         "moment-timezone": "^0.5.28",
         "natural": "^0.6.3",
-        "node-cache": "^5.1.0"
+        "node-cache": "^5.1.0",
+        "open": "^7.0.3"
     }
 }
