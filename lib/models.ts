@@ -63,6 +63,7 @@ export class Track {
     progress_ms: number = 0;
     features: SpotifyAudioFeature = new SpotifyAudioFeature();
     httpStatus: number = 200;
+    actions: any;
 }
 
 export class Artist {

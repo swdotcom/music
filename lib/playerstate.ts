@@ -502,10 +502,12 @@ export class MusicPlayerState {
             response.data.item
         ) {
             const data = response.data;
-            track = musicUtil.copySpotifyTrackToCodyTrack(response.data.item);
-            track.progress_ms = response.data.progress_ms
-                ? response.data.progress_ms
-                : 0;
+            track = musicUtil.copySpotifyTrackToCodyTrack(data.item);
+            track.progress_ms = data.progress_ms ? data.progress_ms : 0;
+
+            // set the actions ("actions": {"disallows": {"resuming": true}})
+            track.actions = data.actions;
+
             // set whether this track is playing or not
             /**
              * data: {
