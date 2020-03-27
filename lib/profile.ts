@@ -40,11 +40,7 @@ export class UserProfile {
     }
 
     async getUserProfile(): Promise<SpotifyUser> {
-        let userProfile: SpotifyUser = cacheMgr.get("user-profile");
-        if (userProfile) {
-            return userProfile;
-        }
-        userProfile = new SpotifyUser();
+        let userProfile: SpotifyUser = new SpotifyUser();
         let api = "/v1/me";
         let response = await musicClient.spotifyApiGet(api);
 
@@ -58,7 +54,6 @@ export class UserProfile {
 
         if (response && response.status === 200 && response.data) {
             userProfile = response.data;
-            cacheMgr.set("user-profile", userProfile, 60 * 10);
             musicStore.spotifyUserId = userProfile.id;
         }
 
