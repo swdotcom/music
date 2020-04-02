@@ -237,7 +237,7 @@ export class MusicClient {
         spotifyClient.defaults.headers.common[
             "Authorization"
         ] = `Bearer ${musicStore.spotifyAccessToken}`;
-        console.log(`GET ${api} - ${moment().format()}`);
+        // console.log(`GET ${api} - ${moment().format()}`);
         return spotifyClient
             .get(api)
             .then(resp => {
@@ -426,7 +426,7 @@ export class MusicClient {
             "Authorization"
         ] = `Bearer ${accessToken}`;
 
-        console.log(`GET ${api} - ${moment().format()}`);
+        // console.log(`GET ${api} - ${moment().format()}`);
         return spotifyClient
             .get(api)
             .then((resp: any) => {
@@ -451,7 +451,7 @@ export class MusicClient {
             "Authorization"
         ] = `Bearer ${musicStore.spotifyAccessToken}`;
 
-        console.log(`PUT ${api} - ${moment().format()}`);
+        // console.log(`PUT ${api} - ${moment().format()}`);
         return spotifyClient
             .put(api, payload)
             .then((resp: any) => {
@@ -476,7 +476,7 @@ export class MusicClient {
             "Authorization"
         ] = `Bearer ${musicStore.spotifyAccessToken}`;
 
-        console.log(`POST ${api} - ${moment().format()}`);
+        // console.log(`POST ${api} - ${moment().format()}`);
         return spotifyClient
             .post(api, payload)
             .then((resp: any) => {
@@ -501,7 +501,7 @@ export class MusicClient {
             "Authorization"
         ] = `Bearer ${musicStore.spotifyAccessToken}`;
 
-        console.log(`DELETE ${api} - ${moment().format()}`);
+        //console.log(`DELETE ${api} - ${moment().format()}`);
         return spotifyClient
             .delete(api, payload)
             .then((resp: any) => {
