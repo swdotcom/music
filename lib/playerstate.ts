@@ -10,7 +10,7 @@ import {
     TrackStatus,
     Artist,
     PlayerName,
-    CodyResponse
+    CodyResponse,
 } from "./models";
 import { CacheManager } from "./cache";
 import { AudioStat } from "./audiostat";
@@ -43,7 +43,7 @@ export class MusicPlayerState {
          */
         let result = await musicUtil
             .execCmd(MusicController.WINDOWS_SPOTIFY_TRACK_FIND)
-            .catch(e => {
+            .catch((e) => {
                 // console.log(
                 //     "Error trying to identify if spotify is running on windows: ",
                 //     e.message
@@ -140,7 +140,7 @@ export class MusicPlayerState {
         // get the artist - song name from the command result, then get the rest of the info from spotify
         let songInfo = await musicUtil
             .execCmd(MusicController.WINDOWS_SPOTIFY_TRACK_FIND)
-            .catch(e => {
+            .catch((e) => {
                 // console.log(
                 //     "Error trying to identify if spotify is running on windows: ",
                 //     e.message
@@ -188,8 +188,11 @@ export class MusicPlayerState {
         includeGenre: boolean = false
     ): Promise<Track[]> {
         const finalIds: string[] = [];
-        ids.forEach(id => {
-            finalIds.push(musicUtil.createSpotifyIdFromUri(id));
+        ids.forEach((id) => {
+            id = musicUtil.createSpotifyIdFromUri(id);
+            if (id) {
+                finalIds.push(id);
+            }
         });
         const tracksToReturn: Track[] = [];
         const api = `/v1/tracks`;
@@ -228,7 +231,7 @@ export class MusicPlayerState {
             }
 
             if (includeArtistData) {
-                let artistIds = Object.keys(artistIdMap).map(key => {
+                let artistIds = Object.keys(artistIdMap).map((key) => {
                     return key;
                 });
 
@@ -315,7 +318,7 @@ export class MusicPlayerState {
             if (includeAudioFeaturesData) {
                 const spotifyAudioFeatures = await audioStat
                     .getSpotifyAudioFeatures(ids)
-                    .catch(e => {
+                    .catch((e) => {
                         return null;
                     });
                 if (spotifyAudioFeatures && spotifyAudioFeatures.length > 0) {
@@ -601,7 +604,7 @@ export class MusicPlayerState {
         const qsOptions: any = {
             limit,
             min_popularity,
-            target_popularity
+            target_popularity,
         };
         if (seed_genres.length) {
             qsOptions["seed_genres"] = seed_genres.join(",");
@@ -617,7 +620,7 @@ export class MusicPlayerState {
         }
         const featureKeys = Object.keys(features);
         if (featureKeys.length) {
-            featureKeys.forEach(key => {
+            featureKeys.forEach((key) => {
                 qsOptions[key] = features[key];
             });
         }
