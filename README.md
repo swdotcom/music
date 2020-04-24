@@ -108,23 +108,23 @@ await CodyMusic.getRunningTrack().then((track: Track) => {
 await CodyMusic.playTrack(
     "spotify",
     "spotify:track:2YarjDYjBJuH63dUIh9OWv"
-).then(result => {
+).then((result) => {
     // track is playing
 });
 
 // play an iTunes track number
-await CodyMusic.playTrack("itunes", 1).then(result => {
+await CodyMusic.playTrack("itunes", 1).then((result) => {
     // track is playing
 });
 
 // handling errors
-await CodyMusic.playTrack("spotify", 1000000000).then(result => {
+await CodyMusic.playTrack("spotify", 1000000000).then((result) => {
     // result will contain the "error" attribute with the error message
     if (result.error) {
         console.log(`Unable to play track, error: ${result.error}`);
     }
 });
-await CodyMusic.getRunningTrack().then(result => {
+await CodyMusic.getRunningTrack().then((result) => {
     // result will be the best effort track that is playing.
     // i.e. if you have your itunes app running, it would show you that track
 });
@@ -480,6 +480,27 @@ next(player: PlayerName, options: any = {})
 previous(player: PlayerName, options: any = {})
 
 /**
+ * Repeats a playlist
+ * @param player
+ * @param deviceId
+ */
+setRepeatPlaylist(player: PlayerName, deviceId: string = "")
+
+/**
+ * Repeats a track
+ * @param player
+ * @param deviceId
+ */
+setRepeatTrack(player: PlayerName, deviceId: string = "")
+
+/**
+ * Turn repeat off
+ * @param player
+ * @param deviceId
+ */
+setRepeatOff(player: PlayerName, deviceId: string = "")
+
+/**
  * Turn on/off repeat for a given player
  * @param player {spotify|spotify-web|itunes}
  * @param options
@@ -489,8 +510,10 @@ setRepeat(player: PlayerName, repeat: boolean)
 /**
  * Turn on/off shuffling for a given player
  * @param player {spotify|spotify-web|itunes}
+ * @param shuffle (true or false)
+ * @param deviceId (optional)
  */
-setShuffle(player: PlayerName, shuffle: boolean)
+setShuffle(player: PlayerName, shuffle: boolean, deviceId: string = "")
 
 /**
  * Return whether shuffling is on or not

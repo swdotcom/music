@@ -13,7 +13,7 @@ import {
     PaginationItem,
     PlayerContext,
     TrackStatus,
-    SpotifyAuthState
+    SpotifyAuthState,
 } from "./models";
 import { MusicPlayerState } from "./playerstate";
 import { AudioStat } from "./audiostat";
@@ -750,16 +750,59 @@ export function previous(player: PlayerName, options: any = {}) {
 }
 
 /**
+ * Repeats a playlist
+ * @param player
+ * @param deviceId
+ */
+export function setRepeatPlaylist(player: PlayerName, deviceId: string = "") {
+    if (player === PlayerName.SpotifyWeb) {
+        return musicPlayerCtr.setPlaylistRepeat(deviceId);
+    } else {
+        return musicCtr.run(player, "repeatOn");
+    }
+}
+
+/**
+ * Repeats a track
+ * @param player
+ * @param deviceId
+ */
+export function setRepeatTrack(player: PlayerName, deviceId: string = "") {
+    if (player === PlayerName.SpotifyWeb) {
+        return musicPlayerCtr.setTrackRepeat(deviceId);
+    } else {
+        return musicCtr.run(player, "repeatOn");
+    }
+}
+
+/**
+ * Turn repeat off
+ * @param player
+ * @param deviceId
+ */
+export function setRepeatOff(player: PlayerName, deviceId: string = "") {
+    if (player === PlayerName.SpotifyWeb) {
+        return musicPlayerCtr.setRepeatOff(deviceId);
+    } else {
+        return musicCtr.run(player, "repeatOff");
+    }
+}
+
+/**
  * Turn on/off repeat for a given player
  * @param player {spotify|spotify-web|itunes}
  * @param options
  */
-export function setRepeat(player: PlayerName, repeat: boolean) {
+export function setRepeat(
+    player: PlayerName,
+    repeat: boolean,
+    deviceId: string = ""
+) {
     if (
         player === PlayerName.SpotifyWeb ||
         (player === PlayerName.SpotifyDesktop && musicUtil.isWindows())
     ) {
-        musicPlayerCtr.updateRepeatMode(repeat);
+        return musicPlayerCtr.updateRepeatMode(repeat, deviceId);
     } else {
         let repeatParam = repeat ? "repeatOn" : "repeatOff";
         return musicCtr.run(player, repeatParam);
@@ -770,9 +813,18 @@ export function setRepeat(player: PlayerName, repeat: boolean) {
  * Turn on/off shuffling for a given player
  * @param player {spotify|spotify-web|itunes}
  */
-export function setShuffle(player: PlayerName, shuffle: boolean) {
-    let shuffleParam = shuffle ? ["true"] : ["false"];
-    return musicCtr.run(player, "setShuffling", shuffleParam);
+export function setShuffle(
+    player: PlayerName,
+    shuffle: boolean,
+    deviceId: string = ""
+) {
+    if (player === PlayerName.SpotifyWeb) {
+        // use spotify web api
+        return musicPlayerCtr.setShuffle(shuffle, deviceId);
+    } else {
+        let shuffleParam = shuffle ? ["true"] : ["false"];
+        return musicCtr.run(player, "setShuffling", shuffleParam);
+    }
 }
 
 /**
@@ -780,6 +832,9 @@ export function setShuffle(player: PlayerName, shuffle: boolean) {
  * @param player {spotify|spotify-web|itunes}
  */
 export async function isShuffling(player: PlayerName) {
+    if (player === PlayerName.SpotifyWeb) {
+        // use the web api
+    }
     const val = await musicCtr.run(player, "isShuffling");
     if (musicUtil.isBooleanString(val)) {
         return JSON.parse(val);

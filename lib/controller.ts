@@ -17,29 +17,29 @@ export class MusicController {
     private scripts: any = {
         state: {
             file: "get_state.{0}.applescript",
-            requiresArgv: false
+            requiresArgv: false,
         },
         checkPlayerRunningState: {
             file: "check_state.{0}.applescript",
-            requiresArgv: false
+            requiresArgv: false,
         },
         firstTrackState: {
             file: "get_first_track_state.{0}.applescript",
-            requiresArgv: false
+            requiresArgv: false,
         },
         volumeUp: {
             file: "volume_up.{0}.applescript",
-            requiresArgv: false
+            requiresArgv: false,
         },
         volumeDown: {
             file: "volume_down.{0}.applescript",
-            requiresArgv: false
+            requiresArgv: false,
         },
         playTrackInContext:
             'tell application "{0}" to play track "{1}" {2} "{3}"',
         playTrackNumberInPlaylist: {
             file: "play_track_number_in_playlist.{0}.applescript",
-            requiresArgv: true
+            requiresArgv: true,
         },
         play: 'tell application "{0}" to play',
         playFromLibrary: 'tell application "{0}" to play of playlist "{1}"',
@@ -59,22 +59,22 @@ export class MusicController {
         setShuffling: 'tell application "{0}" to set {1} to {2}',
         isShuffling: 'tell application "{0}" to {1}',
         playlistNames: {
-            file: "get_playlist_names.{0}.applescript"
+            file: "get_playlist_names.{0}.applescript",
         },
         playTrackOfPlaylist: {
-            file: "play_track_of_playlist.{0}.applescript"
+            file: "play_track_of_playlist.{0}.applescript",
         },
         playlistTracksOfPlaylist: {
             file: "get_playlist_songs.{0}.applescript",
-            requiresArgv: true
+            requiresArgv: true,
         },
         setItunesLoved:
             'tell application "{0}" to set loved of current track to {1}',
         playlistTrackCounts: {
             file: "get_playlist_count.{0}.applescript",
-            requiresArgv: false
+            requiresArgv: false,
         },
-        activate: 'tell application "{0}" to activate'
+        activate: 'tell application "{0}" to activate',
     };
 
     private static instance: MusicController;
@@ -350,7 +350,7 @@ export class MusicController {
         }
 
         return this.execScript(player, scriptName, params, argv).then(
-            async result => {
+            async (result) => {
                 if (
                     result &&
                     result.error &&
@@ -379,7 +379,7 @@ export class MusicController {
 
     setVolume(player: string, volume: number) {
         this.lastVolumeLevel = volume;
-        return this.execScript(player, "setVolume", [volume]).then(result => {
+        return this.execScript(player, "setVolume", [volume]).then((result) => {
             if (result === null || result === undefined || result === "") {
                 result = "ok";
             }
@@ -389,15 +389,15 @@ export class MusicController {
 
     setItunesLoved(loved: boolean) {
         return this.execScript(PlayerName.ItunesDesktop, "setItunesLoved", [
-            loved
+            loved,
         ])
-            .then(result => {
+            .then((result) => {
                 if (result === null || result === undefined || result === "") {
                     result = "ok";
                 }
                 return result;
             })
-            .catch(err => {
+            .catch((err) => {
                 return false;
             });
     }
@@ -411,7 +411,7 @@ export class MusicController {
         if (playlistId) {
             this.playTrackInContext(PlayerName.SpotifyDesktop, [
                 trackId,
-                playlistId
+                playlistId,
             ]);
         } else {
             this.run(PlayerName.SpotifyDesktop, "playTrack", [trackId]);
@@ -420,7 +420,7 @@ export class MusicController {
 
     playTrackInContext(player: string, params: any[]) {
         return this.execScript(player, "playTrackInContext", params).then(
-            result => {
+            (result) => {
                 if (result === null || result === undefined || result === "") {
                     result = "ok";
                 }
@@ -432,7 +432,7 @@ export class MusicController {
     public async playPauseSpotifyDevice(device_id: string, play: boolean) {
         const payload = {
             device_ids: [device_id],
-            play
+            play,
         };
         return musicClient.spotifyApiPut("/v1/me/player", {}, payload);
     }
@@ -449,7 +449,7 @@ export class MusicController {
         // {"context_uri":"spotify:playlist:<id>"}
 
         let payload: any = {
-            offset: { position: 0 }
+            offset: { position: 0 },
         };
 
         // playlistId is required
@@ -457,7 +457,7 @@ export class MusicController {
 
         if (trackUris && trackUris.length > 0) {
             payload.offset = {
-                uri: trackUris[0]
+                uri: trackUris[0],
             };
         }
 
@@ -484,7 +484,7 @@ export class MusicController {
         const trackUris = musicUtil.createUrisFromTrackIds([trackId]);
         const qsOptions = deviceId ? { device_id: deviceId } : {};
         const payload = {
-            uris: trackUris
+            uris: trackUris,
         };
         const api = "/v1/me/player/play";
         let response = await musicClient.spotifyApiPut(api, qsOptions, payload);
@@ -529,11 +529,11 @@ export class MusicController {
             if (options.offset !== undefined && options.offset !== null) {
                 payload["offset"] = {
                     ...payload.offset,
-                    uri: payload.uris[0]
+                    uri: payload.uris[0],
                 };
             } else {
                 payload["offset"] = {
-                    uri: payload.uris[0]
+                    uri: payload.uris[0],
                 };
             }
             delete payload.uris;
@@ -659,7 +659,7 @@ export class MusicController {
             genre = await this.getGenreFromSpotify(
                 artist,
                 spotifyArtistId
-            ).catch(e => {
+            ).catch((e) => {
                 return "";
             });
         }

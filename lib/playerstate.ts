@@ -645,18 +645,67 @@ export class MusicPlayerState {
         return tracks;
     }
 
-    async updateRepeatMode(setToOn: boolean): Promise<CodyResponse> {
-        const state = setToOn ? "track" : "off";
-
-        const api = `/v1/me/player/repeat`;
-        let codyResp = await musicClient.spotifyApiPut(api, { state }, {});
+    async setShuffle(shuffle: boolean, device_id = ""): Promise<CodyResponse> {
+        const api = `/v1/me/player/shuffle`;
+        let qsOptions: any = {
+            state: shuffle,
+        };
+        if (device_id) {
+            qsOptions["device_id"] = device_id;
+        }
+        let codyResp = await musicClient.spotifyApiPut(api, qsOptions, {});
 
         // check if the token needs to be refreshed
         if (codyResp.statusText === "EXPIRED") {
             // refresh the token
             await musicClient.refreshSpotifyToken();
             // try again
-            codyResp = await musicClient.spotifyApiPut(api, { state }, {});
+            codyResp = await musicClient.spotifyApiPut(api, qsOptions, {});
+        }
+
+        return codyResp;
+    }
+
+    async setRepeatOff(device_id: string = ""): Promise<CodyResponse> {
+        return await this.setRepeat("off", device_id);
+    }
+
+    async setTrackRepeat(device_id: string = ""): Promise<CodyResponse> {
+        return await this.setRepeat("track", device_id);
+    }
+
+    async setPlaylistRepeat(device_id: string = ""): Promise<CodyResponse> {
+        return await this.setRepeat("context", device_id);
+    }
+
+    async updateRepeatMode(
+        setToOn: boolean,
+        device_id: string = ""
+    ): Promise<CodyResponse> {
+        const state = setToOn ? "track" : "off";
+
+        return await this.setRepeat(state, device_id);
+    }
+
+    async setRepeat(
+        state: string,
+        device_id: string = ""
+    ): Promise<CodyResponse> {
+        const api = `/v1/me/player/repeat`;
+        let qsOptions: any = {
+            state,
+        };
+        if (device_id) {
+            qsOptions["device_id"] = device_id;
+        }
+        let codyResp = await musicClient.spotifyApiPut(api, qsOptions, {});
+
+        // check if the token needs to be refreshed
+        if (codyResp.statusText === "EXPIRED") {
+            // refresh the token
+            await musicClient.refreshSpotifyToken();
+            // try again
+            codyResp = await musicClient.spotifyApiPut(api, qsOptions, {});
         }
 
         return codyResp;
