@@ -883,7 +883,10 @@ export function volumeDown(player: PlayerName) {
  * Mutes the players volume
  * @param player {spotify|spotify-web|itunes}
  */
-export function mute(player: PlayerName) {
+export function mute(player: PlayerName, device_id: string = "") {
+    if (player === PlayerName.SpotifyWeb) {
+        return musicPlayerCtr.setMute(true, device_id);
+    }
     return musicCtr.run(player, "mute");
 }
 
@@ -891,7 +894,10 @@ export function mute(player: PlayerName) {
  * Unmutes the players volume
  * @param player {spotify|spotify-web|itunes}
  */
-export function unmute(player: PlayerName) {
+export function unmute(player: PlayerName, device_id: string = "") {
+    if (player === PlayerName.SpotifyWeb) {
+        return musicPlayerCtr.setMute(false, device_id);
+    }
     return musicCtr.run(player, "unMute");
 }
 

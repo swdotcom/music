@@ -645,6 +645,10 @@ export class MusicPlayerState {
         return tracks;
     }
 
+    async setMute(mute: boolean, device_id = ""): Promise<CodyResponse> {
+        //
+    }
+
     async setShuffle(shuffle: boolean, device_id = ""): Promise<CodyResponse> {
         const api = `/v1/me/player/shuffle`;
         let qsOptions: any = {
