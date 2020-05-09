@@ -646,7 +646,10 @@ export class MusicPlayerState {
     }
 
     async setMute(mute: boolean, device_id = ""): Promise<CodyResponse> {
-        //
+        const resp: CodyResponse = new CodyResponse();
+        resp.message = "Not Supported";
+        resp.status = 501;
+        return resp;
     }
 
     async setShuffle(shuffle: boolean, device_id = ""): Promise<CodyResponse> {

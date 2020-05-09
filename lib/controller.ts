@@ -136,39 +136,41 @@ export class MusicController {
         return result;
     }
 
-    async startPlayer(player: string, options: any = {}) {
+    async startPlayer(player: string, options: any = {}): Promise<any> {
         let launchResult: any = "ok";
         if (musicUtil.isWindows()) {
-            launchResult = await this.startWindowsPlayer("cmd /c spotify.exe");
+            launchResult = await this.launchPlayerWithCommand(
+                "cmd /c spotify.exe"
+            );
             if (launchResult && launchResult.error) {
                 // try using the %APPDATA%/Spotify/Spotify.exe command
-                launchResult = await this.startWindowsPlayer(
+                launchResult = await this.launchPlayerWithCommand(
                     "%APPDATA%/Spotify/Spotify.exe"
                 );
                 if (launchResult && launchResult.error) {
                     // try with roaming/spotify
-                    launchResult = await this.startWindowsPlayer(
+                    launchResult = await this.launchPlayerWithCommand(
                         "%APPDATA%/Roaming/Spotify/Spotify.exe"
                     );
                     if (launchResult && launchResult.error) {
                         // try it with START
-                        launchResult = await this.startWindowsPlayer(
+                        launchResult = await this.launchPlayerWithCommand(
                             "START SPOTIFY"
                         );
                         if (launchResult && launchResult.error) {
                             // try with just spotify
-                            launchResult = await this.startWindowsPlayer(
+                            launchResult = await this.launchPlayerWithCommand(
                                 "spotify"
                             );
                             if (launchResult && launchResult.error) {
                                 // try with spotify exe
-                                launchResult = await this.startWindowsPlayer(
+                                launchResult = await this.launchPlayerWithCommand(
                                     "spotify.exe"
                                 );
                                 if (launchResult && launchResult.error) {
                                     const homedir = os.homedir();
                                     const cmd = `${homedir}/AppData/Roaming/Spotify/Spotify.exe`;
-                                    launchResult = await this.startWindowsPlayer(
+                                    launchResult = await this.launchPlayerWithCommand(
                                         cmd
                                     );
                                 }
@@ -178,7 +180,29 @@ export class MusicController {
                 }
             }
             return launchResult;
+        } else if (musicUtil.isLinux()) {
+            launchResult = await this.launchPlayerWithCommand(
+                "snap install spotify"
+            );
+            if (launchResult && launchResult.error) {
+                launchResult = await this.launchPlayerWithCommand(
+                    "flatpak run com.spotify.Client"
+                );
+                if (launchResult && launchResult.error) {
+                    // try with just spotify
+                    launchResult = await this.launchPlayerWithCommand(
+                        "spotify"
+                    );
+                    if (launchResult && launchResult.error) {
+                        launchResult = await this.launchPlayerWithCommand(
+                            "/usr/bin/spotify"
+                        );
+                    }
+                }
+            }
+            return launchResult;
         }
+
         if (
             player === PlayerName.SpotifyDesktop ||
             player === PlayerName.ItunesDesktop
@@ -211,7 +235,7 @@ export class MusicController {
         return result;
     }
 
-    async startWindowsPlayer(command: string) {
+    async launchPlayerWithCommand(command: string) {
         let result = await musicUtil.execCmd(command);
         if (result === null || result === undefined || result === "") {
             result = "ok";
