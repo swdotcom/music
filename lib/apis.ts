@@ -373,18 +373,22 @@ export async function getTrack(player: PlayerName): Promise<Track> {
     } else {
         // get the string representation of the track.
         // fetch the track from the specified player name.
-        track = await musicCtr.run(player, "state");
-        if (track) {
-            try {
-                track = JSON.parse(track);
-                if (track) {
-                    if (player === PlayerName.ItunesDesktop) {
-                        track.playerType = PlayerType.MacItunesDesktop;
-                    } else {
-                        track.playerType = PlayerType.MacSpotifyDesktop;
+        // first check to see if the app is running before checking
+        const running = await isPlayerRunning(player);
+        if (running) {
+            track = await musicCtr.run(player, "state");
+            if (track) {
+                try {
+                    track = JSON.parse(track);
+                    if (track) {
+                        if (player === PlayerName.ItunesDesktop) {
+                            track.playerType = PlayerType.MacItunesDesktop;
+                        } else {
+                            track.playerType = PlayerType.MacSpotifyDesktop;
+                        }
                     }
-                }
-            } catch (e) {}
+                } catch (e) {}
+            }
         }
     }
 
