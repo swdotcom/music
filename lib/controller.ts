@@ -35,8 +35,7 @@ export class MusicController {
             file: "volume_down.{0}.applescript",
             requiresArgv: false,
         },
-        playTrackInContext:
-            'tell application "{0}" to play track "{1}" {2} "{3}"',
+        playTrackInContext: 'tell application "{0}" to play track "{1}" {2} "{3}"',
         playTrackNumberInPlaylist: {
             file: "play_track_number_in_playlist.{0}.applescript",
             requiresArgv: true,
@@ -68,8 +67,7 @@ export class MusicController {
             file: "get_playlist_songs.{0}.applescript",
             requiresArgv: true,
         },
-        setItunesLoved:
-            'tell application "{0}" to set loved of current track to {1}',
+        setItunesLoved: 'tell application "{0}" to set loved of current track to {1}',
         playlistTrackCounts: {
             file: "get_playlist_count.{0}.applescript",
             requiresArgv: false,
@@ -139,9 +137,7 @@ export class MusicController {
     async startPlayer(player: string, options: any = {}): Promise<any> {
         let launchResult: any = "ok";
         if (musicUtil.isWindows()) {
-            launchResult = await this.launchPlayerWithCommand(
-                "cmd /c spotify.exe"
-            );
+            launchResult = await this.launchPlayerWithCommand("cmd /c spotify.exe");
             if (launchResult && launchResult.error) {
                 // try using the %APPDATA%/Spotify/Spotify.exe command
                 launchResult = await this.launchPlayerWithCommand(
@@ -159,9 +155,7 @@ export class MusicController {
                         );
                         if (launchResult && launchResult.error) {
                             // try with just spotify
-                            launchResult = await this.launchPlayerWithCommand(
-                                "spotify"
-                            );
+                            launchResult = await this.launchPlayerWithCommand("spotify");
                             if (launchResult && launchResult.error) {
                                 // try with spotify exe
                                 launchResult = await this.launchPlayerWithCommand(
@@ -181,18 +175,14 @@ export class MusicController {
             }
             return launchResult;
         } else if (musicUtil.isLinux()) {
-            launchResult = await this.launchPlayerWithCommand(
-                "snap install spotify"
-            );
+            launchResult = await this.launchPlayerWithCommand("snap install spotify");
             if (launchResult && launchResult.error) {
                 launchResult = await this.launchPlayerWithCommand(
                     "flatpak run com.spotify.Client"
                 );
                 if (launchResult && launchResult.error) {
                     // try with just spotify
-                    launchResult = await this.launchPlayerWithCommand(
-                        "spotify"
-                    );
+                    launchResult = await this.launchPlayerWithCommand("spotify");
                     if (launchResult && launchResult.error) {
                         launchResult = await this.launchPlayerWithCommand(
                             "/usr/bin/spotify"
@@ -203,10 +193,7 @@ export class MusicController {
             return launchResult;
         }
 
-        if (
-            player === PlayerName.SpotifyDesktop ||
-            player === PlayerName.ItunesDesktop
-        ) {
+        if (player === PlayerName.SpotifyDesktop || player === PlayerName.ItunesDesktop) {
             launchResult = await this.run(player, "activate");
             if (launchResult && launchResult.error) {
                 // try launching with the start command
@@ -219,11 +206,7 @@ export class MusicController {
     async startMacPlayer(player: string, options: any = {}) {
         player = musicUtil.getPlayerName(player);
         let quietly = true;
-        if (
-            options &&
-            options.quietly !== undefined &&
-            options.quietly !== null
-        ) {
+        if (options && options.quietly !== undefined && options.quietly !== null) {
             quietly = options.quietly;
         }
 
@@ -280,10 +263,7 @@ export class MusicController {
             if (scriptName === "play" && player.toLowerCase() === "itunes") {
                 // if itunes is not currently running, default to play from the
                 // user's default playlist
-                let itunesTrack = await this.run(
-                    PlayerName.ItunesDesktop,
-                    "state"
-                );
+                let itunesTrack = await this.run(PlayerName.ItunesDesktop, "state");
 
                 if (itunesTrack) {
                     // make it an object
@@ -373,32 +353,30 @@ export class MusicController {
             }
         }
 
-        return this.execScript(player, scriptName, params, argv).then(
-            async (result) => {
-                if (
-                    result &&
-                    result.error &&
-                    result.error.toLowerCase().includes("not authorized")
-                ) {
-                    // reset the apple events to show the request access again
-                    // await musicUtil.execCmd("tccutil reset AppleEvents");
-                    // result = await this.execScript(
-                    //     player,
-                    //     scriptName,
-                    //     params,
-                    //     argv
-                    // );
-                    return "[GRANT_ERROR] Desktop Player Access Not Authorized";
-                }
-                if (result === null || result === undefined || result === "") {
-                    if (player === PlayerName.ItunesDesktop) {
-                        MusicStore.getInstance().itunesAccessGranted = true;
-                    }
-                    result = "ok";
-                }
-                return result;
+        return this.execScript(player, scriptName, params, argv).then(async (result) => {
+            if (
+                result &&
+                result.error &&
+                result.error.toLowerCase().includes("not authorized")
+            ) {
+                // reset the apple events to show the request access again
+                // await musicUtil.execCmd("tccutil reset AppleEvents");
+                // result = await this.execScript(
+                //     player,
+                //     scriptName,
+                //     params,
+                //     argv
+                // );
+                return "[GRANT_ERROR] Desktop Player Access Not Authorized";
             }
-        );
+            if (result === null || result === undefined || result === "") {
+                if (player === PlayerName.ItunesDesktop) {
+                    MusicStore.getInstance().itunesAccessGranted = true;
+                }
+                result = "ok";
+            }
+            return result;
+        });
     }
 
     setVolume(player: string, volume: number) {
@@ -412,9 +390,7 @@ export class MusicController {
     }
 
     setItunesLoved(loved: boolean) {
-        return this.execScript(PlayerName.ItunesDesktop, "setItunesLoved", [
-            loved,
-        ])
+        return this.execScript(PlayerName.ItunesDesktop, "setItunesLoved", [loved])
             .then((result) => {
                 if (result === null || result === undefined || result === "") {
                     result = "ok";
@@ -433,24 +409,19 @@ export class MusicController {
         }
 
         if (playlistId) {
-            this.playTrackInContext(PlayerName.SpotifyDesktop, [
-                trackId,
-                playlistId,
-            ]);
+            this.playTrackInContext(PlayerName.SpotifyDesktop, [trackId, playlistId]);
         } else {
             this.run(PlayerName.SpotifyDesktop, "playTrack", [trackId]);
         }
     }
 
     playTrackInContext(player: string, params: any[]) {
-        return this.execScript(player, "playTrackInContext", params).then(
-            (result) => {
-                if (result === null || result === undefined || result === "") {
-                    result = "ok";
-                }
-                return result;
+        return this.execScript(player, "playTrackInContext", params).then((result) => {
+            if (result === null || result === undefined || result === "") {
+                result = "ok";
             }
-        );
+            return result;
+        });
     }
 
     public async playPauseSpotifyDevice(device_id: string, play: boolean) {
@@ -524,16 +495,12 @@ export class MusicController {
     }
 
     public async spotifyWebPlay(options: any) {
-        const qsOptions = options.device_id
-            ? { device_id: options.device_id }
-            : {};
+        const qsOptions = options.device_id ? { device_id: options.device_id } : {};
         let payload: any = {};
         if (options.uris) {
             payload["uris"] = options.uris;
         } else if (options.track_ids) {
-            payload["uris"] = musicUtil.createUrisFromTrackIds(
-                options.track_ids
-            );
+            payload["uris"] = musicUtil.createUrisFromTrackIds(options.track_ids);
         }
 
         // "offset": {"position": 5}
@@ -577,16 +544,12 @@ export class MusicController {
     }
 
     public async spotifyWebPause(options: any) {
-        const qsOptions = options.device_id
-            ? { device_id: options.device_id }
-            : {};
+        const qsOptions = options.device_id ? { device_id: options.device_id } : {};
         let payload: any = {};
         if (options.uris) {
             payload["uris"] = options.uris;
         } else if (options.track_ids) {
-            payload["uris"] = musicUtil.createUrisFromTrackIds(
-                options.track_ids
-            );
+            payload["uris"] = musicUtil.createUrisFromTrackIds(options.track_ids);
         }
 
         const api = "/v1/me/player/pause";
@@ -604,70 +567,46 @@ export class MusicController {
     }
 
     public async spotifyWebPrevious(options: any) {
-        const qsOptions = options.device_id
-            ? { device_id: options.device_id }
-            : {};
+        const qsOptions = options.device_id ? { device_id: options.device_id } : {};
         let payload: any = {};
         if (options.uris) {
             payload["uris"] = options.uris;
         } else if (options.track_ids) {
-            payload["uris"] = musicUtil.createUrisFromTrackIds(
-                options.track_ids
-            );
+            payload["uris"] = musicUtil.createUrisFromTrackIds(options.track_ids);
         }
 
         const api = "/v1/me/player/previous";
-        let codyResp = await musicClient.spotifyApiPost(
-            api,
-            qsOptions,
-            payload
-        );
+        let codyResp = await musicClient.spotifyApiPost(api, qsOptions, payload);
 
         // check if the token needs to be refreshed
         if (codyResp.statusText === "EXPIRED") {
             // refresh the token
             await musicClient.refreshSpotifyToken();
             // try again
-            codyResp = await musicClient.spotifyApiPost(
-                api,
-                qsOptions,
-                payload
-            );
+            codyResp = await musicClient.spotifyApiPost(api, qsOptions, payload);
         }
 
         return codyResp;
     }
 
     public async spotifyWebNext(options: any) {
-        const qsOptions = options.device_id
-            ? { device_id: options.device_id }
-            : {};
+        const qsOptions = options.device_id ? { device_id: options.device_id } : {};
         let payload: any = {};
         if (options.uris) {
             payload["uris"] = options.uris;
         } else if (options.track_ids) {
-            payload["uris"] = musicUtil.createUrisFromTrackIds(
-                options.track_ids
-            );
+            payload["uris"] = musicUtil.createUrisFromTrackIds(options.track_ids);
         }
 
         const api = "/v1/me/player/next";
-        let codyResp = await musicClient.spotifyApiPost(
-            api,
-            qsOptions,
-            payload
-        );
+        let codyResp = await musicClient.spotifyApiPost(api, qsOptions, payload);
 
         // check if the token needs to be refreshed
         if (codyResp.statusText === "EXPIRED") {
             // refresh the token
             await musicClient.refreshSpotifyToken();
             // try again
-            codyResp = await musicClient.spotifyApiPost(
-                api,
-                qsOptions,
-                payload
-            );
+            codyResp = await musicClient.spotifyApiPost(api, qsOptions, payload);
         }
 
         return codyResp;
@@ -680,10 +619,7 @@ export class MusicController {
     ): Promise<string> {
         let genre = await musicClient.getGenreFromItunes(artist, songName);
         if (!genre || genre === "") {
-            genre = await this.getGenreFromSpotify(
-                artist,
-                spotifyArtistId
-            ).catch((e) => {
+            genre = await this.getGenreFromSpotify(artist, spotifyArtistId).catch((e) => {
                 return "";
             });
         }
@@ -706,19 +642,13 @@ export class MusicController {
             // make sure it's just the ID part
             spotifyArtistId = musicUtil.createSpotifyIdFromUri(spotifyArtistId);
         }
-        response = await musicClient.getGenreFromSpotify(
-            artist,
-            spotifyArtistId
-        );
+        response = await musicClient.getGenreFromSpotify(artist, spotifyArtistId);
         // check if the token needs to be refreshed
         if (response.statusText === "EXPIRED") {
             // refresh the token
             await musicClient.refreshSpotifyToken();
             // try again
-            response = await musicClient.getGenreFromSpotify(
-                artist,
-                spotifyArtistId
-            );
+            response = await musicClient.getGenreFromSpotify(artist, spotifyArtistId);
         }
 
         genre = response.data;

@@ -6,7 +6,7 @@ import {
     PlayerName,
     PlaylistItem,
     CodyResponse,
-    PaginationItem
+    PaginationItem,
 } from "../../lib/models";
 import { MusicController } from "../../lib/controller";
 
@@ -22,57 +22,47 @@ const musicCtr = MusicController.getInstance();
  * "Error: Resolution method is overspecified. Specify a callback *or* return a Promise; not both."
  */
 describe("itunes player tests", () => {
-    before(done => {
-        musicCtr
-            .quitApp(CodyMusic.PlayerName.SpotifyDesktop)
-            .then((result: any) => {
-                musicCtr
-                    .quitApp(CodyMusic.PlayerName.ItunesDesktop)
-                    .then((result: any) => {
-                        done();
-                    });
-            });
-    });
-
-    after("itunes player test completion", done => {
-        musicCtr
-            .quitApp(CodyMusic.PlayerName.SpotifyDesktop)
-            .then((result: any) => {
-                musicCtr
-                    .quitApp(CodyMusic.PlayerName.ItunesDesktop)
-                    .then((result: any) => {
-                        done();
-                    });
-            });
-    });
-
-    it("Launch test", done => {
-        CodyMusic.launchPlayer(CodyMusic.PlayerName.ItunesDesktop, {}).then(
-            result => {
-                musicUtil.sleep(3000);
+    before((done) => {
+        musicCtr.quitApp(CodyMusic.PlayerName.SpotifyDesktop).then((result: any) => {
+            musicCtr.quitApp(CodyMusic.PlayerName.ItunesDesktop).then((result: any) => {
                 done();
-            }
-        );
+            });
+        });
     });
 
-    xit("Get running track state", done => {
+    after("itunes player test completion", (done) => {
+        musicCtr.quitApp(CodyMusic.PlayerName.SpotifyDesktop).then((result: any) => {
+            musicCtr.quitApp(CodyMusic.PlayerName.ItunesDesktop).then((result: any) => {
+                done();
+            });
+        });
+    });
+
+    it("Launch test", (done) => {
+        CodyMusic.launchPlayer(CodyMusic.PlayerName.ItunesDesktop, {}).then((result) => {
+            musicUtil.sleep(3000);
+            done();
+        });
+    });
+
+    xit("Get running track state", (done) => {
         CodyMusic.getRunningTrack().then((track: Track) => {
             expect(track.id).to.not.equal("");
             done();
         });
     });
 
-    xit("Get running track with only iTunes running", done => {
-        CodyMusic.play(CodyMusic.PlayerName.ItunesDesktop).then(result => {
+    xit("Get running track with only iTunes running", (done) => {
+        CodyMusic.play(CodyMusic.PlayerName.ItunesDesktop).then((result) => {
             musicUtil.sleep(3000);
-            CodyMusic.getRunningTrack().then(track => {
+            CodyMusic.getRunningTrack().then((track) => {
                 expect(track.id).to.not.equal("");
                 done();
             });
         });
     });
 
-    xit("Get itunes playlists", done => {
+    xit("Get itunes playlists", (done) => {
         CodyMusic.getPlaylists(PlayerName.ItunesDesktop).then(
             (result: PlaylistItem[]) => {
                 expect(result.length).to.not.equal(0);
@@ -83,7 +73,7 @@ describe("itunes player tests", () => {
         );
     });
 
-    xit("Get itunes playlists tracks", done => {
+    xit("Get itunes playlists tracks", (done) => {
         CodyMusic.getPlaylists(PlayerName.ItunesDesktop).then(
             (result: PlaylistItem[]) => {
                 expect(result.length).to.not.equal(0);
@@ -100,7 +90,7 @@ describe("itunes player tests", () => {
         );
     });
 
-    xit("Play track in context", done => {
+    it("Play track in context", (done) => {
         CodyMusic.getPlaylists(PlayerName.ItunesDesktop).then(
             (result: PlaylistItem[]) => {
                 const playlistItem: PlaylistItem = result[0];
@@ -114,8 +104,8 @@ describe("itunes player tests", () => {
                     const trackName = track.name;
                     CodyMusic.playTrackInContext(PlayerName.ItunesDesktop, [
                         trackName,
-                        playlistName
-                    ]).then(result => {
+                        playlistName,
+                    ]).then((result) => {
                         CodyMusic.getRunningTrack().then((result: Track) => {
                             expect(result.name).to.equal(trackName);
                             done();
@@ -126,7 +116,7 @@ describe("itunes player tests", () => {
         );
     });
 
-    xit("Play song in library", done => {
+    xit("Play song in library", (done) => {
         CodyMusic.getPlaylists(PlayerName.ItunesDesktop).then(
             (result: PlaylistItem[]) => {
                 const playlistItem: PlaylistItem = result[0];
@@ -140,8 +130,8 @@ describe("itunes player tests", () => {
                     const trackName = track.name;
                     CodyMusic.playTrackInLibrary(PlayerName.ItunesDesktop, [
                         trackName,
-                        playlistName
-                    ]).then(result => {
+                        playlistName,
+                    ]).then((result) => {
                         CodyMusic.getRunningTrack().then((result: Track) => {
                             expect(result.name).to.equal(trackName);
                             done();
@@ -152,12 +142,10 @@ describe("itunes player tests", () => {
         );
     });
 
-    it("Play track number in playlist", done => {
-        CodyMusic.playItunesTrackNumberInPlaylist("MostRecents", 7).then(
-            result => {
-                console.log("result: ", result);
-                done();
-            }
-        );
+    it("Play track number in playlist", (done) => {
+        CodyMusic.playItunesTrackNumberInPlaylist("MostRecents", 7).then((result) => {
+            console.log("result: ", result);
+            done();
+        });
     });
 });
