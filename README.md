@@ -248,7 +248,7 @@ getRecommendationsForTracks(
     seed_genres: string[] = [],
     seed_artists: string[] = [],
     features: any = {}
-): Promise<Track[]> {
+): Promise<Track[]>
 
 /**
  * Returns the currently running track.
@@ -263,9 +263,31 @@ getRunningTrack(): Promise<Track>
 
 /**
  * Fetch the recently played spotify tracks
- * @param limit
+ * @param limit - The maximum number of items to return. Default: 50. Minimum: 1. Maximum: 50
  */
-getSpotifyRecentlyPlayedTracks(limit: number): Promise<Track[]>
+getSpotifyRecentlyPlayedTracks(
+    limit: number = 50
+): Promise<Track[]>
+
+/**
+ * Fetch the recently played spotify tracks
+ * @param limit - The maximum number of items to return. Default: 50. Minimum: 1. Maximum: 50
+ * @param before - Returns all items before (but not including) this cursor position
+ */
+getSpotifyRecentlyPlayedBefore(
+    limit: number = 50,
+    before: number = 0
+): Promise<Track[]>
+
+/**
+ * Fetch the recently played spotify tracks
+ * @param limit - The maximum number of items to return. Default: 50. Minimum: 1. Maximum: 50
+ * @param after - Returns all items before (but not including) this cursor position
+ */
+getSpotifyRecentlyPlayedAfter(
+    limit: number = 50,
+    after: number = 0
+): Promise<Track[]>
 
 /**
  * Fetch the spotify player context

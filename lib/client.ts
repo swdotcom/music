@@ -8,14 +8,14 @@ const musicStore = MusicStore.getInstance();
 export const SPOTIFY_ROOT_API = "https://api.spotify.com";
 
 const spotifyClient: AxiosInstance = axios.create({
-    baseURL: SPOTIFY_ROOT_API
+    baseURL: SPOTIFY_ROOT_API,
 });
 const spotifyAccountClient: AxiosInstance = axios.create({
     baseURL: "https://accounts.spotify.com",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" }
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
 });
 const itunesSearchClient: AxiosInstance = axios.create({
-    baseURL: "https://itunes.apple.com"
+    baseURL: "https://itunes.apple.com",
 });
 
 // genres
@@ -60,7 +60,7 @@ const spotifyGenres = [
     "arab",
     "afro",
     "travel",
-    "k-pop"
+    "k-pop",
 ];
 
 /**
@@ -135,7 +135,7 @@ export class MusicClient {
                                 "ig"
                             );
 
-                            Object.keys(map).forEach(key => {
+                            Object.keys(map).forEach((key) => {
                                 if (key !== token && key !== genre) {
                                     if (key.match(tokenRegex)) {
                                         // increment the count
@@ -150,9 +150,9 @@ export class MusicClient {
 
             // Now go over every key to see if it's tokens(s)
             // are found in another key's set of keywords
-            Object.keys(map).forEach(key => {
+            Object.keys(map).forEach((key) => {
                 // check to see if this key pattern matches other keys
-                Object.keys(map).forEach(subKey => {
+                Object.keys(map).forEach((subKey) => {
                     // but don't match itself
                     if (subKey !== key) {
                         let regex = new RegExp("\\b" + key + "\\b", "ig");
@@ -172,7 +172,7 @@ export class MusicClient {
         if (Object.keys(map).length) {
             // remove the ones that are not original
             genreList = [];
-            Object.keys(map).forEach(key => {
+            Object.keys(map).forEach((key) => {
                 genreList.push(map[key]);
             });
             // remove the ones that are not original
@@ -240,7 +240,7 @@ export class MusicClient {
         // console.log(`GET ${api} - ${moment().format()}`);
         return spotifyClient
             .get(api)
-            .then(resp => {
+            .then((resp) => {
                 let genre = "";
                 if (resp && resp.data) {
                     if (artistId) {
@@ -265,10 +265,10 @@ export class MusicClient {
                 return {
                     status: "success",
                     statusText: resp.statusText,
-                    data: genre
+                    data: genre,
                 };
             })
-            .catch(err => {
+            .catch((err) => {
                 return this.buildErrorResponse(err);
             });
     }
@@ -277,7 +277,7 @@ export class MusicClient {
         artist: string,
         song: string = ""
     ): Promise<string> {
-        let genre = await this.fetchItunesGenre(artist, song).catch(e => {
+        let genre = await this.fetchItunesGenre(artist, song).catch((e) => {
             return "";
         });
         // try cleaning up the song name
@@ -294,7 +294,7 @@ export class MusicClient {
             if (song.indexOf("(") > 0) {
                 song = song.split("(")[0].trim();
             }
-            genre = await this.fetchItunesGenre(artist, song).catch(e => {
+            genre = await this.fetchItunesGenre(artist, song).catch((e) => {
                 return "";
             });
         }
@@ -304,7 +304,7 @@ export class MusicClient {
             // split up the artist names
             artist = artist.split(",")[0].trim();
 
-            genre = await this.fetchItunesGenre(artist, song).catch(e => {
+            genre = await this.fetchItunesGenre(artist, song).catch((e) => {
                 return "";
             });
         }
@@ -322,14 +322,14 @@ export class MusicClient {
             terms = `${artist.trim()}`;
         }
         let api = `search?term=${encodeURIComponent(terms)}`;
-        let resp = await itunesSearchClient.get(api).catch(err => {
+        let resp = await itunesSearchClient.get(api).catch((err) => {
             return "";
         });
         let genre = await this.findNameFromItunesResponse(resp);
         if (!genre) {
             // try it without encoding
             api = `search?term=${terms}`;
-            resp = await itunesSearchClient.get(api).catch(err => {
+            resp = await itunesSearchClient.get(api).catch((err) => {
                 return "";
             });
             genre = await this.findNameFromItunesResponse(resp);
@@ -361,7 +361,7 @@ export class MusicClient {
                 status: "failed",
                 statusText: "ERROR",
                 data: "",
-                message: "Missing Spotify Credentials"
+                message: "Missing Spotify Credentials",
             };
         }
         const authPayload = `${musicStore.spotifyClientId}:${musicStore.spotifyClientSecret}`;
@@ -382,22 +382,22 @@ export class MusicClient {
                 `/api/token?grant_type=refresh_token&refresh_token=${refreshToken}`,
                 null
             )
-            .then(resp => {
+            .then((resp) => {
                 if (resp.data && resp.data.access_token) {
                     return { status: "success", data: resp.data.access_token };
                 } else {
                     return {
                         status: "failed",
-                        message: "Unable refresh the access token"
+                        message: "Unable refresh the access token",
                     };
                 }
             })
-            .catch(err => {
+            .catch((err) => {
                 console.log("refresh token error: ", err.message);
                 if (err.response) {
                     return {
                         status: "failed",
-                        message: err.message
+                        message: err.message,
                     };
                 }
                 return err;
@@ -418,6 +418,8 @@ export class MusicClient {
         }
         api = this.addQueryStringToApi(api, qsOptions);
 
+        console.log("GET api: ", api);
+
         const accessToken = optionalAccessToken
             ? optionalAccessToken
             : musicStore.spotifyAccessToken;
@@ -432,7 +434,7 @@ export class MusicClient {
             .then((resp: any) => {
                 return this.buildSuccessResponse(resp);
             })
-            .catch(async err => {
+            .catch(async (err) => {
                 return this.buildErrorResponse(err);
             });
     }
@@ -457,7 +459,7 @@ export class MusicClient {
             .then((resp: any) => {
                 return this.buildSuccessResponse(resp);
             })
-            .catch(err => {
+            .catch((err) => {
                 return this.buildErrorResponse(err);
             });
     }
@@ -482,7 +484,7 @@ export class MusicClient {
             .then((resp: any) => {
                 return this.buildSuccessResponse(resp);
             })
-            .catch(err => {
+            .catch((err) => {
                 return this.buildErrorResponse(err);
             });
     }
@@ -507,7 +509,7 @@ export class MusicClient {
             .then((resp: any) => {
                 return this.buildSuccessResponse(resp);
             })
-            .catch(err => {
+            .catch((err) => {
                 return this.buildErrorResponse(err);
             });
     }
