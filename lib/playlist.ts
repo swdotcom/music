@@ -44,7 +44,7 @@ export class Playlist {
         );
 
         // check if the token needs to be refreshed
-        if (codyResp.statusText === "EXPIRED") {
+        if (codyResp.status === 401) {
             // refresh the token
             await musicClient.refreshSpotifyToken();
             // try again
@@ -71,7 +71,7 @@ export class Playlist {
         );
 
         // check if the token needs to be refreshed
-        if (codyResp.statusText === "EXPIRED") {
+        if (codyResp.status === 401) {
             // refresh the token
             await musicClient.refreshSpotifyToken();
             // try again
@@ -100,7 +100,7 @@ export class Playlist {
         );
 
         // check if the token needs to be refreshed
-        if (codyResp.statusText === "EXPIRED") {
+        if (codyResp.status === 401) {
             // refresh the token
             await musicClient.refreshSpotifyToken();
             // try again
@@ -220,7 +220,7 @@ export class Playlist {
             qsOptions
         );
         // check if the token needs to be refreshed
-        if (codyResp.statusText === "EXPIRED") {
+        if (codyResp.status === 401) {
             // refresh the token
             await musicClient.refreshSpotifyToken();
             // try again
@@ -241,7 +241,7 @@ export class Playlist {
         let codyResp: CodyResponse = await musicClient.spotifyApiGet(api, {});
 
         // check if the token needs to be refreshed
-        if (codyResp.statusText === "EXPIRED") {
+        if (codyResp.status === 401) {
             // refresh the token
             await musicClient.refreshSpotifyToken();
             // try again
@@ -277,7 +277,7 @@ export class Playlist {
         let codyResp = await musicClient.spotifyApiGet(api, qsOptions);
 
         // check if the token needs to be refreshed
-        if (codyResp.statusText === "EXPIRED") {
+        if (codyResp.status === 401) {
             // refresh the token
             await musicClient.refreshSpotifyToken();
             // try again
@@ -413,7 +413,7 @@ export class Playlist {
         let codyResp = await musicClient.spotifyApiDelete(api, {}, {});
 
         // check if the token needs to be refreshed
-        if (codyResp.statusText === "EXPIRED") {
+        if (codyResp.status === 401) {
             // refresh the token
             await musicClient.refreshSpotifyToken();
             // try again
@@ -463,7 +463,7 @@ export class Playlist {
         );
 
         // check if the token needs to be refreshed
-        if (codyResp.statusText === "EXPIRED") {
+        if (codyResp.status === 401) {
             // refresh the token
             await musicClient.refreshSpotifyToken();
             // try again
@@ -578,7 +578,7 @@ export class Playlist {
         codyResp = await musicClient.spotifyApiPost(api, {}, payload);
 
         // check if the token needs to be refreshed
-        if (codyResp.statusText === "EXPIRED") {
+        if (codyResp.status === 401) {
             // refresh the token
             await musicClient.refreshSpotifyToken();
             // try again
@@ -612,7 +612,7 @@ export class Playlist {
         codyResp = await musicClient.spotifyApiPut(api, {}, payload);
 
         // check if the token needs to be refreshed
-        if (codyResp.statusText === "EXPIRED") {
+        if (codyResp.status === 401) {
             // refresh the token
             await musicClient.refreshSpotifyToken();
             // try again
@@ -653,7 +653,7 @@ export class Playlist {
         );
 
         // check if the token needs to be refreshed
-        if (codyResp.statusText === "EXPIRED") {
+        if (codyResp.status === 401) {
             // refresh the token
             await musicClient.refreshSpotifyToken();
             // try again
@@ -681,7 +681,7 @@ export class Playlist {
         let response = await musicClient.spotifyApiGet(api, qsOptions);
 
         // check if the token needs to be refreshed
-        if (response.statusText === "EXPIRED") {
+        if (response.status === 401) {
             // refresh the token
             await musicClient.refreshSpotifyToken();
             // try again
@@ -710,7 +710,7 @@ export class Playlist {
         let codyResp = await musicClient.spotifyApiPut(api, {}, {});
 
         // check if the token needs to be refreshed
-        if (codyResp.statusText === "EXPIRED") {
+        if (codyResp.status === 401) {
             // refresh the token
             await musicClient.refreshSpotifyToken();
             // try again

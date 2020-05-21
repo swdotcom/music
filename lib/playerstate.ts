@@ -15,6 +15,7 @@ import {
 import { CacheManager } from "./cache";
 import { AudioStat } from "./audiostat";
 
+const moment = require("moment-timezone");
 const musicStore = MusicStore.getInstance();
 const musicClient = MusicClient.getInstance();
 const audioStat = AudioStat.getInstance();
@@ -99,7 +100,7 @@ export class MusicPlayerState {
         let response = await musicClient.spotifyApiGet(api);
 
         // check if the token needs to be refreshed
-        if (response.statusText === "EXPIRED") {
+        if (response.status === 401) {
             // refresh the token
             await musicClient.refreshSpotifyToken();
             // try again
@@ -201,7 +202,7 @@ export class MusicPlayerState {
         let response = await musicClient.spotifyApiGet(api, qsOptions);
 
         // check if the token needs to be refreshed
-        if (response.statusText === "EXPIRED") {
+        if (response.status === 401) {
             // refresh the token
             await musicClient.refreshSpotifyToken();
             // try again
@@ -354,7 +355,7 @@ export class MusicPlayerState {
         let response = await musicClient.spotifyApiGet(api);
 
         // check if the token needs to be refreshed
-        if (response.statusText === "EXPIRED") {
+        if (response.status === 401) {
             // refresh the token
             await musicClient.refreshSpotifyToken();
             // try again
@@ -441,7 +442,7 @@ export class MusicPlayerState {
         let response = await musicClient.spotifyApiGet(api, qParam);
 
         // check if the token needs to be refreshed
-        if (response.statusText === "EXPIRED") {
+        if (response.status === 401) {
             // refresh the token
             await musicClient.refreshSpotifyToken();
             // try again
@@ -467,7 +468,7 @@ export class MusicPlayerState {
         let response = await musicClient.spotifyApiGet(api);
 
         // check if the token needs to be refreshed
-        if (response.statusText === "EXPIRED") {
+        if (response.status === 401) {
             // refresh the token
             await musicClient.refreshSpotifyToken();
             // try again
@@ -491,7 +492,7 @@ export class MusicPlayerState {
         let response = await musicClient.spotifyApiGet(api);
 
         // check if the token needs to be refreshed
-        if (response.statusText === "EXPIRED") {
+        if (response.status === 401) {
             // refresh the token
             await musicClient.refreshSpotifyToken();
             // try again
@@ -545,15 +546,15 @@ export class MusicPlayerState {
     async getSpotifyRecentlyPlayedTracksBefore(
         limit: number = 50,
         before: number = 0
-    ): Promise<Track[]> {
-        return this.getSpotifyRecentlyPlayedTracks(limit, 0, before);
+    ): Promise<CodyResponse> {
+        return this.fetchSpotifyReentlyPlayedTracksData(limit, 0, before);
     }
 
     async getSpotifyRecentlyPlayedTracksAfter(
         limit: number = 50,
         after: number = 0
-    ): Promise<Track[]> {
-        return this.getSpotifyRecentlyPlayedTracks(limit, after, 0);
+    ): Promise<CodyResponse> {
+        return this.fetchSpotifyReentlyPlayedTracksData(limit, after, 0);
     }
 
     async getSpotifyRecentlyPlayedTracks(
@@ -561,22 +562,57 @@ export class MusicPlayerState {
         after: number = 0,
         before: number = 0
     ): Promise<Track[]> {
+        const resp: CodyResponse = await this.fetchSpotifyReentlyPlayedTracksData(
+            limit,
+            after,
+            before
+        );
+        if (resp && resp.data && resp.data.tracks) {
+            return resp.data.tracks;
+        }
+        return [];
+    }
+
+    /**
+     * Fetch the recently played tracks data
+     * @param limit (max of 1000)
+     * @param after
+     * @param before
+     */
+    async fetchSpotifyReentlyPlayedTracksData(
+        limit: number = 50,
+        after: number = 0,
+        before: number = 0
+    ): Promise<CodyResponse> {
         let api = "/v1/me/player/recently-played";
         const qsOptions: any = {};
 
-        if (limit && limit > 0) {
-            qsOptions["limit"] = limit;
-        } else if (limit > 50) {
-            qsOptions["limit"] = 50;
+        // max # of tracks for pagination
+        let trackLimit = limit;
+        if (trackLimit <= 0 || trackLimit > 1000) {
+            trackLimit = 1000;
         }
+
+        // spotify api limit is 50
+        let apiLimit = limit;
+        if (apiLimit <= 0 || apiLimit > 50) {
+            apiLimit = 50;
+        }
+
+        // set the spotify per api limit
+        qsOptions["limit"] = apiLimit;
+
         if (after && after > 0) {
             qsOptions["after"] = after;
         } else if (before && before > 0) {
             qsOptions["before"] = before;
         }
-        let resp = await musicClient.spotifyApiGet(api, qsOptions);
+        let resp: CodyResponse = await musicClient.spotifyApiGet(
+            api,
+            qsOptions
+        );
         // check if the token needs to be refreshed
-        if (resp.statusText === "EXPIRED") {
+        if (resp.status === 401) {
             // refresh the token
             await musicClient.refreshSpotifyToken();
             // try again
@@ -590,19 +626,48 @@ export class MusicPlayerState {
                 const track: Track = musicUtil.copySpotifyTrackToCodyTrack(
                     spotifyTrack
                 );
+                track.played_at = item.played_at;
+                track.played_at_utc_seconds = moment(item.played_at).unix();
                 tracks.push(track);
             });
 
-            if (resp.data.next) {
+            let cursors = resp.data.cursors;
+            if (cursors) {
+                cursors.before = parseInt(cursors.before, 10);
+                cursors.after = parseInt(cursors.after, 10);
+            } else {
+                cursors = {
+                    before: 0,
+                    after: 0,
+                };
+            }
+
+            if (resp.data.next && tracks.length < trackLimit) {
                 // continue fetching until we've reached the limit
                 let reachedLimit = false;
                 let nextApi = resp.data.next;
                 while (!reachedLimit) {
+                    let nextCursors = resp.data.cursors;
+                    if (nextCursors && cursors) {
+                        // update the before and after
+                        const prevBefore = cursors.before;
+                        const before = parseInt(nextCursors.before, 10);
+                        if (before < prevBefore || prevBefore === 0) {
+                            cursors.before = before;
+                        }
+
+                        const prevAfter = cursors.after;
+                        const after = parseInt(nextCursors.after, 10);
+                        if (after > prevAfter || prevAfter === 0) {
+                            cursors.after = after;
+                        }
+                    }
                     if (!nextApi) {
                         reachedLimit = true;
                         break;
                     }
 
+                    // get the next api
                     api = nextApi.substring(
                         nextApi.indexOf("/v1"),
                         nextApi.length
@@ -616,26 +681,39 @@ export class MusicPlayerState {
                                 const track: Track = musicUtil.copySpotifyTrackToCodyTrack(
                                     spotifyTrack
                                 );
+                                track.played_at = item.played_at;
+                                track.played_at_utc_seconds = moment(
+                                    item.played_at
+                                ).unix();
                                 tracks.push(track);
                             });
                         } else {
                             reachedLimit = true;
-                            break;
                         }
                     } else {
                         reachedLimit = true;
-                        break;
+                    }
+
+                    if (tracks.length >= trackLimit) {
+                        reachedLimit = true;
                     }
                 }
-
-                // example
-                // next: 'https://api.spotify.com/v1/me/player/recently-played?before=1589420857143&limit=10',
-                // cursors: { after: '1589468541438', before: '1589420857143' }
-                console.log("response data: ", tracks.length);
             }
+
+            // update the cursors
+            resp.data.cursors = cursors;
         }
 
-        return tracks;
+        if (resp.data) {
+            delete resp.data.items;
+            delete resp.data.href;
+            delete resp.data.next;
+            delete resp.data.limit;
+            // add tracks to the response
+            resp.data["tracks"] = tracks;
+        }
+
+        return resp;
     }
 
     async getRecommendationsForTracks(
@@ -694,7 +772,7 @@ export class MusicPlayerState {
         let response = await musicClient.spotifyApiGet(api, qsOptions);
 
         // check if the token needs to be refreshed
-        if (response.statusText === "EXPIRED") {
+        if (response.status === 401) {
             // refresh the token
             await musicClient.refreshSpotifyToken();
             // try again
@@ -726,7 +804,7 @@ export class MusicPlayerState {
         let codyResp = await musicClient.spotifyApiPut(api, qsOptions, {});
 
         // check if the token needs to be refreshed
-        if (codyResp.statusText === "EXPIRED") {
+        if (codyResp.status === 401) {
             // refresh the token
             await musicClient.refreshSpotifyToken();
             // try again
@@ -771,7 +849,7 @@ export class MusicPlayerState {
         let codyResp = await musicClient.spotifyApiPut(api, qsOptions, {});
 
         // check if the token needs to be refreshed
-        if (codyResp.statusText === "EXPIRED") {
+        if (codyResp.status === 401) {
             // refresh the token
             await musicClient.refreshSpotifyToken();
             // try again
@@ -795,7 +873,7 @@ export class MusicPlayerState {
         let response = await musicClient.spotifyApiGet(api);
 
         // check if the token needs to be refreshed
-        if (response.statusText === "EXPIRED") {
+        if (response.status === 401) {
             // refresh the token
             await musicClient.refreshSpotifyToken();
             // try again

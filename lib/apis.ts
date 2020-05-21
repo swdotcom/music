@@ -339,7 +339,7 @@ export async function getSpotifyRecentlyPlayedTracks(
 export async function getSpotifyRecentlyPlayedBefore(
     limit: number = 50,
     before: number = 0
-): Promise<Track[]> {
+): Promise<CodyResponse> {
     return musicPlayerCtr.getSpotifyRecentlyPlayedTracksBefore(limit, before);
 }
 
@@ -351,7 +351,7 @@ export async function getSpotifyRecentlyPlayedBefore(
 export async function getSpotifyRecentlyPlayedAfter(
     limit: number = 50,
     after: number = 0
-): Promise<Track[]> {
+): Promise<CodyResponse> {
     return musicPlayerCtr.getSpotifyRecentlyPlayedTracksAfter(limit, after);
 }
 
@@ -677,6 +677,13 @@ export function playSpotifyDevice(device_id: string) {
  */
 export function transferSpotifyDevice(device_id: string, play: boolean) {
     return musicCtr.playPauseSpotifyDevice(device_id, play);
+}
+
+/**
+ * Check if the access/refresh tokens have expired
+ */
+export function accessExpired(): Promise<boolean> {
+    return userProfile.accessExpired();
 }
 
 /**

@@ -1,7 +1,6 @@
 import axios, { AxiosInstance } from "axios";
 import { MusicStore } from "./store";
 import { CodyResponse, CodyResponseType } from "./models";
-const moment = require("moment-timezone");
 const querystring = require("querystring");
 
 const musicStore = MusicStore.getInstance();
@@ -426,7 +425,6 @@ export class MusicClient {
             "Authorization"
         ] = `Bearer ${accessToken}`;
 
-        // console.log(`GET ${api} - ${moment().format()}`);
         return spotifyClient
             .get(api)
             .then((resp: any) => {
@@ -537,9 +535,12 @@ export class MusicClient {
         const codyResp = new CodyResponse();
         if (err.status) {
             codyResp.status = err.status;
+        } else if (err.response && err.response.status) {
+            codyResp.status = err.response.status;
         } else {
             codyResp.status = 500;
         }
+
         codyResp.state = CodyResponseType.Failed;
         codyResp.error = err;
         if (err.response && err.response.data && err.response.data.error) {
@@ -548,7 +549,7 @@ export class MusicClient {
             codyResp.message = err.message;
         }
         codyResp.message = err.message;
-        if (err.response && err.response.status === 401) {
+        if (codyResp.status === 401) {
             codyResp.statusText = "EXPIRED";
         } else {
             codyResp.statusText = "ERROR";

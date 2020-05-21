@@ -25,7 +25,7 @@ export class AudioStat {
             return audiofeatures;
         }
         // make sure the IDs are the short spotify ID format
-        ids = ids.map(id => {
+        ids = ids.map((id) => {
             return musicUtil.createSpotifyIdFromUri(id);
         });
 
@@ -37,7 +37,7 @@ export class AudioStat {
 
             let response = await musicClient.spotifyApiGet(api);
             // check if the token needs to be refreshed
-            if (response.statusText === "EXPIRED") {
+            if (response.status === 401) {
                 // refresh the token
                 await musicClient.refreshSpotifyToken();
                 // try again
@@ -74,7 +74,7 @@ export class AudioStat {
                 let audio_features: SpotifyAudioFeature[] =
                     response.data.audio_features;
                 if (audio_features && audio_features.length > 0) {
-                    audio_features.forEach(feature => {
+                    audio_features.forEach((feature) => {
                         if (feature) {
                             audiofeatures.push(feature);
                         }

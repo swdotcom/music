@@ -3,13 +3,13 @@ export enum PlayerType {
     MacSpotifyDesktop = "MacSpotifyDesktop",
     WindowsSpotifyDesktop = "WidowsSpotifyDesktop",
     WebSpotify = "WebSpotify",
-    NotAssigned = "NotAssigned"
+    NotAssigned = "NotAssigned",
 }
 
 export enum PlayerName {
     SpotifyDesktop = "spotify",
     SpotifyWeb = "spotify-web",
-    ItunesDesktop = "itunes"
+    ItunesDesktop = "itunes",
 }
 
 export enum TrackStatus {
@@ -17,12 +17,12 @@ export enum TrackStatus {
     Paused = "paused",
     Advertisement = "advertisement",
     NotAssigned = "notassigned",
-    GrantError = "granterror"
+    GrantError = "granterror",
 }
 
 export enum CodyResponseType {
     Success = "success",
-    Failed = "failed"
+    Failed = "failed",
 }
 
 export class CodyResponse {
@@ -64,6 +64,8 @@ export class Track {
     features: SpotifyAudioFeature = new SpotifyAudioFeature();
     httpStatus: number = 200;
     actions: any;
+    played_at: string = "";
+    played_at_utc_seconds: number = 0;
 }
 
 export class Artist {

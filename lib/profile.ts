@@ -2,12 +2,10 @@ import { MusicClient } from "./client";
 import { MusicStore } from "./store";
 import { MusicPlayerState } from "./playerstate";
 import { SpotifyAuthState } from "./models";
-import { CacheManager } from "./cache";
 
 const musicClient = MusicClient.getInstance();
 const musicPlayerCtr = MusicPlayerState.getInstance();
 const musicStore = MusicStore.getInstance();
-const cacheMgr = CacheManager.getInstance();
 
 export class SpotifyUser {
     birthdate: string = ""; // format YYYY-MM-DD
@@ -39,13 +37,32 @@ export class UserProfile {
         return UserProfile.instance;
     }
 
+    async accessExpired(): Promise<boolean> {
+        if (!musicStore.hasSpotifyAccessToken()) {
+            // no access token to check against
+            return false;
+        }
+        const api = "/v1/me";
+        let resp = await musicClient.spotifyApiGet(api);
+        if (resp.status === 401) {
+            // refresh the token
+            await musicClient.refreshSpotifyToken();
+            // try again
+            resp = await musicClient.spotifyApiGet(api);
+            if (resp.status === 401) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     async getUserProfile(): Promise<SpotifyUser> {
         let userProfile: SpotifyUser = new SpotifyUser();
         let api = "/v1/me";
         let response = await musicClient.spotifyApiGet(api);
 
         // check if the token needs to be refreshed
-        if (response.statusText === "EXPIRED") {
+        if (response.status === 401) {
             // refresh the token
             await musicClient.refreshSpotifyToken();
             // try again
