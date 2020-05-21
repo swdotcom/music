@@ -5,7 +5,7 @@ import {
     PlaylistItem,
     Track,
     PaginationItem,
-    PlayerType
+    PlayerType,
 } from "./models";
 import { MusicStore } from "./store";
 import { UserProfile } from "./profile";
@@ -62,7 +62,7 @@ export class Playlist {
          */
         const qsOptions = {};
         const payload = {
-            ids: trackIds
+            ids: trackIds,
         };
         let codyResp: CodyResponse = await musicClient.spotifyApiPut(
             api,
@@ -146,8 +146,6 @@ export class Playlist {
             await userProfile.getUserProfile();
         }
 
-        const playlistMap: any = {};
-
         if (musicStore.spotifyUserId) {
             const spotifyUserId = musicStore.spotifyUserId;
             const fetchAll = qsOptions.all ? true : false;
@@ -213,7 +211,7 @@ export class Playlist {
         offset = offset || 0;
         const qsOptions = {
             limit,
-            offset
+            offset,
         };
 
         const api = `/v1/users/${spotifyUserId}/playlists`;
@@ -252,7 +250,7 @@ export class Playlist {
 
         if (musicUtil.isResponseOk(codyResp)) {
             playlistItem = {
-                ...codyResp.data
+                ...codyResp.data,
             };
         }
 
@@ -381,7 +379,7 @@ export class Playlist {
             const payload = {
                 name,
                 public: isPublic,
-                description
+                description,
             };
             const api = `/v1/users/${spotifyUserId}/playlists`;
             const resp: CodyResponse = await musicClient.spotifyApiPost(
@@ -452,7 +450,7 @@ export class Playlist {
         let qryObj: any = {
             type,
             q,
-            limit
+            limit,
         };
 
         // concat the key/value filterObjects
@@ -518,7 +516,7 @@ export class Playlist {
                 qryObj = {
                     type,
                     q,
-                    limit
+                    limit,
                 };
                 codyResp = await musicClient.spotifyApiGet(api, qryObj);
             }
@@ -573,7 +571,7 @@ export class Playlist {
 
         let payload = {
             uris: tracks,
-            position
+            position,
         };
 
         const api = `/v1/playlists/${playlist_id}/tracks`;
@@ -607,7 +605,7 @@ export class Playlist {
         const tracks = musicUtil.createUrisFromTrackIds(track_ids);
 
         let payload = {
-            uris: tracks
+            uris: tracks,
         };
 
         const api = `/v1/playlists/${playlist_id}/tracks`;
@@ -677,7 +675,7 @@ export class Playlist {
         // add to the api to prevent the querystring from escaping the comma
         const qsOptions = {
             time_range: "medium_term",
-            limit: 50
+            limit: 50,
         };
 
         let response = await musicClient.spotifyApiGet(api, qsOptions);
@@ -694,7 +692,7 @@ export class Playlist {
         }
 
         if (tracks && tracks.length > 0) {
-            tracks = tracks.map(track => {
+            tracks = tracks.map((track) => {
                 return musicUtil.copySpotifyTrackToCodyTrack(track);
             });
         }
