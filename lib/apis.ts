@@ -214,7 +214,10 @@ export async function getRunningTrack(): Promise<Track> {
         let spotifyWebTrackRunning = musicUtil.isTrackRunning(spotifyWebTrack);
 
         // if it's playing then return it
-        if (spotifyWebTrackRunning && spotifyWebTrack.state === TrackStatus.Playing) {
+        if (
+            spotifyWebTrackRunning &&
+            spotifyWebTrack.state === TrackStatus.Playing
+        ) {
             // spotify web track is running. it's the highest priority track
             return spotifyWebTrack;
         }
@@ -224,15 +227,20 @@ export async function getRunningTrack(): Promise<Track> {
     // spotify desktop try
     if (musicStore.spotifyDesktopEnabled) {
         // next try spotify desktop
-        const spotifyDesktopRunning = await isPlayerRunning(PlayerName.SpotifyDesktop);
+        const spotifyDesktopRunning = await isPlayerRunning(
+            PlayerName.SpotifyDesktop
+        );
         if (spotifyDesktopRunning) {
             spotifyDesktopTrack = await getTrack(PlayerName.SpotifyDesktop);
-            const isSpotifyDesktopRunning = musicUtil.isTrackRunning(spotifyDesktopTrack);
+            const isSpotifyDesktopRunning = musicUtil.isTrackRunning(
+                spotifyDesktopTrack
+            );
             if (
                 isSpotifyDesktopRunning &&
                 spotifyDesktopTrack.state === TrackStatus.Playing
             ) {
-                spotifyDesktopTrack["playerType"] = PlayerType.MacSpotifyDesktop;
+                spotifyDesktopTrack["playerType"] =
+                    PlayerType.MacSpotifyDesktop;
                 return spotifyDesktopTrack;
             }
         }
@@ -240,9 +248,14 @@ export async function getRunningTrack(): Promise<Track> {
 
     let itunesDesktopTrack = null;
     // itunes desktop try
-    if (musicStore.itunesDesktopTrackingEnabled && musicStore.itunesAccessGranted) {
+    if (
+        musicStore.itunesDesktopTrackingEnabled &&
+        musicStore.itunesAccessGranted
+    ) {
         // still no track or it's paused, try itunes desktop
-        const itunesDesktopRunning = await isPlayerRunning(PlayerName.ItunesDesktop);
+        const itunesDesktopRunning = await isPlayerRunning(
+            PlayerName.ItunesDesktop
+        );
 
         if (itunesDesktopRunning) {
             itunesDesktopTrack = await getTrack(PlayerName.ItunesDesktop);
@@ -273,7 +286,9 @@ export async function getRunningTrack(): Promise<Track> {
             }
 
             // if itunes is not running, return the spotify web track we've gathered
-            const isItunesTrackRunning = musicUtil.isTrackRunning(itunesDesktopTrack);
+            const isItunesTrackRunning = musicUtil.isTrackRunning(
+                itunesDesktopTrack
+            );
 
             if (
                 isItunesTrackRunning &&
@@ -291,9 +306,15 @@ export async function getRunningTrack(): Promise<Track> {
     // 3) itunes desktop
     if (spotifyWebTrack && spotifyWebTrack.state == TrackStatus.Paused) {
         return spotifyWebTrack;
-    } else if (spotifyDesktopTrack && spotifyDesktopTrack.state === TrackStatus.Paused) {
+    } else if (
+        spotifyDesktopTrack &&
+        spotifyDesktopTrack.state === TrackStatus.Paused
+    ) {
         return spotifyDesktopTrack;
-    } else if (itunesDesktopTrack && itunesDesktopTrack.state === TrackStatus.Paused) {
+    } else if (
+        itunesDesktopTrack &&
+        itunesDesktopTrack.state === TrackStatus.Paused
+    ) {
         return itunesDesktopTrack;
     }
 
@@ -302,10 +323,36 @@ export async function getRunningTrack(): Promise<Track> {
 
 /**
  * Fetch the recently played spotify tracks
- * @param limit
+ * @param limit - The maximum number of items to return. Default: 50. Minimum: 1. Maximum: 50
  */
-export async function getSpotifyRecentlyPlayedTracks(limit: number): Promise<Track[]> {
+export async function getSpotifyRecentlyPlayedTracks(
+    limit: number = 50
+): Promise<Track[]> {
     return musicPlayerCtr.getSpotifyRecentlyPlayedTracks(limit);
+}
+
+/**
+ * Fetch the recently played spotify tracks
+ * @param limit - The maximum number of items to return. Default: 50. Minimum: 1. Maximum: 50
+ * @param before - Returns all items before (but not including) this cursor position
+ */
+export async function getSpotifyRecentlyPlayedBefore(
+    limit: number = 50,
+    before: number = 0
+): Promise<Track[]> {
+    return musicPlayerCtr.getSpotifyRecentlyPlayedTracksBefore(limit, before);
+}
+
+/**
+ * Fetch the recently played spotify tracks
+ * @param limit - The maximum number of items to return. Default: 50. Minimum: 1. Maximum: 50
+ * @param after - Returns all items before (but not including) this cursor position
+ */
+export async function getSpotifyRecentlyPlayedAfter(
+    limit: number = 50,
+    after: number = 0
+): Promise<Track[]> {
+    return musicPlayerCtr.getSpotifyRecentlyPlayedTracksAfter(limit, after);
 }
 
 /**
@@ -419,7 +466,12 @@ export async function getTracksByPlaylistName(
     let playlistItems: Track[] = [];
     const params = null;
     const argv = [playListName];
-    const result = await musicCtr.run(player, "playlistTracksOfPlaylist", params, argv);
+    const result = await musicCtr.run(
+        player,
+        "playlistTracksOfPlaylist",
+        params,
+        argv
+    );
 
     let jsonResult: any = {};
     if (result) {
@@ -481,7 +533,9 @@ export async function getTracksByPlaylistName(
  * @param player
  * @param qsOptions
  */
-export async function getSpotifyLikedSongs(qsOptions: any = {}): Promise<Track[]> {
+export async function getSpotifyLikedSongs(
+    qsOptions: any = {}
+): Promise<Track[]> {
     return getSavedTracks(PlayerName.SpotifyWeb, qsOptions);
 }
 
@@ -505,7 +559,9 @@ export async function getSavedTracks(
  * Returns a playlist by ID
  * @param playlist_id ID is preferred, but we'll transform a URI to an ID
  */
-export async function getSpotifyPlaylist(playlist_id: string): Promise<PlaylistItem> {
+export async function getSpotifyPlaylist(
+    playlist_id: string
+): Promise<PlaylistItem> {
     return playlist.getSpotifyPlaylist(playlist_id);
 }
 
@@ -550,7 +606,11 @@ export function playSpotifyPlaylist(
     startingTrackId: string = "",
     deviceId: string = ""
 ) {
-    return musicCtr.spotifyWebPlayPlaylist(playlistId, startingTrackId, deviceId);
+    return musicCtr.spotifyWebPlayPlaylist(
+        playlistId,
+        startingTrackId,
+        deviceId
+    );
 }
 
 /**
@@ -761,7 +821,11 @@ export function setRepeatOff(player: PlayerName, deviceId: string = "") {
  * @param player {spotify|spotify-web|itunes}
  * @param options
  */
-export function setRepeat(player: PlayerName, repeat: boolean, deviceId: string = "") {
+export function setRepeat(
+    player: PlayerName,
+    repeat: boolean,
+    deviceId: string = ""
+) {
     if (
         player === PlayerName.SpotifyWeb ||
         (player === PlayerName.SpotifyDesktop && musicUtil.isWindows())
@@ -777,7 +841,11 @@ export function setRepeat(player: PlayerName, repeat: boolean, deviceId: string 
  * Turn on/off shuffling for a given player
  * @param player {spotify|spotify-web|itunes}
  */
-export function setShuffle(player: PlayerName, shuffle: boolean, deviceId: string = "") {
+export function setShuffle(
+    player: PlayerName,
+    shuffle: boolean,
+    deviceId: string = ""
+) {
     if (player === PlayerName.SpotifyWeb) {
         // use spotify web api
         return musicPlayerCtr.setShuffle(shuffle, deviceId);
@@ -881,7 +949,9 @@ export function saveToSpotifyLiked(trackIds: string[]): Promise<CodyResponse> {
  * Remove tracks from your liked playlist
  * @param trackIds (i.e. ["4iV5W9uYEdYUVa79Axb7Rh", "1301WleyT98MSxVHPZCA6M"])
  */
-export function removeFromSpotifyLiked(trackIds: string[]): Promise<CodyResponse> {
+export function removeFromSpotifyLiked(
+    trackIds: string[]
+): Promise<CodyResponse> {
     return playlist.removeFromSpotifyLiked(trackIds);
 }
 
@@ -920,7 +990,8 @@ export async function getPlaylists(
                                 playlistItem.id = item.name;
                                 playlistItem.tracks.total = item.count;
                                 if (player === PlayerName.ItunesDesktop) {
-                                    playlistItem.playerType = PlayerType.MacItunesDesktop;
+                                    playlistItem.playerType =
+                                        PlayerType.MacItunesDesktop;
                                 } else {
                                     playlistItem.playerType =
                                         PlayerType.MacSpotifyDesktop;
@@ -992,7 +1063,11 @@ export function launchAndPlaySpotifyTrack(
     playlistId: string = "",
     playerName: PlayerName = PlayerName.SpotifyWeb
 ) {
-    return musicPlayerCtr.launchAndPlaySpotifyTrack(trackId, playlistId, playerName);
+    return musicPlayerCtr.launchAndPlaySpotifyTrack(
+        trackId,
+        playlistId,
+        playerName
+    );
 }
 
 /**
@@ -1043,7 +1118,9 @@ export function getSpotifyGenre(artist: string): Promise<string> {
  * Returns the spotify genre for a provided arguments
  * @param spotifyArtistId {string} is required
  */
-export function getSpotifyGenreByArtistId(spotifyArtistId: string): Promise<string> {
+export function getSpotifyGenreByArtistId(
+    spotifyArtistId: string
+): Promise<string> {
     return musicCtr.getGenreFromSpotify("" /*artist name*/, spotifyArtistId);
 }
 
@@ -1066,7 +1143,9 @@ export function getTopSpotifyTracks(): Promise<Track[]> {
  * Returns the audio features of the given track IDs
  * @param ids these are the track ids (sans spotify:track)
  */
-export function getSpotifyAudioFeatures(ids: string[]): Promise<SpotifyAudioFeature[]> {
+export function getSpotifyAudioFeatures(
+    ids: string[]
+): Promise<SpotifyAudioFeature[]> {
     return audioStat.getSpotifyAudioFeatures(ids);
 }
 
@@ -1106,7 +1185,10 @@ export function followPlaylist(playlist_id: string): Promise<CodyResponse> {
  * @param playlist_id
  * @param track_ids
  */
-export function replacePlaylistTracks(playlist_id: string, track_ids: string[]) {
+export function replacePlaylistTracks(
+    playlist_id: string,
+    track_ids: string[]
+) {
     return playlist.replacePlaylistTracks(playlist_id, track_ids);
 }
 
@@ -1133,7 +1215,10 @@ export function addTracksToPlaylist(
  * but if it's only the id (i.e. "4iV5W9uYEdYUVa79Axb7Rh") this will add
  * the uri part "spotify:track:"
  */
-export function removeTracksFromPlaylist(playlist_id: string, tracks: string[]) {
+export function removeTracksFromPlaylist(
+    playlist_id: string,
+    tracks: string[]
+) {
     return playlist.removeTracksFromPlaylist(playlist_id, tracks);
 }
 

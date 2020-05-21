@@ -542,18 +542,42 @@ export class MusicPlayerState {
         return track;
     }
 
-    async getSpotifyRecentlyPlayedTracks(limit: number): Promise<Track[]> {
+    async getSpotifyRecentlyPlayedTracksBefore(
+        limit: number = 50,
+        before: number = 0
+    ): Promise<Track[]> {
+        return this.getSpotifyRecentlyPlayedTracks(limit, 0, before);
+    }
+
+    async getSpotifyRecentlyPlayedTracksAfter(
+        limit: number = 50,
+        after: number = 0
+    ): Promise<Track[]> {
+        return this.getSpotifyRecentlyPlayedTracks(limit, after, 0);
+    }
+
+    async getSpotifyRecentlyPlayedTracks(
+        limit: number = 50,
+        after: number = 0,
+        before: number = 0
+    ): Promise<Track[]> {
         let api = "/v1/me/player/recently-played";
-        if (limit) {
-            api += `?limit=${limit}`;
+        const qsOptions: any = {};
+        if (limit && limit > 0) {
+            qsOptions["limit"] = limit;
         }
-        let response = await musicClient.spotifyApiGet(api);
+        if (after && after > 0) {
+            qsOptions["after"] = after;
+        } else if (before && before > 0) {
+            qsOptions["before"] = before;
+        }
+        let response = await musicClient.spotifyApiGet(api, qsOptions);
         // check if the token needs to be refreshed
         if (response.statusText === "EXPIRED") {
             // refresh the token
             await musicClient.refreshSpotifyToken();
             // try again
-            response = await musicClient.spotifyApiGet(api);
+            response = await musicClient.spotifyApiGet(api, qsOptions);
         }
 
         let tracks: Track[] = [];
