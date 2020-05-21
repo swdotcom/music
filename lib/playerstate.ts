@@ -563,36 +563,75 @@ export class MusicPlayerState {
     ): Promise<Track[]> {
         let api = "/v1/me/player/recently-played";
         const qsOptions: any = {};
+
         if (limit && limit > 0) {
             qsOptions["limit"] = limit;
+        } else if (limit > 50) {
+            qsOptions["limit"] = 50;
         }
         if (after && after > 0) {
             qsOptions["after"] = after;
         } else if (before && before > 0) {
             qsOptions["before"] = before;
         }
-        let response = await musicClient.spotifyApiGet(api, qsOptions);
+        let resp = await musicClient.spotifyApiGet(api, qsOptions);
         // check if the token needs to be refreshed
-        if (response.statusText === "EXPIRED") {
+        if (resp.statusText === "EXPIRED") {
             // refresh the token
             await musicClient.refreshSpotifyToken();
             // try again
-            response = await musicClient.spotifyApiGet(api, qsOptions);
+            resp = await musicClient.spotifyApiGet(api, qsOptions);
         }
 
         let tracks: Track[] = [];
-        if (
-            response &&
-            response.status === 200 &&
-            response.data &&
-            response.data.items
-        ) {
-            for (let i = 0; i < response.data.items.length; i++) {
-                let spotifyTrack = response.data.items[i].track;
+        if (musicUtil.isItemsResponseOk(resp)) {
+            resp.data.items.forEach((item: any) => {
+                let spotifyTrack = item.track;
                 const track: Track = musicUtil.copySpotifyTrackToCodyTrack(
                     spotifyTrack
                 );
                 tracks.push(track);
+            });
+
+            if (resp.data.next) {
+                // continue fetching until we've reached the limit
+                let reachedLimit = false;
+                let nextApi = resp.data.next;
+                while (!reachedLimit) {
+                    if (!nextApi) {
+                        reachedLimit = true;
+                        break;
+                    }
+
+                    api = nextApi.substring(
+                        nextApi.indexOf("/v1"),
+                        nextApi.length
+                    );
+                    const nextResults = await musicClient.spotifyApiGet(api);
+                    if (musicUtil.isItemsResponseOk(nextResults)) {
+                        nextApi = nextResults.data.next;
+                        if (nextResults.data.items.length > 0) {
+                            nextResults.data.items.forEach((item: any) => {
+                                let spotifyTrack = item.track;
+                                const track: Track = musicUtil.copySpotifyTrackToCodyTrack(
+                                    spotifyTrack
+                                );
+                                tracks.push(track);
+                            });
+                        } else {
+                            reachedLimit = true;
+                            break;
+                        }
+                    } else {
+                        reachedLimit = true;
+                        break;
+                    }
+                }
+
+                // example
+                // next: 'https://api.spotify.com/v1/me/player/recently-played?before=1589420857143&limit=10',
+                // cursors: { after: '1589468541438', before: '1589420857143' }
+                console.log("response data: ", tracks.length);
             }
         }
 

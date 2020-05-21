@@ -418,8 +418,6 @@ export class MusicClient {
         }
         api = this.addQueryStringToApi(api, qsOptions);
 
-        console.log("GET api: ", api);
-
         const accessToken = optionalAccessToken
             ? optionalAccessToken
             : musicStore.spotifyAccessToken;
