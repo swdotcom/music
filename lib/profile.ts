@@ -16,6 +16,7 @@ export class SpotifyUser {
     id: string = "";
     followers: any = {};
     product: string = "";
+    status: number = 0;
     // {"birthdate":"1937-06-01","country":"SE","display_name":"JM Wizzler",
     // "email":"email@example.com","external_urls":{"spotify":"https://open.spotify.com/user/wizzler"},
     // "followers":{"href":null,"total":3829},"href":"https://api.spotify.com/v1/users/wizzler",
@@ -73,6 +74,8 @@ export class UserProfile {
             userProfile = response.data;
             musicStore.spotifyUserId = userProfile.id;
         }
+
+        userProfile.status = response.status || 0;
 
         return userProfile;
     }
