@@ -17,6 +17,7 @@ export class MusicStore {
     private _spotifyApiEnabled: boolean = true;
     private _itunesAccessGranted: boolean = true;
     private _debug: boolean = false;
+    private _prev_volume_percent: number = 0;
 
     private static instance: MusicStore;
     private constructor() {
@@ -42,7 +43,7 @@ export class MusicStore {
     }
 
     setCredentials(creds: any) {
-        Object.keys(creds).forEach(key => {
+        Object.keys(creds).forEach((key) => {
             if (key === "clientId") {
                 this.spotifyClientId = creds[key];
             } else if (key === "clientSecret") {
@@ -84,6 +85,14 @@ export class MusicStore {
 
     set spotifyAccessToken(newAccessToken: string) {
         this._spotifyAccessToken = newAccessToken;
+    }
+
+    get prevVolumePercent(): number {
+        return this._prev_volume_percent;
+    }
+
+    set prevVolumePercent(percent: number) {
+        this._prev_volume_percent = percent;
     }
 
     get itunesAccessGranted(): boolean {

@@ -10,14 +10,14 @@ const musicUtil = new MusicUtil();
 const musicCtr = MusicController.getInstance();
 
 describe("spotify liked songs tests", () => {
-    before(done => {
+    before((done) => {
         let configFile = __dirname + "/../config.json";
         let data = testUtil.getJsonFromFile(configFile);
         CodyMusic.setCredentials({
             refreshToken: data.refreshToken,
             clientSecret: data.clientSecret,
             clientId: data.clientId,
-            accessToken: data.accessToken
+            accessToken: data.accessToken,
         });
 
         done();
@@ -31,12 +31,11 @@ describe("spotify liked songs tests", () => {
             "5QLHGv0DfpeXLNFo7SFEy1",
             "5SjLRpgI7LWFzy9ggSqlkO",
             "1MSM3Fo2fvnwVqMcz8Jhjq",
-            "7LVHVU3tWfcxj5aiPFEW4Q"
+            "7LVHVU3tWfcxj5aiPFEW4Q",
         ];
         const resp = await CodyMusic.play(PlayerName.SpotifyWeb, {
             track_ids,
-            device_id: device.id
+            device_id: device.id,
         });
-        console.log("resp: ", resp);
     });
 });

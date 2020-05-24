@@ -611,6 +611,7 @@ export class MusicPlayerState {
             api,
             qsOptions
         );
+
         // check if the token needs to be refreshed
         if (resp.status === 401) {
             // refresh the token
@@ -787,10 +788,42 @@ export class MusicPlayerState {
     }
 
     async setMute(mute: boolean, device_id = ""): Promise<CodyResponse> {
-        const resp: CodyResponse = new CodyResponse();
-        resp.message = "Not Supported";
-        resp.status = 501;
-        return resp;
+        const api = `/v1/me/player/volume`;
+
+        if (musicStore.prevVolumePercent === 0) {
+            // get the previous volume
+            const devices: PlayerDevice[] = await this.getSpotifyDevices();
+
+            const playerContext: PlayerContext = await this.getSpotifyPlayerContext(
+                false
+            );
+
+            if (playerContext && playerContext.device) {
+                musicStore.prevVolumePercent =
+                    playerContext.device.volume_percent;
+            }
+            if (playerContext.device.volume_percent === 0) {
+                playerContext.device.volume_percent = 50;
+            }
+        }
+
+        let qsOptions: any = {
+            volume_percent: mute ? 0 : musicStore.prevVolumePercent,
+        };
+        if (device_id) {
+            qsOptions["device_id"] = device_id;
+        }
+        let codyResp = await musicClient.spotifyApiPut(api, qsOptions, {});
+
+        // check if the token needs to be refreshed
+        if (codyResp.status === 401) {
+            // refresh the token
+            await musicClient.refreshSpotifyToken();
+            // try again
+            codyResp = await musicClient.spotifyApiPut(api, qsOptions, {});
+        }
+
+        return codyResp;
     }
 
     async setShuffle(shuffle: boolean, device_id = ""): Promise<CodyResponse> {

@@ -20,10 +20,10 @@ describe("recently playing tracks tests", () => {
         let configFile = __dirname + "/../config.json";
         let data = testUtil.getJsonFromFile(configFile);
         CodyMusic.setCredentials({
-            refreshToken: data.refreshToken,
+            refreshToken: data.myRefreshToken,
             clientSecret: data.clientSecret,
             clientId: data.clientId,
-            accessToken: data.accessToken,
+            accessToken: data.myAccessToken,
         });
     });
 

@@ -3,7 +3,7 @@ import {
     Track,
     TrackStatus,
     PlayerType,
-    CodyResponse
+    CodyResponse,
 } from "./models";
 
 const cp = require("child_process");
@@ -94,7 +94,7 @@ export class MusicUtil {
     }
 
     // Sleep for the designated milliseconds.
-    // It should not be used in lib but only in the test.
+    // It should not be used in prod but only in the test.
     // It has a max of 5 seconds as this is resource intensive
     sleep(delayInMillis: number) {
         delayInMillis = Math.min(delayInMillis, 5000);
@@ -185,7 +185,7 @@ export class MusicUtil {
 
             if (useUriObj) {
                 const urlObj = {
-                    uri
+                    uri,
                 };
                 tracks.push(urlObj);
             } else {
@@ -213,7 +213,7 @@ export class MusicUtil {
     createSpotifyIdsFromUris(uris: string[]) {
         const ids: string[] = [];
         if (uris && uris.length) {
-            uris.forEach(uri => {
+            uris.forEach((uri) => {
                 ids.push(this.createSpotifyIdFromUri(uri));
             });
         }
@@ -235,7 +235,7 @@ export class MusicUtil {
                 artists.push({
                     name: artist.name,
                     uri: artist.uri,
-                    id: artist.id
+                    id: artist.id,
                 });
             }
             delete track.artists;
