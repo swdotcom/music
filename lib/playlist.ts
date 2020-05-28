@@ -642,21 +642,18 @@ export class Playlist {
             return codyResp;
         }
         // returns list of URIs
-        const uriIds = musicUtil.createUrisFromTrackIds(
+        let payload: any = {};
+        payload["tracks"] = musicUtil.createUrisFromTrackIds(
             track_ids,
             true /*addUriObj*/
         );
 
-        // body format:
-        // { "tracks": [{ "uri": "spotify:track:4iV5W9uYEdYUVa79Axb7Rh" }
-        const uriData = uriIds.map((uri) => {
-            return { uri };
-        });
+        console.log(`removeTracksFromPlaylist ${JSON.stringify(payload)}`);
 
         codyResp = await musicClient.spotifyApiDelete(
             `/v1/playlists/${playlist_id}/tracks`,
             {},
-            { tracks: uriData }
+            payload
         );
 
         // check if the token needs to be refreshed
@@ -667,7 +664,7 @@ export class Playlist {
             codyResp = await musicClient.spotifyApiDelete(
                 `/v1/playlists/${playlist_id}/tracks`,
                 {},
-                { tracks: uriData }
+                payload
             );
         }
 
