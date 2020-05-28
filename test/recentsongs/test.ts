@@ -61,6 +61,8 @@ describe("recently playing tracks tests", () => {
             limit,
             before
         );
+        console.log("resp: ", resp);
+        console.log("track 1: ", resp.data.tracks[0]);
         expect(resp.data.tracks.length).to.equal(2);
     });
 });

@@ -641,15 +641,22 @@ export class Playlist {
             codyResp.message = "No track URIs provided to remove from playlist";
             return codyResp;
         }
-        const tracks = musicUtil.createUrisFromTrackIds(
+        // returns list of URIs
+        const uriIds = musicUtil.createUrisFromTrackIds(
             track_ids,
             true /*addUriObj*/
         );
 
+        // body format:
+        // { "tracks": [{ "uri": "spotify:track:4iV5W9uYEdYUVa79Axb7Rh" }
+        const uriData = uriIds.map((uri) => {
+            return { uri };
+        });
+
         codyResp = await musicClient.spotifyApiDelete(
             `/v1/playlists/${playlist_id}/tracks`,
             {},
-            { tracks }
+            { tracks: uriData }
         );
 
         // check if the token needs to be refreshed
@@ -660,7 +667,7 @@ export class Playlist {
             codyResp = await musicClient.spotifyApiDelete(
                 `/v1/playlists/${playlist_id}/tracks`,
                 {},
-                { tracks }
+                { tracks: uriData }
             );
         }
 
