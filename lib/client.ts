@@ -392,7 +392,7 @@ export class MusicClient {
                 }
             })
             .catch((err) => {
-                console.log("refresh token error: ", err.message);
+                // console.log("refresh token error: ", err.message);
                 if (err.response) {
                     return {
                         status: "failed",
@@ -499,9 +499,11 @@ export class MusicClient {
             "Authorization"
         ] = `Bearer ${musicStore.spotifyAccessToken}`;
 
+        const body = { data: payload };
+
         //console.log(`DELETE ${api} - ${moment().format()}`);
         return spotifyClient
-            .delete(api, payload)
+            .delete(api, body)
             .then((resp: any) => {
                 return this.buildSuccessResponse(resp);
             })

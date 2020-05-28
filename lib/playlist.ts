@@ -648,7 +648,7 @@ export class Playlist {
             true /*addUriObj*/
         );
 
-        console.log(`removeTracksFromPlaylist ${JSON.stringify(payload)}`);
+        // console.log(`removeTracksFromPlaylist ${JSON.stringify(payload)}`);
 
         codyResp = await musicClient.spotifyApiDelete(
             `/v1/playlists/${playlist_id}/tracks`,
