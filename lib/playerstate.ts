@@ -206,7 +206,7 @@ export class MusicPlayerState {
             // refresh the token
             await musicClient.refreshSpotifyToken();
             // try again
-            response = await musicClient.spotifyApiGet(api);
+            response = await musicClient.spotifyApiGet(api, qsOptions);
         }
 
         if (response && response.status === 200 && response.data) {
@@ -435,7 +435,7 @@ export class MusicPlayerState {
             // refresh the token
             await musicClient.refreshSpotifyToken();
             // try again
-            response = await musicClient.spotifyApiGet(api);
+            response = await musicClient.spotifyApiGet(api, qParam);
         }
 
         if (response && response.status === 200 && response.data) {

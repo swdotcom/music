@@ -1,6 +1,6 @@
 {
     "name": "cody-music",
-    "version": "2.9.26",
+    "version": "2.9.27",
     "description": "mac osx spotify and itunes music player controller, spotify audio features, itunes and spotify genre, and playlist control",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
