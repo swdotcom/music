@@ -296,17 +296,6 @@ export class MusicPlayerState {
                                     //
                                 }
                             }
-                            if (!genre) {
-                                // get the genre
-                                try {
-                                    genre = await musicController.getGenre(
-                                        t.artist,
-                                        t.name
-                                    );
-                                } catch (e) {
-                                    //
-                                }
-                            }
                             if (genre) {
                                 t.genre = genre;
                             }
