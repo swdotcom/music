@@ -84,11 +84,15 @@ export class Playlist {
     async getSavedTracks(qsOptions: any = {}) {
         let tracks: Track[] = [];
 
+        const totalTracksToFetch =
+            !qsOptions.limit || qsOptions.limit === -1 ? -1 : qsOptions.limit;
+
         if (!qsOptions.limit) {
             qsOptions["limit"] = 50;
         } else if (qsOptions.limit < 1) {
             qsOptions.limit = 1;
         }
+
         if (!qsOptions.offset) {
             qsOptions["offset"] = 0;
         }
@@ -115,12 +119,25 @@ export class Playlist {
                 let trackContainers: any[] = codyResp.data.items;
 
                 // ensure the playerType is set
-                trackContainers.forEach((item: any) => {
+                let fetchedLimit = false;
+                for (let x = 0; x < trackContainers.length; x++) {
+                    const item = trackContainers[x];
                     if (item.track) {
                         const track: Track = this.buildTrack(item.track);
                         tracks.push(track);
                     }
-                });
+                    if (
+                        totalTracksToFetch > 0 &&
+                        tracks.length >= totalTracksToFetch
+                    ) {
+                        fetchedLimit = true;
+                        break;
+                    }
+                }
+
+                if (fetchedLimit) {
+                    break;
+                }
 
                 if (codyResp.data.next) {
                     // fetch the next set (remove the root)
