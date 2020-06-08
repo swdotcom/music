@@ -264,8 +264,7 @@ export class MusicPlayerState {
 
                 if (artists && artists.length > 0) {
                     // go through the tracks and update the artist with the fully populated one
-                    for (let z = 0; z < tracksToReturn.length; z++) {
-                        const t: Track = tracksToReturn[z];
+                    for (let t of tracksToReturn) {
                         const trackArtistIds: string[] = t.artists.map(
                             (artist: any) => {
                                 return artist.id;
@@ -283,8 +282,7 @@ export class MusicPlayerState {
                             // first check if we have an artist in artists
                             let genre = "";
                             if (t.artists && t.artists.length) {
-                                for (let a = 0; a < t.artists.length; a++) {
-                                    const artistCandidate = t.artists[a];
+                                for (let artistCandidate of t.artists) {
                                     if (
                                         artistCandidate.genres &&
                                         artistCandidate.genres.length
