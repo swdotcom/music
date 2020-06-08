@@ -241,21 +241,21 @@ export class MusicPlayerState {
                 if (artistIds) {
                     // spotify's limit is 50, so batch if it's greater than 50
                     if (artistIds.length > 50) {
-                        const maxArtists = 50;
-                        let offset = 0;
-                        let maxlen = artistIds.length / maxArtists;
-                        if (maxlen % 1 !== 0) {
-                            maxlen += 1;
-                        }
-                        for (let idx = 0; idx < maxlen; idx++) {
-                            artistIds = artistIds.splice(offset, 50);
+                        let hasData = artistIds.length ? true : false;
+                        while (hasData) {
+                            // keep removing from the artistIds
+                            let splicedArtistIds = artistIds.splice(0, 50);
+
                             const batchedArtists = await this.getSpotifyArtistsByIds(
-                                artistIds
+                                splicedArtistIds
                             );
-                            if (batchedArtists) {
+                            if (batchedArtists && batchedArtists.length) {
                                 artists.push(...batchedArtists);
                             }
-                            offset += maxArtists;
+                            hasData = artistIds.length ? true : false;
+                            if (!hasData) {
+                                break;
+                            }
                         }
                     } else {
                         artists = await this.getSpotifyArtistsByIds(artistIds);
@@ -282,18 +282,22 @@ export class MusicPlayerState {
                         if (!t.genre && includeGenre) {
                             // first check if we have an artist in artists
                             let genre = "";
-                            if (
-                                t.artists &&
-                                t.artists.length > 0 &&
-                                t.artists[0].genres
-                            ) {
-                                // make sure we use the highest frequency genre
-                                try {
-                                    genre = musicClient.getHighestFrequencySpotifyGenre(
-                                        t.artists[0].genres
-                                    );
-                                } catch (e) {
-                                    //
+                            if (t.artists && t.artists.length) {
+                                for (let a = 0; a < t.artists.length; a++) {
+                                    const artistCandidate = t.artists[a];
+                                    if (
+                                        artistCandidate.genres &&
+                                        artistCandidate.genres.length
+                                    ) {
+                                        try {
+                                            genre = musicClient.getHighestFrequencySpotifyGenre(
+                                                artistCandidate.genres
+                                            );
+                                        } catch (e) {
+                                            //
+                                        }
+                                        break;
+                                    }
                                 }
                             }
                             if (genre) {
