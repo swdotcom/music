@@ -428,16 +428,20 @@ export class MusicPlayerState {
         // check the cache first
 
         let api = `/v1/artists`;
-        const qParam = { ids };
+        // const qParam = { ids };
+        // just create a comma separated list of these
+        if (ids && ids.length) {
+            api = `${api}?ids=${ids.join(",")}`;
+        }
 
-        let response = await musicClient.spotifyApiGet(api, qParam);
+        let response = await musicClient.spotifyApiGet(api);
 
         // check if the token needs to be refreshed
         if (response.status === 401) {
             // refresh the token
             await musicClient.refreshSpotifyToken();
             // try again
-            response = await musicClient.spotifyApiGet(api, qParam);
+            response = await musicClient.spotifyApiGet(api);
         }
 
         if (response && response.status === 200 && response.data) {
