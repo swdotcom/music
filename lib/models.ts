@@ -66,6 +66,8 @@ export class Track {
     actions: any;
     played_at: string = "";
     played_at_utc_seconds: number = 0;
+    context_uri: string = "";
+    context_type: string = "";
 }
 
 export class Artist {

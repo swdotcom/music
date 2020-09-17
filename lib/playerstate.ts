@@ -618,10 +618,14 @@ export class MusicPlayerState {
         let tracks: Track[] = [];
         if (musicUtil.isItemsResponseOk(resp)) {
             resp.data.items.forEach((item: any) => {
-                let spotifyTrack = item.track;
                 const track: Track = musicUtil.copySpotifyTrackToCodyTrack(
-                    spotifyTrack
+                    item.track
                 );
+                // set the context info
+                if (item.context) {
+                    track.context_type = item.context.type;
+                    track.context_uri = item.context.uri;
+                }
                 track.played_at = item.played_at;
                 track.played_at_utc_seconds = moment(item.played_at).unix();
                 tracks.push(track);
