@@ -282,7 +282,10 @@ export class MusicUtil {
             // pull out the artist info into a more readable set of attributes
             this.extractAristFromSpotifyTrack(spotifyTrack);
 
-            track = spotifyTrack;
+            // assign the track
+            track = {
+                ...spotifyTrack
+            };
 
             if (spotifyTrack.duration_ms) {
                 track.duration = spotifyTrack.duration_ms;
