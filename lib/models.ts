@@ -32,6 +32,7 @@ export class CodyResponse {
     message: string = "";
     data: any = {};
     error: any = {};
+    retrySeconds: number = 0;
 }
 
 // {artist, album, genre, disc_number, duration, played_count, track_number, id, name, state}

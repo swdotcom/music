@@ -7,14 +7,14 @@ const musicStore = MusicStore.getInstance();
 export const SPOTIFY_ROOT_API = "https://api.spotify.com";
 
 const spotifyClient: AxiosInstance = axios.create({
-    baseURL: SPOTIFY_ROOT_API,
+    baseURL: SPOTIFY_ROOT_API
 });
 const spotifyAccountClient: AxiosInstance = axios.create({
     baseURL: "https://accounts.spotify.com",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    headers: { "Content-Type": "application/x-www-form-urlencoded" }
 });
 const itunesSearchClient: AxiosInstance = axios.create({
-    baseURL: "https://itunes.apple.com",
+    baseURL: "https://itunes.apple.com"
 });
 
 // genres
@@ -545,8 +545,9 @@ export class MusicClient {
 
         codyResp.state = CodyResponseType.Failed;
         codyResp.error = err;
-        if (err.response && err.response.data && err.response.data.error) {
-            codyResp.message = err.response.data.error.message;
+        const errResp = err.response || {};
+        if (errResp.data && errResp.data.error) {
+            codyResp.message = errResp.data.error.message;
         } else {
             codyResp.message = err.message;
         }
@@ -555,6 +556,13 @@ export class MusicClient {
             codyResp.statusText = "EXPIRED";
         } else {
             codyResp.statusText = "ERROR";
+        }
+
+        // rate limiting status code check
+        if (codyResp.status === 429) {
+            // get the "Retry-After" value from the header.
+            // this will contain the number of seconds to wait
+            codyResp.retrySeconds = errResp.headers ? parseInt(errResp.headers["retry-after"], 10) : 5;
         }
         return codyResp;
     }
