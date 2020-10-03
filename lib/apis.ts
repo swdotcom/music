@@ -22,6 +22,9 @@ import { MusicUtil } from "./util";
 import { Playlist } from "./playlist";
 import { UserProfile, SpotifyUser } from "./profile";
 
+// initi the props
+require('dotenv').config();
+
 // get the instances
 const musicCtr = MusicController.getInstance();
 const musicPlayerCtr = MusicPlayerState.getInstance();
@@ -395,7 +398,7 @@ export async function getSpotifyTracks(
     ids: string[],
     includeFullArtistData: boolean = false,
     includeAudioFeaturesData: boolean = false,
-    includeGenre: boolean = false
+    includeGenre: boolean = true
 ): Promise<Track[]> {
     return musicPlayerCtr.getSpotifyTracks(
         ids,
@@ -434,7 +437,7 @@ export async function getTrack(player: PlayerName): Promise<Track> {
                             track.playerType = PlayerType.MacSpotifyDesktop;
                         }
                     }
-                } catch (e) {}
+                } catch (e) { }
             }
         }
     }

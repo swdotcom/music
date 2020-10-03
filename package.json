@@ -6,7 +6,8 @@
     "types": "dist/index.d.ts",
     "scripts": {
         "build": "babel --presets es2015 -d dist/ lib && tsc && node packaging",
-        "test": "yarn build && mocha -r ts-node/register test/**/test.ts --reporter spec --timeout 20000 --exit"
+        "test": "yarn build && mocha -r ts-node/register test/**/test.ts --reporter spec --timeout 20000 --exit",
+        "tracks-test": "yarn build && mocha -r ts-node/register test/tracks/*.ts --timeout 20000 --exit"
     },
     "repository": {
         "type": "git",
@@ -45,6 +46,7 @@
     },
     "dependencies": {
         "axios": "^0.19.0",
+        "dotenv": "^8.2.0",
         "kind-of": "^6.0.3",
         "moment-timezone": "^0.5.28",
         "natural": "^0.6.3",

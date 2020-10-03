@@ -209,11 +209,22 @@ export class MusicPlayerState {
             response = await musicClient.spotifyApiGet(api, qsOptions);
         }
 
+        // get the features if the flag is set to true
+        let spotifyAudioFeaturesP = null;
+        if (includeAudioFeaturesData) {
+            // async - call the spotify api to fetch the audio features
+            spotifyAudioFeaturesP = audioStat
+                .getSpotifyAudioFeatures(ids)
+                .catch((e) => {
+                    return null;
+                });
+        }
+
         if (response && response.status === 200 && response.data) {
+            // get the tracks
             let artistIdMap: any = {};
             const tracks: any[] = response.data.tracks || [];
-            for (let x = 0; x < tracks.length; x++) {
-                const trackData = tracks[x];
+            tracks.forEach((trackData: Track) => {
                 const track: Track = musicUtil.copySpotifyTrackToCodyTrack(
                     trackData
                 );
@@ -221,29 +232,26 @@ export class MusicPlayerState {
                     ? response.data.progress_ms
                     : 0;
 
-                if (includeArtistData) {
-                    for (let i = 0; i < track.artists.length; i++) {
-                        const artist: any = track.artists[i];
+                if (track.artists) {
+                    track.artists.forEach((artist: any) => {
                         artistIdMap[artist.id] = artist.id;
-                    }
+                    });
                 }
 
                 tracksToReturn.push(track);
-            }
+            });
 
+            // fetch the artists from spotify if this flag is set to true
             if (includeArtistData) {
-                let artistIds = Object.keys(artistIdMap).map((key) => {
-                    return key;
-                });
+                let artistIds = Object.keys(artistIdMap).map(key => key);
 
                 // fetch the artists all at once or in batches
                 let artists: any[] = [];
                 if (artistIds) {
                     // spotify's limit is 50, so batch if it's greater than 50
                     if (artistIds.length > 50) {
-                        let hasData = artistIds.length ? true : false;
-                        while (hasData) {
-                            // keep removing from the artistIds
+                        while (artistIds.length) {
+                            // keep removing from the artistIds 50 at a time
                             let splicedArtistIds = artistIds.splice(0, 50);
 
                             const batchedArtists = await this.getSpotifyArtistsByIds(
@@ -252,29 +260,26 @@ export class MusicPlayerState {
                             if (batchedArtists && batchedArtists.length) {
                                 artists.push(...batchedArtists);
                             }
-                            hasData = artistIds.length ? true : false;
-                            if (!hasData) {
-                                break;
-                            }
                         }
                     } else {
                         artists = await this.getSpotifyArtistsByIds(artistIds);
                     }
                 }
 
-                if (artists && artists.length > 0) {
-                    // go through the tracks and update the artist with the fully populated one
-                    for (let t of tracksToReturn) {
-                        const trackArtistIds: string[] = t.artists.map(
-                            (artist: any) => {
-                                return artist.id;
-                            }
-                        );
+                // populate the artists into the existing tracks
+                if (artists && artists.length) {
+                    tracksToReturn.forEach((t: Track) => {
+                        // get the artist IDs from the tracks to return shallow artists array
+                        const trackArtistIds: string[] = t.artists.map((artist: any) => artist.id);
+
+                        // filter out the full artists found in the artists response
+                        // based on the artist IDs that were in the tracksToReturn
                         const artistsForTrack: any[] = artists.filter(
                             (n: any) => trackArtistIds.includes(n.id)
                         );
+
                         if (artistsForTrack && artistsForTrack.length) {
-                            // replace the artists
+                            // replace the shallow artists with the full artists
                             t.artists = artistsForTrack;
                         }
 
@@ -302,30 +307,27 @@ export class MusicPlayerState {
                                 t.genre = genre;
                             }
                         }
-                    }
+                    });
                 }
             }
 
-            // get the features
+            // get the features if the flag is set to true
             if (includeAudioFeaturesData) {
-                const spotifyAudioFeatures = await audioStat
-                    .getSpotifyAudioFeatures(ids)
-                    .catch((e) => {
-                        return null;
-                    });
-                if (spotifyAudioFeatures && spotifyAudioFeatures.length > 0) {
+                // await for the call we made earlier
+                const spotifyAudioFeatures = await spotifyAudioFeaturesP;
+                if (spotifyAudioFeatures && spotifyAudioFeatures.length) {
                     // "id": "4JpKVNYnVcJ8tuMKjAj50A",
                     // "uri": "spotify:track:4JpKVNYnVcJ8tuMKjAj50A",
                     // track.features = spotifyAudioFeatures[0];
-                    for (let i = 0; i < spotifyAudioFeatures.length; i++) {
-                        const uri: string = spotifyAudioFeatures[i].uri;
+                    spotifyAudioFeatures.forEach((feature: any) => {
+                        const uri: string = feature.uri;
                         const foundTrack = tracksToReturn.find(
                             (t: Track) => t.uri === uri
                         );
                         if (foundTrack) {
-                            foundTrack.features = spotifyAudioFeatures[i];
+                            foundTrack.features = feature;
                         }
-                    }
+                    });
                 }
             }
         }
