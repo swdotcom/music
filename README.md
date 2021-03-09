@@ -343,6 +343,12 @@ getTracksByPlaylistName(
 ): Promise<Track[]>
 
 /**
+ * Returns tracks of a Spotify Album
+ * @param albumId: spotify album uri or album ID
+ **/
+getSpotifyAlbumTracks(albumId: string): Promise<Track[]>
+
+/**
  * Currently only returns Spotify Web tracks not associated with a playlist.
  * @param player
  * @param qsOptions
