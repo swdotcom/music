@@ -14,13 +14,15 @@ import {
     PlayerContext,
     TrackStatus,
     SpotifyAuthState,
+    Album,
 } from "./models";
 import { MusicPlayerState } from "./playerstate";
 import { AudioStat } from "./audiostat";
 import { MusicStore } from "./store";
 import { MusicUtil } from "./util";
-import { Playlist } from "./playlist";
+import { PlaylistService } from "./playlist.service";
 import { UserProfile, SpotifyUser } from "./profile";
+import { AlbumService } from './album.service';
 
 // initi the props
 require('dotenv').config();
@@ -31,8 +33,9 @@ const musicPlayerCtr = MusicPlayerState.getInstance();
 const musicStore = MusicStore.getInstance();
 const musicUtil = new MusicUtil();
 const audioStat = AudioStat.getInstance();
-const playlist = Playlist.getInstance();
+const playlist = PlaylistService.getInstance();
 const userProfile = UserProfile.getInstance();
+const albumSvc = AlbumService.getInstance();
 
 /**
  * Initialize/set music credentials and settings
@@ -529,6 +532,10 @@ export async function getTracksByPlaylistName(
         });
     }
     return playlistItems;
+}
+
+export function getSpotifyAlbumTracks(albumId: string): Promise<Track[]> {
+    return albumSvc.getSpotifyAlbumTracks(albumId);
 }
 
 /**

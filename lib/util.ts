@@ -156,6 +156,14 @@ export class MusicUtil {
         return playlist_id;
     }
 
+    createSpotifyAlbumIdFromUri(uri: string) {
+        // "spotify:album:6ZG5lRT77aJ3btmArcykra"
+        if (uri && uri.indexOf("spotify:") === 0) {
+            return uri.substring(uri.lastIndexOf(":") + 1);
+        }
+        return uri;
+    }
+
     createTrackIdsFromUris(uris: string[]) {
         let trackIds = [];
         for (let i = 0; i < uris.length; i++) {
@@ -324,5 +332,32 @@ export class MusicUtil {
         } else {
             return "";
         }
+    }
+
+    buildTrack(spotifyTrack: any) {
+        let artists: string[] = [];
+        if (spotifyTrack.artists) {
+            artists = spotifyTrack.artists.map((artist: any) => {
+                return artist.name;
+            });
+        }
+
+        let track: Track = new Track();
+        track.playerType = PlayerType.WebSpotify;
+        track.type = spotifyTrack.type;
+        track.artist = artists.join(", ");
+        track.artist_names = artists;
+        track.artists = spotifyTrack.artists;
+        track.uri = spotifyTrack.uri;
+        track.id = spotifyTrack.id;
+        track.name = spotifyTrack.name;
+        track.popularity = spotifyTrack.popularity;
+        track.duration_ms = spotifyTrack.duration_ms;
+        track.duration = spotifyTrack.duration_ms;
+        track.disc_number = spotifyTrack.disc_number;
+        track.explicit = spotifyTrack.explicit;
+        track.href = spotifyTrack.href;
+        track.album = spotifyTrack.album;
+        return track;
     }
 }

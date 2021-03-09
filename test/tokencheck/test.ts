@@ -1,9 +1,6 @@
 const expect = require("chai").expect;
 import * as CodyMusic from "../../index";
-import { Track, CodyResponse } from "../../lib/models";
 import { TestUtil } from "../util";
-
-const moment = require("moment-timezone");
 
 const testUtil = new TestUtil();
 

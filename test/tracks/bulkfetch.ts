@@ -1,5 +1,5 @@
 import * as CodyMusic from "../../index";
-import { Artist, Track } from "../../lib/models";
+import { Track } from "../../lib/models";
 
 const expect = require("chai").expect;
 
@@ -9,7 +9,7 @@ const trackURIs = [
 	"spotify:track:0aF5lDR6bB34Bhx2MefN1X"
 ];
 
-describe("Track bulk fetch tests", () => {
+describe("track-bulk-fetch-tests", () => {
 
 	before(() => {
 		CodyMusic.setCredentials({

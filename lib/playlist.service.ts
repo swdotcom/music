@@ -19,16 +19,16 @@ const musicUtil = new MusicUtil();
 
 const cacheMgr: CacheManager = CacheManager.getInstance();
 
-export class Playlist {
-    private static instance: Playlist;
+export class PlaylistService {
+    private static instance: PlaylistService;
     private constructor() {
         //
     }
     static getInstance() {
-        if (!Playlist.instance) {
-            Playlist.instance = new Playlist();
+        if (!PlaylistService.instance) {
+            PlaylistService.instance = new PlaylistService();
         }
-        return Playlist.instance;
+        return PlaylistService.instance;
     }
 
     async removeFromSpotifyLiked(trackIds: string[]): Promise<CodyResponse> {
@@ -123,7 +123,7 @@ export class Playlist {
                 for (let x = 0; x < trackContainers.length; x++) {
                     const item = trackContainers[x];
                     if (item.track) {
-                        const track: Track = this.buildTrack(item.track);
+                        const track: Track = musicUtil.buildTrack(item.track);
                         tracks.push(track);
                     }
                     if (
@@ -315,7 +315,7 @@ export class Playlist {
                 // ensure the playerType is set
                 trackContainers.forEach((item: any) => {
                     if (item.track) {
-                        const track: Track = this.buildTrack(item.track);
+                        const track: Track = musicUtil.buildTrack(item.track);
                         tracks.push(track);
                     }
                 });
@@ -739,32 +739,5 @@ export class Playlist {
         }
 
         return codyResp;
-    }
-
-    buildTrack(spotifyTrack: any) {
-        let artists: string[] = [];
-        if (spotifyTrack.artists) {
-            artists = spotifyTrack.artists.map((artist: any) => {
-                return artist.name;
-            });
-        }
-
-        let track: Track = new Track();
-        track.playerType = PlayerType.WebSpotify;
-        track.type = spotifyTrack.type;
-        track.artist = artists.join(", ");
-        track.artist_names = artists;
-        track.artists = spotifyTrack.artists;
-        track.uri = spotifyTrack.uri;
-        track.id = spotifyTrack.id;
-        track.name = spotifyTrack.name;
-        track.popularity = spotifyTrack.popularity;
-        track.duration_ms = spotifyTrack.duration_ms;
-        track.duration = spotifyTrack.duration_ms;
-        track.disc_number = spotifyTrack.disc_number;
-        track.explicit = spotifyTrack.explicit;
-        track.href = spotifyTrack.href;
-        track.album = spotifyTrack.album;
-        return track;
     }
 }

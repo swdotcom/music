@@ -211,8 +211,6 @@ describe("web player music tests", () => {
             );
             musicUtil.sleep(3000);
 
-            delete options["track_ids"];
-
             response = await CodyMusic.next(
                 CodyMusic.PlayerName.SpotifyWeb,
                 options
