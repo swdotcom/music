@@ -10,14 +10,11 @@ import {
 import { MusicStore } from "./store";
 import { UserProfile } from "./profile";
 import { MusicUtil } from "./util";
-import { CacheManager } from "./cache";
 
 const musicClient = MusicClient.getInstance();
 const musicStore = MusicStore.getInstance();
 const userProfile = UserProfile.getInstance();
 const musicUtil = new MusicUtil();
-
-const cacheMgr: CacheManager = CacheManager.getInstance();
 
 export class PlaylistService {
     private static instance: PlaylistService;
@@ -370,11 +367,7 @@ export class PlaylistService {
 
         const spotifyUserId = musicStore.spotifyUserId;
 
-        let playlists: PlaylistItem[] = cacheMgr.get("playlists");
-        if (!playlists) {
-            // fetch the playlists again
-            playlists = await this.getPlaylists();
-        }
+        let playlists: PlaylistItem[] = await this.getPlaylists();
 
         // check if it's already in the playlist
         const existingPlaylist: PlaylistItem[] = playlists.length

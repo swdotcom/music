@@ -12,7 +12,6 @@ import {
     PlayerName,
     CodyResponse,
 } from "./models";
-import { CacheManager } from "./cache";
 import { AudioStat } from "./audiostat";
 
 const moment = require("moment-timezone");
@@ -21,7 +20,6 @@ const musicClient = MusicClient.getInstance();
 const audioStat = AudioStat.getInstance();
 const musicController = MusicController.getInstance();
 const musicUtil = new MusicUtil();
-const cacheMgr = CacheManager.getInstance();
 
 export const SPOTIFY_LIKED_SONGS_PLAYLIST_NAME = "Liked Songs";
 
@@ -82,20 +80,13 @@ export class MusicPlayerState {
         } ]
         }
      */
-    async getSpotifyDevices(
-        clearCache: boolean = false
-    ): Promise<PlayerDevice[]> {
-        if (clearCache) {
-            cacheMgr.set("spotify-devices", null);
-        }
+    async getSpotifyDevices(): Promise<PlayerDevice[]> {
+        let devices = [];
         const accessToken = musicStore.spotifyAccessToken;
         if (!accessToken) {
             return [];
         }
-        let devices = cacheMgr.get("spotify-devices");
-        if (devices && devices.length) {
-            return devices;
-        }
+
         const api = "/v1/me/player/devices";
         let response = await musicClient.spotifyApiGet(api);
 
@@ -106,13 +97,9 @@ export class MusicPlayerState {
             // try again
             response = await musicClient.spotifyApiGet(api);
         }
-        devices = [];
+
         if (response.data && response.data.devices) {
             devices = response.data.devices;
-        }
-
-        if (devices && devices.length) {
-            cacheMgr.set("spotify-devices", devices);
         }
 
         return devices || [];
@@ -427,8 +414,6 @@ export class MusicPlayerState {
 
         ids = musicUtil.createSpotifyIdsFromUris(ids);
 
-        // check the cache first
-
         let api = `/v1/artists`;
         // const qParam = { ids };
         // just create a comma separated list of these
@@ -457,8 +442,6 @@ export class MusicPlayerState {
         let artist: Artist = new Artist();
 
         id = musicUtil.createSpotifyIdFromUri(id);
-
-        // check the cache first
 
         let api = `/v1/artists/${id}`;
 
@@ -795,9 +778,7 @@ export class MusicPlayerState {
             // get the previous volume
             const devices: PlayerDevice[] = await this.getSpotifyDevices();
 
-            const playerContext: PlayerContext = await this.getSpotifyPlayerContext(
-                false
-            );
+            const playerContext: PlayerContext = await this.getSpotifyPlayerContext();
 
             if (playerContext && playerContext.device) {
                 musicStore.prevVolumePercent =
@@ -893,16 +874,9 @@ export class MusicPlayerState {
         return codyResp;
     }
 
-    async getSpotifyPlayerContext(clearCache: boolean): Promise<PlayerContext> {
-        if (clearCache) {
-            cacheMgr.set("player-context", null);
-        }
-        let playerContext: PlayerContext = cacheMgr.get("player-context");
-        if (playerContext) {
-            return playerContext;
-        }
+    async getSpotifyPlayerContext(): Promise<PlayerContext> {
 
-        playerContext = new PlayerContext();
+        let playerContext: PlayerContext = new PlayerContext();
         let api = "/v1/me/player";
         let response = await musicClient.spotifyApiGet(api);
 
@@ -925,10 +899,6 @@ export class MusicPlayerState {
             response.data.item["playerType"] = PlayerType.WebSpotify;
             musicUtil.extractAristFromSpotifyTrack(response.data.item);
             playerContext = response.data;
-            if (playerContext && playerContext.device) {
-                // 15 second cache
-                cacheMgr.set("player-context", playerContext, 15);
-            }
         }
         return playerContext;
     }

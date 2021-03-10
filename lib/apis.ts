@@ -366,7 +366,7 @@ export async function getSpotifyRecentlyPlayedAfter(
  * Info about the device, is playing state, etc.
  */
 export async function getSpotifyPlayerContext(): Promise<PlayerContext> {
-    return musicPlayerCtr.getSpotifyPlayerContext(true);
+    return musicPlayerCtr.getSpotifyPlayerContext();
 }
 
 /**
@@ -1105,7 +1105,7 @@ export function playSpotifyMacDesktopTrack(
  * @returns {Promise<PlayerDevice[]>}
  */
 export function getSpotifyDevices(): Promise<PlayerDevice[]> {
-    return musicPlayerCtr.getSpotifyDevices(true);
+    return musicPlayerCtr.getSpotifyDevices();
 }
 
 /**
