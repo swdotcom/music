@@ -785,7 +785,7 @@ export class MusicPlayerState {
                     playerContext.device.volume_percent;
             }
             if (playerContext.device.volume_percent === 0) {
-                playerContext.device.volume_percent = 50;
+                musicStore.prevVolumePercent = 45;
             }
         }
 
