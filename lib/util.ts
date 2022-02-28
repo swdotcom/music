@@ -71,7 +71,7 @@ export class MusicUtil {
                     ? { cwd: projectDir }
                     : {};
             result = await this.execPromise(cmd, opts);
-        } catch (e) {
+        } catch (e: any) {
             result = { error: e.message };
         }
         return result;
