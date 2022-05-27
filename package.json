@@ -48,7 +48,7 @@
     "dependencies": {
         "axios": "^0.26.0",
         "dotenv": "^16.0.0",
-        "moment-timezone": "^0.5.33",
+        "moment-timezone": "^0.5.34",
         "open": "^8.4.0"
     }
 }
