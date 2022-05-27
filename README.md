@@ -196,6 +196,12 @@ isItunesDesktopSongTrackingEnabled()
 getSpotifyAccessToken()
 
 /**
+ * Refresh the Spotify accessToken
+ * @returns {Promise<boolean>} whether or not the refresh was successful
+ */
+refreshSpotifyAccessToken()
+
+/**
  * Returns false if cody music has been configured to to disable it,
  * otherwise it's set to true by default
  */

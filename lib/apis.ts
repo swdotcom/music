@@ -16,6 +16,7 @@ import {
     SpotifyAuthState,
     Album,
 } from "./models";
+import { MusicClient } from "./client";
 import { MusicPlayerState } from "./playerstate";
 import { AudioStat } from "./audiostat";
 import { MusicStore } from "./store";
@@ -28,6 +29,7 @@ import { AlbumService } from './album.service';
 require('dotenv').config();
 
 // get the instances
+const musicClient = MusicClient.getInstance();
 const musicCtr = MusicController.getInstance();
 const musicPlayerCtr = MusicPlayerState.getInstance();
 const musicStore = MusicStore.getInstance();
@@ -104,6 +106,15 @@ export function isItunesDesktopSongTrackingEnabled() {
  */
 export function getSpotifyAccessToken() {
     return musicStore.credentialByKey("spotifyAccessToken");
+}
+
+/**
+ * Refresh the Spotify accessToken
+ * @returns {Promise<boolean>} whether or not the refresh was successful
+ */
+ export async function refreshSpotifyAccessToken(): Promise<boolean> {
+    const response = await musicClient.refreshSpotifyToken();
+    return response.status === "success";
 }
 
 /**
