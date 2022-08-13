@@ -355,12 +355,12 @@ export class MusicClient {
      * Refresh the spotify access token
      */
     async refreshSpotifyToken(optionalRefreshToken: string = "") {
-        if (!musicStore.spotifyRefreshToken) {
+        if (!musicStore.spotifyClientSecret || !musicStore.spotifyRefreshToken) {
             return {
                 status: "failed",
                 statusText: "ERROR",
                 data: "",
-                message: "Missing Spotify Credentials",
+                message: "Missing Spotify token refresh information",
             };
         }
         const authPayload = `${musicStore.spotifyClientId}:${musicStore.spotifyClientSecret}`;
@@ -449,7 +449,6 @@ export class MusicClient {
             "Authorization"
         ] = `Bearer ${musicStore.spotifyAccessToken}`;
 
-        // console.log(`PUT ${api} - ${moment().format()}`);
         return spotifyClient
             .put(api, payload)
             .then((resp: any) => {

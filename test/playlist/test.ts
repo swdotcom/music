@@ -14,7 +14,7 @@ const testUtil = new TestUtil();
  */
 describe("recently playing tracks tests", () => {
     before(async () => {
-        let configFile = __dirname + "/../config.json";
+        let configFile = __dirname + "/../../config.json";
         let data = testUtil.getJsonFromFile(configFile);
         CodyMusic.setCredentials({
             refreshToken: data.refreshToken,

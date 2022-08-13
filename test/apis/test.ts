@@ -5,7 +5,7 @@ import { TestUtil } from "../util";
 const testUtil = new TestUtil();
 
 describe("refreshSpotifyAccessToken()", () => {
-  let configFile = __dirname + "/../config.json";
+  let configFile = __dirname + "/../../config.json";
   let data = testUtil.getJsonFromFile(configFile);
 
   before(function () {

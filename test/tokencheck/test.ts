@@ -14,7 +14,7 @@ const testUtil = new TestUtil();
  */
 describe("recently playing tracks tests", () => {
     it("Validate getting expired access token response", async () => {
-        let configFile = __dirname + "/../config.json";
+        let configFile = __dirname + "/../../config.json";
         let data = testUtil.getJsonFromFile(configFile);
         CodyMusic.setCredentials({
             refreshToken: data.refreshToken,
@@ -27,7 +27,7 @@ describe("recently playing tracks tests", () => {
     });
 
     it("Validate getting non-expired token response", async () => {
-        let configFile = __dirname + "/../config.json";
+        let configFile = __dirname + "/../../config.json";
         let data = testUtil.getJsonFromFile(configFile);
         CodyMusic.setCredentials({
             refreshToken: data.refreshToken,
