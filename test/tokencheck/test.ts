@@ -13,29 +13,28 @@ const testUtil = new TestUtil();
  * "Error: Resolution method is overspecified. Specify a callback *or* return a Promise; not both."
  */
 describe("recently playing tracks tests", () => {
-    it("Validate getting expired access token response", async () => {
-        let configFile = __dirname + "/../../config.json";
-        let data = testUtil.getJsonFromFile(configFile);
-        CodyMusic.setCredentials({
-            refreshToken: data.refreshToken,
-            clientSecret: data.newClientSecret,
-            clientId: data.newClientId,
-            accessToken: data.accessToken,
-        });
-        const expired = await CodyMusic.accessExpired();
-        expect(expired).to.be.true;
+    it("Validate refreshing an expired access token", async () => {
+      testUtil.initializeSpotifyConfig('expired');
+      expect(await CodyMusic.accessExpired()).to.be.false;
     });
 
     it("Validate getting non-expired token response", async () => {
-        let configFile = __dirname + "/../../config.json";
-        let data = testUtil.getJsonFromFile(configFile);
-        CodyMusic.setCredentials({
-            refreshToken: data.refreshToken,
-            clientSecret: data.clientSecret,
-            clientId: data.clientId,
-            accessToken: data.accessToken,
-        });
-        const expired = await CodyMusic.accessExpired();
-        expect(expired).to.be.false;
+      testUtil.initializeSpotifyConfig();
+      expect(await CodyMusic.accessExpired()).to.be.false;
+    });
+
+    it("Validate getting non-expired token response", async () => {
+      testUtil.initializeSpotifyConfig('expired', 'bad_secret');
+      expect(await CodyMusic.accessExpired()).to.be.true;
+    });
+
+    it("Returns a 401 status", async () => {
+      const resp:CodyMusic.CodyResponse = await CodyMusic.pause(CodyMusic.PlayerName.SpotifyWeb);
+      expect(resp.status).to.equal(401);
+    });
+
+    it("Returns an expired status text", async () => {
+      const resp:CodyMusic.CodyResponse = await CodyMusic.pause(CodyMusic.PlayerName.SpotifyWeb);
+      expect(resp.statusText).to.equal('EXPIRED');
     });
 });

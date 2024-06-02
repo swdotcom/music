@@ -1,5 +1,6 @@
 import * as CodyMusic from "../../index";
 import { Track } from "../../lib/models";
+import { TestUtil } from "../util";
 
 const expect = require("chai").expect;
 
@@ -8,13 +9,7 @@ const trackName = "Heavy";
 
 describe("album-fetch-tests", () => {
   before(() => {
-    const creds = {
-      refreshToken: process.env.REFRESH_TOKEN,
-      clientSecret: process.env.CLIENT_SECRET,
-      clientId: process.env.CLIENT_ID,
-      accessToken: process.env.ACCESS_TOKEN,
-    };
-    CodyMusic.setCredentials(creds);
+    new TestUtil().initializeSpotifyConfig();
   });
 
   context("Validate fetching album tracks", () => {

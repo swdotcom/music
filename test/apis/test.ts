@@ -2,28 +2,28 @@ const expect = require("chai").expect;
 import * as CodyMusic from "../../index";
 import { TestUtil } from "../util";
 
-const testUtil = new TestUtil();
-
 describe("refreshSpotifyAccessToken()", () => {
-  let configFile = __dirname + "/../../config.json";
-  let data = testUtil.getJsonFromFile(configFile);
-
   before(function () {
-      CodyMusic.setCredentials({
-          clientId: data.clientId,
-          clientSecret: data.clientSecret,
-          accessToken: data.accessToken,
-          refreshToken: data.refreshToken,
-      });
+    new TestUtil().initializeSpotifyConfig();
   });
 
   it("updates the access token", async () => {
       await CodyMusic.refreshSpotifyAccessToken();
-      expect(CodyMusic.getSpotifyAccessToken()).not.to.eq(data.accessToken);
+      expect(CodyMusic.getSpotifyAccessToken()).not.to.eq(process.env.ACCESS_TOKEN);
   });
 
   it("returns true", async () => {
-      const wasRefreshed = await CodyMusic.refreshSpotifyAccessToken();
-      expect(wasRefreshed).to.be.true;
+      expect(await CodyMusic.refreshSpotifyAccessToken()).to.be.true;
+  });
+});
+
+describe("searchTracks()", () => {
+  before(function () {
+    new TestUtil().initializeSpotifyConfig();
+  });
+
+  it("returns a list of tracks", async () => {
+    const searchResults = await CodyMusic.searchTracks("Kanye West");
+    expect(searchResults.tracks.items).to.be.an("array");
   });
 });

@@ -236,7 +236,6 @@ export class MusicClient {
         spotifyClient.defaults.headers.common[
             "Authorization"
         ] = `Bearer ${musicStore.spotifyAccessToken}`;
-        // console.log(`GET ${api} - ${moment().format()}`);
         return spotifyClient
             .get(api)
             .then((resp) => {
@@ -392,7 +391,6 @@ export class MusicClient {
                 }
             })
             .catch((err) => {
-                // console.log("refresh token error: ", err.message);
                 if (err.response) {
                     return {
                         status: "failed",
@@ -424,7 +422,6 @@ export class MusicClient {
         spotifyClient.defaults.headers.common[
             "Authorization"
         ] = `Bearer ${accessToken}`;
-
         return spotifyClient
             .get(api)
             .then((resp: any) => {
@@ -472,8 +469,6 @@ export class MusicClient {
         spotifyClient.defaults.headers.common[
             "Authorization"
         ] = `Bearer ${musicStore.spotifyAccessToken}`;
-
-        // console.log(`POST ${api} - ${moment().format()}`);
         return spotifyClient
             .post(api, payload)
             .then((resp: any) => {
@@ -499,8 +494,6 @@ export class MusicClient {
         ] = `Bearer ${musicStore.spotifyAccessToken}`;
 
         const body = { data: payload };
-
-        //console.log(`DELETE ${api} - ${moment().format()}`);
         return spotifyClient
             .delete(api, body)
             .then((resp: any) => {
