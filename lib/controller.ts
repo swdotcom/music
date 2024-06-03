@@ -137,7 +137,6 @@ export class MusicController {
     }
 
     async startPlayer(player: string, options: any = {}): Promise<any> {
-        // console.log(`starting ${player}`);
         let launchResult: any = "ok";
         if (musicUtil.isWindows()) {
             launchResult = await this.launchPlayerWithCommand(
@@ -744,7 +743,6 @@ export class MusicController {
      * @param player {spotify|spotify-web|itunes}
      */
     public launchApp(player: PlayerName) {
-        // console.log(`launch ${player} app`);
         if (player === PlayerName.ItunesDesktop) {
             return this.startPlayer(PlayerName.ItunesDesktop);
         }

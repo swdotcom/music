@@ -13,8 +13,8 @@ import {
     CodyResponse,
 } from "./models";
 import { AudioStat } from "./audiostat";
+import { getUnixTime } from "date-fns";
 
-const moment = require("moment-timezone");
 const musicStore = MusicStore.getInstance();
 const musicClient = MusicClient.getInstance();
 const audioStat = AudioStat.getInstance();
@@ -43,10 +43,6 @@ export class MusicPlayerState {
         let result = await musicUtil
             .execCmd(MusicController.WINDOWS_SPOTIFY_TRACK_FIND)
             .catch((e) => {
-                // console.log(
-                //     "Error trying to identify if spotify is running on windows: ",
-                //     e.message
-                // );
                 return null;
             });
         if (result && result.toLowerCase().includes("title")) {
@@ -129,10 +125,6 @@ export class MusicPlayerState {
         let songInfo = await musicUtil
             .execCmd(MusicController.WINDOWS_SPOTIFY_TRACK_FIND)
             .catch((e) => {
-                // console.log(
-                //     "Error trying to identify if spotify is running on windows: ",
-                //     e.message
-                // );
                 return null;
             });
         if (!songInfo || !songInfo.includes(windowTitleStr)) {
@@ -591,7 +583,6 @@ export class MusicPlayerState {
             api,
             qsOptions
         );
-
         // check if the token needs to be refreshed
         if (resp.status === 401) {
             // refresh the token
@@ -599,7 +590,6 @@ export class MusicPlayerState {
             // try again
             resp = await musicClient.spotifyApiGet(api, qsOptions);
         }
-
         let tracks: Track[] = [];
         if (musicUtil.isItemsResponseOk(resp)) {
             resp.data.items.forEach((item: any) => {
@@ -612,7 +602,7 @@ export class MusicPlayerState {
                     track.context_uri = item.context.uri;
                 }
                 track.played_at = item.played_at;
-                track.played_at_utc_seconds = moment(item.played_at).unix();
+                track.played_at_utc_seconds = getUnixTime(item.played_at);
                 tracks.push(track);
             });
 
@@ -667,9 +657,7 @@ export class MusicPlayerState {
                                     spotifyTrack
                                 );
                                 track.played_at = item.played_at;
-                                track.played_at_utc_seconds = moment(
-                                    item.played_at
-                                ).unix();
+                                track.played_at_utc_seconds = getUnixTime(item.played_at);
                                 tracks.push(track);
                             });
                         } else {

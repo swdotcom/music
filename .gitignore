@@ -2,5 +2,6 @@ dist/
 out
 node_modules
 .DS_Store
-test/config.json
-.env
+.env.local
+.eslintrc.json
+.vscode/settings.json

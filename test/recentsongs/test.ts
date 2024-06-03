@@ -2,10 +2,7 @@ const expect = require("chai").expect;
 import * as CodyMusic from "../../index";
 import { CodyResponse } from "../../lib/models";
 import { TestUtil } from "../util";
-
-const moment = require("moment-timezone");
-
-const testUtil = new TestUtil();
+import { getTime } from "date-fns";
 
 /**
  * Don't add "async" into the it condition.
@@ -17,14 +14,7 @@ const testUtil = new TestUtil();
  */
 describe("recently playing tracks tests", () => {
     before(() => {
-        let configFile = __dirname + "/../../config.json";
-        let data = testUtil.getJsonFromFile(configFile);
-        CodyMusic.setCredentials({
-            refreshToken: data.myRefreshToken,
-            clientSecret: data.clientSecret,
-            clientId: data.clientId,
-            accessToken: data.myAccessToken,
-        });
+      new TestUtil().initializeSpotifyConfig();
     });
 
     beforeEach(() => {
@@ -33,8 +23,7 @@ describe("recently playing tracks tests", () => {
 
     it("Get tracks after time", async () => {
         const limit = 10;
-        const momentDate = moment().utc();
-        const after = momentDate.valueOf();
+        const after = getTime(new Date());
         const resp: CodyResponse = await CodyMusic.getSpotifyRecentlyPlayedAfter(
             limit,
             after
@@ -44,8 +33,7 @@ describe("recently playing tracks tests", () => {
 
     it("Get tracks before time without limit", async () => {
         const limit = -1;
-        const momentDate = moment().utc();
-        const before = momentDate.valueOf();
+        const before = getTime(new Date());
         const resp: CodyResponse = await CodyMusic.getSpotifyRecentlyPlayedBefore(
             limit,
             before
@@ -55,8 +43,7 @@ describe("recently playing tracks tests", () => {
 
     it("Get tracks with limit", async () => {
         const limit = 2;
-        const momentDate = moment().utc();
-        const before = momentDate.valueOf();
+        const before = getTime(new Date());
         const resp: CodyResponse = await CodyMusic.getSpotifyRecentlyPlayedBefore(
             limit,
             before

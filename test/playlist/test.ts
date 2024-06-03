@@ -2,8 +2,6 @@ const expect = require("chai").expect;
 import * as CodyMusic from "../../index";
 import { TestUtil } from "../util";
 
-const testUtil = new TestUtil();
-
 /**
  * Don't add "async" into the it condition.
  * i.e. it("description text", async (done) => {
@@ -14,14 +12,7 @@ const testUtil = new TestUtil();
  */
 describe("recently playing tracks tests", () => {
     before(async () => {
-        let configFile = __dirname + "/../../config.json";
-        let data = testUtil.getJsonFromFile(configFile);
-        CodyMusic.setCredentials({
-            refreshToken: data.refreshToken,
-            clientSecret: data.clientSecret,
-            clientId: data.clientId,
-            accessToken: data.accessToken,
-        });
+      new TestUtil().initializeSpotifyConfig();
     });
 
     beforeEach(() => {

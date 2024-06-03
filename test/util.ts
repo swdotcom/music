@@ -1,16 +1,17 @@
-const fs = require("fs");
+import { setConfig } from "../lib/apis";
+import { CodyConfig } from "../lib/models";
 
 export class TestUtil {
-    getJsonFromFile(filename: string) {
-        let content = fs.readFileSync(filename).toString();
-        if (content) {
-            try {
-                const data = JSON.parse(content);
-                return data;
-            } catch (e) {
-                //
-            }
-        }
-        return null;
-    }
+  initializeSpotifyConfig(
+    accessTokenOverride: string = "",
+    clientSecretOverride: string = ""
+  ) {
+    require('dotenv').config({ path: '.env.local' });
+    const codyConfig: CodyConfig = new CodyConfig();
+    codyConfig.spotifyAccessToken = accessTokenOverride || process.env.ACCESS_TOKEN || '';
+    codyConfig.spotifyRefreshToken = process.env.REFRESH_TOKEN || '';
+    codyConfig.spotifyClientId = process.env.CLIENT_ID || '';
+    codyConfig.spotifyClientSecret = clientSecretOverride || process.env.CLIENT_SECRET || '';
+    setConfig(codyConfig);
+  }
 }

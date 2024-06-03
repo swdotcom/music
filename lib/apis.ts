@@ -13,8 +13,7 @@ import {
     PaginationItem,
     PlayerContext,
     TrackStatus,
-    SpotifyAuthState,
-    Album,
+    SpotifyAuthState
 } from "./models";
 import { MusicClient } from "./client";
 import { MusicPlayerState } from "./playerstate";
